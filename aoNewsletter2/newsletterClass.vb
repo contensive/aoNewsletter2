@@ -3,11 +3,11 @@ Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
 
-Namespace addonCollectionName
+Namespace newsletter2
     '
     ' Sample Vb addon
     '
-    Public Class HelloWorldClass
+    Public Class newsletterClass
         Inherits AddonBaseClass
         '
         ' - update references to your installed version of cpBase
@@ -18,16 +18,15 @@ Namespace addonCollectionName
         ' - add reference to CPBase.DLL, typically installed in c:\program files\kma\contensive\
         '
         '=====================================================================================
-        ' addon api
+        ' 
         '=====================================================================================
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim returnHtml As String
+            Dim returnHtml As String = ""
             Try
                 returnHtml = "Visual Studio Contensive Addon - OK response"
             Catch ex As Exception
                 errorReport(CP, ex, "execute")
-                returnHtml = "Visual Studio Contensive Addon - Error response"
             End Try
             Return returnHtml
         End Function
@@ -38,7 +37,7 @@ Namespace addonCollectionName
         '
         Private Sub errorReport(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
             Try
-                CP.Site.ErrorReport(ex, "Unexpected error in sampleClass." & method)
+                cp.Site.ErrorReport(ex, "Unexpected error in newsletterClass." & method)
             Catch exLost As Exception
                 '
                 ' stop anything thrown from cp errorReport
