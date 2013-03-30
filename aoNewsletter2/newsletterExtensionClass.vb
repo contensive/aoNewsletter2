@@ -36,7 +36,7 @@ Namespace newsletter2
         ' common report for this class
         '=====================================================================================
         '
-        Private Sub errorReport(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
             Try
                 cp.Site.ErrorReport(ex, "Unexpected error in newsletterExtensionClass." & method)
             Catch exLost As Exception
@@ -46,60 +46,35 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Private Csv As Object
-        Private Main As Object
-        '
-        '========================================================================
-        '   v3.3 Add-on Compatibility
-        '       To make an Add-on that works the same in v3.3 and v3.4, use this adapter instead of the execute above
-        '========================================================================
-        '
-        Public Function Execute(CsvObject As Object, MainObject As Object, OptionString As String, FilterInput As String) As String
-            Csv = CsvObject
-            Call Init(MainObject)
-            Execute = GetContent(OptionString)
-        End Function
-        '
-        '
-        '
-        Public Sub Init(MainObject As Object)
-            '
-            Main = MainObject
-            '
-            Exit Sub
-ErrorTrap:
-            Call HandleError("ExtensionClass", "Init", Err.Number, Err.Source, Err.Description, True, False)
-        End Sub
-        '
         '===========================================================================================================
         '   Tag Type
         '       Issue - The copy is the same for each issue of the newsletter
         '       Page - The copy is new for each page
         '===========================================================================================================
         '
-        Public Function GetContent(OptionString As String) As String
-            On Error GoTo ErrorTrap
+        Public Function GetContent(cp As CPBaseClass, OptionString As String) As String
+            'On Error GoTo ErrorTrap
             '
 
             Dim Stream As String
             Dim ExtensionName As String
             Dim ExtensionType As String
             Dim Copy As String
-            Dim PageID As Long
-            Dim IssueID As Long
+            Dim PageID As Integer
+            Dim IssueID As Integer
             Dim IsWorkflowRendering As Boolean
             Dim IsQuickEditing As Boolean
             Dim Common As New CommonClass
             Dim NewsletterProperty As String
             Dim Parts() As String
-            Dim NewsletterID As Long
+            Dim NewsletterID As Integer
             '
             If Not (Main Is Nothing) Then
                 '
-                ' Assume NavClass is used within a PageClass
+                ' Assume newsletterNavClass is used within a PageClass
                 ' Get the Issue and Newsletter from the visit properties set in PageClass
                 '
-                ExtensionName = Trim(Main.GetAddonOption("ExtensionName", OptionString))
+                ExtensionName = Trim(cp.Doc.GetText("ExtensionName", OptionString))
                 NewsletterProperty = Main.GetVisitProperty(VisitPropertyNewsletter)
                 Parts() = Split(NewsletterProperty, ".")
                 If UBound(Parts) > 2 Then
@@ -117,10 +92,10 @@ ErrorTrap:
                     '
                     ' Handle PageID Request Variable
                     '
-                    ExtensionType = LCase(Trim(Main.GetAddonOption("ExtensionType", OptionString)))
-                    Call Main.TestPoint("GetIssueID call 1, NewsletterID=" & NewsletterID)
-                    IssueID = Common.GetIssueID(Main, NewsletterID)
-                    PageID = Main.GetStreamInteger(RequestNameIssuePageID)
+                    ExtensionType = LCase(Trim(cp.Doc.GetText("ExtensionType", OptionString)))
+                    Call cp.Site.TestPoint("GetIssueID call 1, NewsletterID=" & NewsletterID)
+                    IssueID = Common.GetIssueID(cp, NewsletterID)
+                    PageID = cp.doc.getInteger(RequestNameIssuePageID)
                     IsQuickEditing = Main.IsQuickEditing("Page Content")
                     IsWorkflowRendering = Main.IsWorkflowRendering
                     '
@@ -139,9 +114,9 @@ ErrorTrap:
                 End If
             End If
             '
-            Exit Function
-ErrorTrap:
-            Call HandleError("ExtensionClass", "GetContent", Err.Number, Err.Source, Err.Description, True, False)
+            'Exit Function
+            'ErrorTrap:
+            'Call HandleError("ExtensionClass", "GetContent")
         End Function
 
     End Class

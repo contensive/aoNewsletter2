@@ -11,32 +11,11 @@ Namespace newsletter2
     Public Class newsletterCommonClass
         Inherits AddonBaseClass
         '
-        ' - update references to your installed version of cpBase
-        ' - Verify project root name space is empty
-        ' - Change the namespace to the collection name
-        ' - Change this class name to the addon name
-        ' - Create a Contensive Addon record with the namespace apCollectionName.ad
-        ' - add reference to CPBase.DLL, typically installed in c:\program files\kma\contensive\
-        '
-        '=====================================================================================
-        ' 
-        '=====================================================================================
-        '
-        Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim returnHtml As String = ""
-            Try
-                returnHtml = "Visual Studio Contensive Addon - OK response"
-            Catch ex As Exception
-                errorReport(CP, ex, "execute")
-            End Try
-            Return returnHtml
-        End Function
-        '
         '=====================================================================================
         ' common report for this class
         '=====================================================================================
         '
-        Private Sub errorReport(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
             Try
                 cp.Site.ErrorReport(ex, "Unexpected error in newsletterCommonClass." & method)
             Catch exLost As Exception
@@ -46,60 +25,62 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Friend Function GetIssueID(Main As Object, NewsletterID As Long) As Long
-            On Error GoTo ErrorTrap
+        '
+        '
+        Friend Function GetIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
+            'On Error GoTo ErrorTrap
             '
-            Dim IssueID As Long
+            Dim IssueID As Integer
             '
-            IssueID = Main.GetStreamInteger(RequestNameIssueID)
+            IssueID = cp.doc.getInteger(RequestNameIssueID)
             '
-            Call Main.TestPoint("GetIssueID - IssueID From Stream: " & IssueID)
-            Call Main.TestPoint("GetIssueID - NewsletterID: " & NewsletterID)
+            Call cp.Site.TestPoint("GetIssueID - IssueID From Stream: " & IssueID)
+            Call cp.Site.TestPoint("GetIssueID - NewsletterID: " & NewsletterID)
             '
             If IssueID = 0 Then
-                IssueID = GetCurrentIssueID(Main, NewsletterID)
+                IssueID = GetCurrentIssueID(cp, NewsletterID)
             End If
             '
-            Call Main.TestPoint("GetIssueID - IssueID: " & IssueID)
+            Call cp.Site.TestPoint("GetIssueID - IssueID: " & IssueID)
             '
             GetIssueID = IssueID
             '
-            Exit Function
-ErrorTrap:
-            Call HandleError("NewsLetter", "GetIssueID", Err.Number, Err.Source, Err.Description, True, False)
+            'Exit Function
+            'ErrorTrap:
+            'Call HandleError(cp, ex, "GetIssueID")
         End Function
         '
-        Friend Function GetCurrentIssueID(Main As Object, NewsletterID As Long) As Long
-            On Error GoTo ErrorTrap
+        Friend Function GetCurrentIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
+            'On Error GoTo ErrorTrap
             '
-            Dim CS As Long
+            Dim cs As cpcsBaseClass = cp.csNew()
             '
-            CS = Main.OpenCSContent(ContentNameNewsletterIssues, "(PublishDate<=" & Main.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
+            Call cs.open(ContentNameNewsletterIssues, "(PublishDate<=" & Main.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
             If Main.CSOK(CS) Then
-                GetCurrentIssueID = Main.GetCSInteger(CS, "ID")
+                GetCurrentIssueID = cs.getInteger("ID")
             End If
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
-            Exit Function
-ErrorTrap:
-            Call HandleError("NewsLetter", "GetCurrentIssueID", Err.Number, Err.Source, Err.Description, True, False)
+            'Exit Function
+            'ErrorTrap:
+            'Call HandleError(cp, ex, "GetCurrentIssueID")
         End Function
         '
-        Friend Function GetUnpublishedIssueList(Main As Object, NewsletterID As Long) As String
-            On Error GoTo ErrorTrap
+        Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer) As String
+            'On Error GoTo ErrorTrap
             '
-            Dim CS As Long
-            Dim ID As Long
+            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim ID As Integer
             Dim Name As String
             Dim Active As Boolean
             Dim PublishDate As Date
             Dim Copy As String
             Dim DateAdded As Date
             '
-            CS = Main.OpenCSContent(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & Main.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
+            Call cs.open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & Main.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
             Do While Main.CSOK(CS)
-                ID = Main.GetCSInteger(CS, "ID")
-                Name = Trim(Main.GetCSText(CS, "name"))
+                ID = cs.getInteger("ID")
+                Name = Trim(cs.getText("name"))
                 Active = Main.GetCSBoolean(CS, "active")
                 PublishDate = Main.GetCSDate(CS, "PublishDate")
                 DateAdded = Main.GetCSDate(CS, "DateAdded")
@@ -116,30 +97,30 @@ ErrorTrap:
                 If PublishDate <> CDate(0) Then
                     Copy = Copy & ", publish " & Int(PublishDate)
                 End If
-                If Main.IsContentManager("Newsletters") Then
-                    Copy = "<a href=""?" & Main.RefreshQueryString & "&" & RequestNameIssueID & "=" & ID & """>" & Copy & "</a>"
+                If cp.User.IsContentManager("Newsletters") Then
+                    Copy = "<a href=""?" & cp.Doc.RefreshQueryString & "&" & RequestNameIssueID & "=" & ID & """>" & Copy & "</a>"
                 End If
                 GetUnpublishedIssueList = GetUnpublishedIssueList & "<li>" & Copy & "</li>"
                 Call Main.NextCSRecord(CS)
             Loop
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
             If GetUnpublishedIssueList <> "" Then
                 GetUnpublishedIssueList = "<UL>" & GetUnpublishedIssueList & "</UL>"
             End If
             '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetUnpublishedIssueList", Err.Number, Err.Source, Err.Description, True, False)
+            'Exit Function
+            'ErrorTrap:
+            'Call HandleError("aoNewsletter.newsletterCommonClass", "GetUnpublishedIssueList")
         End Function
         '
-        Friend Sub UpgradeAddOn(Main As Object)
-            On Error GoTo ErrorTrap
+        Friend Sub UpgradeAddOn(cp As CPBaseClass)
+            'On Error GoTo ErrorTrap
             '
             Dim CurrentVersion As String
             Dim AddOnVersion As String
-            Dim CSPointer As Long
-            Dim NewsletterID As Long
+            Dim CSPointer As CPCSBaseClass = cp.CSNew()
+            Dim NewsletterID As Integer
             '
             AddOnVersion = App.Major & "." & App.Minor & "." & App.Revision
             '
@@ -157,7 +138,7 @@ ErrorTrap:
                         CSPointer = Main.InsertCSContent(ContentNameNewsletters)
                     End If
                     If Main.CSOK(CSPointer) Then
-                        NewsletterID = Main.GetCSInteger(CSPointer, "ID")
+                        NewsletterID = cs.getInteger(CSPointer, "ID")
                     End If
                     Call Main.CloseCS(CSPointer)
                     '
@@ -178,46 +159,46 @@ ErrorTrap:
             End If
             '
             Exit Sub
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "Upgrade", Err.Number, Err.Source, Err.Description, True, False)
+            'ErrorTrap:
+            'Call HandleError("aoNewsletter.newsletterCommonClass", "Upgrade")
         End Sub
         '
-        Friend Function GetNewsletterID(Main As Object, NewsletterName As String) As String
-            On Error GoTo ErrorTrap
+        Friend Function GetNewsletterID(cp As CPBaseClass, NewsletterName As String) As String
+            'On Error GoTo ErrorTrap
             '
-            Dim NewsletterID As Long
+            Dim NewsletterID As Integer
             Dim TemplateCopy As String
-            Dim TemplateID As Long
-            Dim CS As Long
-            Dim CSIssue As Long
-            Dim AOPointer As Long
+            Dim TemplateID As Integer
+            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim CSIssue As Integer
+            Dim AOPointer As Integer
             Dim StyleString As String
             '
-            CS = Main.OpenCSContent(ContentNameNewsletters, "Name=" & Main.EncodeSQLText(NewsletterName))
+            Call cs.open(ContentNameNewsletters, "Name=" & Main.EncodeSQLText(NewsletterName))
             If Main.CSOK(CS) Then
-                NewsletterID = Main.GetCSInteger(CS, "ID")
+                NewsletterID = cs.getInteger("ID")
             Else
-                Call Main.CloseCS(CS)
+                Call cs.close()
                 '
                 ' moved the entire build newsletter process here - eliminating the optional build step, makes it easier for cm
                 ' Build Default Template
                 '
                 TemplateID = GetDefaultTemplateID(Main)
-                CS = Main.OpenCSContent("Newsletter Templates", "id=" & TemplateID)
-                If Main.IsCSOK(CS) Then
-                    TemplateCopy = Trim(Main.GetCSText(CS, "Template"))
+                Call cs.open("Newsletter Templates", "id=" & TemplateID)
+                If cs.ok() Then
+                    TemplateCopy = Trim(cs.getText("Template"))
                     If TemplateCopy = "" Then
                         TemplateCopy = GetDefaultTemplateCopy()
                         Call Main.SetCS(CS, "Template", TemplateCopy)
                     End If
                 End If
-                Call Main.CloseCS(CS)
+                Call cs.close()
                 '
                 ' Build Newsletter
                 '
                 CS = Main.InsertCSRecord(ContentNameNewsletters)
                 If Main.CSOK(CS) Then
-                    NewsletterID = Main.GetCSInteger(CS, "ID")
+                    NewsletterID = cs.getInteger("ID")
                     Call Main.SetCS(CS, "Name", NewsletterName)
                     Call Main.SetCS(CS, "TemplateID", TemplateID)
                     AOPointer = Main.OpenCSContent("Add-Ons", "ccGUID=" & Main.EncodeSQLText(NewsletterAddonGuid), , , , , "StylesFileName")
@@ -238,36 +219,34 @@ ErrorTrap:
                 End If
                 Call Main.CloseCS(CSIssue)
             End If
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
             GetNewsletterID = NewsletterID
             '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetNewsletterID", Err.Number, Err.Source, Err.Description, True, False)
+            'Exit Function
+            'ErrorTrap:
+            'Call HandleError("aoNewsletter.newsletterCommonClass", "GetNewsletterID")
         End Function
         '
-        Friend Sub SortCategoriesByIssue(Main As Object, IssueID As Long)
-            On Error GoTo ErrorTrap
-            '
-            Dim CS As Long
-            Dim CategoryID As Long
-            Dim Sort As Long
-            Dim SortUp As Long
-            Dim SortDown As Long
+        Friend Sub SortCategoriesByIssue(cp As CPBaseClass, IssueID As Integer)
+            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim CategoryID As Integer
+            Dim Sort As Integer
+            Dim SortUp As Integer
+            Dim SortDown As Integer
             Dim SQL As String
-            Dim Pointer As Long
+            Dim Pointer As Integer
             Dim MainSQL As String
-            Dim PreviousID As Long
-            Dim PreviousCategoryID As Long
+            Dim PreviousID As Integer
+            Dim PreviousCategoryID As Integer
             Dim SortArray As Object
-            Dim SortArrayPointer As Long
-            Dim SortArrayCount As Long
+            Dim SortArrayPointer As Integer
+            Dim SortArrayCount As Integer
             Dim SortOrder As String
-            Dim RuleCategoryID As Long
-            Dim RuleIssueID As Long
+            Dim RuleCategoryID As Integer
+            Dim RuleIssueID As Integer
             '
-            CategoryID = Main.GetStreamInteger(RequestNameSortUp)
+            CategoryID = cp.doc.getInteger(RequestNameSortUp)
             '
             '   Check for Categories without rules, since rules decide sort order of categories, no stories show if
             '       associated to a category without a rule, join fails.
@@ -283,9 +262,9 @@ ErrorTrap:
             Do While Main.CSOK(CS)
                 Pointer = Main.InsertCSRecord(ContentNameIssueRules)
                 If Main.CSOK(Pointer) Then
-                    RuleCategoryID = Main.GetCSInteger(CS, "CatID")
-                    RuleIssueID = Main.GetCSInteger(CS, "IssueID")
-                    SortOrder = GetSortOrder(Main, RuleCategoryID, RuleIssueID)
+                    RuleCategoryID = cs.getInteger("CatID")
+                    RuleIssueID = cs.getInteger("IssueID")
+                    SortOrder = GetSortOrder(cp, RuleCategoryID, RuleIssueID)
                     Call Main.SetCS(Pointer, "NewsletterIssueID", RuleIssueID)
                     Call Main.SetCS(Pointer, "Active", 1)
                     Call Main.SetCS(Pointer, "CategoryID", RuleCategoryID)
@@ -294,7 +273,7 @@ ErrorTrap:
                 Call Main.CloseCS(Pointer)
                 Call Main.NextCSRecord(CS)
             Loop
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
             If CategoryID <> 0 Then
                 '
@@ -328,16 +307,11 @@ ErrorTrap:
                 Next
                 '
             End If
-            '
-            Exit Sub
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "SortCategoriesByIssue", Err.Number, Err.Source, Err.Description, True, False)
         End Sub
         '
-Friend Function HasArticleAccess(Main As Object, ArticleID As Long, Optional GivenGroupID As Long) As Boolean
-            On Error GoTo ErrorTrap
+        Friend Function HasArticleAccess(cp As CPBaseClass,  ArticleID As Integer, Optional GivenGroupID As Integer) As Boolean
             '
-            Dim CSPointer As Long
+            Dim CSPointer As CPCSBaseClass = cp.CSNew()
             Dim AccessFlag As Boolean
             Dim ThisTest As String
             '
@@ -347,7 +321,7 @@ Friend Function HasArticleAccess(Main As Object, ArticleID As Long, Optional Giv
                     HasArticleAccess = True
                 Else
                     Do While Main.CSOK(CSPointer)
-                        If Main.GetCSInteger(CSPointer, "GroupID") = GivenGroupID Then
+                        If cs.getInteger(CSPointer, "GroupID") = GivenGroupID Then
                             HasArticleAccess = True
                         End If
                         Call Main.NextCSRecord(CSPointer)
@@ -355,7 +329,7 @@ Friend Function HasArticleAccess(Main As Object, ArticleID As Long, Optional Giv
                 End If
                 Call Main.CloseCS(CSPointer)
             Else
-                If Not Main.IsContentManager("Newsletters") Then
+                If Notcp.User.IsContentManager("Newsletters") Then
                     CSPointer = Main.OpenCSContent(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
                     If Not Main.CSOK(CSPointer) Then
                         HasArticleAccess = True
@@ -376,16 +350,12 @@ Friend Function HasArticleAccess(Main As Object, ArticleID As Long, Optional Giv
                     HasArticleAccess = True
                 End If
             End If
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "HasArticleAccess", Err.Number, Err.Source, Err.Description, True, False)
         End Function
         '
-        Friend Function GetCategoryAccessString(Main As Object, CategoryID As Long) As String
-            On Error GoTo ErrorTrap
+        Friend Function GetCategoryAccessString(cp As CPBaseClass, CategoryID As Integer) As String
+            'On Error GoTo ErrorTrap
             '
-            Dim CS As Long
+            Dim cs As cpcsBaseClass = cp.csNew()
             Dim SQL As String
             Dim Stream As String
             '
@@ -401,7 +371,7 @@ ErrorTrap:
                 '
                 '   no unblocked stories, look for blocked stories
                 '
-                Call Main.CloseCS(CS)
+                Call cs.close()
                 SQL = "SELECT GR.GroupID "
                 SQL = SQL & "FROM NewsletterPageGroupRules GR, NewsletterIssuePages NIP "
                 SQL = SQL & "Where (GR.NewsletterPageID = NIP.ID) "
@@ -412,28 +382,23 @@ ErrorTrap:
                     If Stream <> "" Then
                         Stream = Stream & ","
                     End If
-                    Stream = Stream & Main.GetCSInteger(CS, "GroupID")
+                    Stream = Stream & cs.getInteger("GroupID")
                     Call Main.NextCSRecord(CS)
                 Loop
-                Call Main.CloseCS(CS)
+                Call cs.close()
             End If
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
             '    If Stream <> "" Then
             '        Stream = Stream & ","
             '    End If
             '
             GetCategoryAccessString = Stream
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetCategoryAccessString", Err.Number, Err.Source, Err.Description, True, False)
         End Function
         '
-        Friend Function GetArticleAccessString(Main As Object, StoryID As Long) As String
-            On Error GoTo ErrorTrap
+        Friend Function GetArticleAccessString(cp As CPBaseClass, StoryID As Integer) As String
             '
-            Dim CS As Long
+            Dim cs As cpcsBaseClass = cp.csNew()
             Dim SQL As String
             Dim Stream As String
             '
@@ -446,31 +411,26 @@ ErrorTrap:
                 If Stream <> "" Then
                     Stream = Stream & ","
                 End If
-                Stream = Stream & Main.GetCSInteger(CS, "GroupID")
+                Stream = Stream & cs.getInteger("GroupID")
                 Call Main.NextCSRecord(CS)
             Loop
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
             '    If Stream <> "" Then
             '        Stream = Stream & ","
             '    End If
             '
             GetArticleAccessString = Stream
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetArticleAccessString", Err.Number, Err.Source, Err.Description, True, False)
         End Function
         '
-        Friend Function HasAccess(Main As Object, GroupString As String) As Boolean
-            On Error GoTo ErrorTrap
+        Friend Function HasAccess(cp As CPBaseClass, GroupString As String) As Boolean
             '
             Dim ListArray() As String
-            Dim ListArrayCount As Long
-            Dim ListArrayPointer As Long
+            Dim ListArrayCount As Integer
+            Dim ListArrayPointer As Integer
             Dim AccessFlag As Boolean
             '
-            If Main.IsContentManager("Newsletters") Then
+            If cp.User.IsContentManager("Newsletters") Then
                 HasAccess = True
             Else
                 If GroupString <> "" Then
@@ -489,16 +449,14 @@ ErrorTrap:
                 End If
             End If
             '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetArticleAccessString", Err.Number, Err.Source, Err.Description, True, False)
+            'Exit Function
+            'ErrorTrap:
+            'Call HandleError("aoNewsletter.newsletterCommonClass", "GetArticleAccessString")
         End Function
         '
-        Private Function PadValue(Value As Long, StringLenghth As Long) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim Counter As Long
-            Dim ValueLenghth As Long
+        Private Function PadValue(cp As CPBaseClass, Value As Integer, StringLenghth As Integer) As String
+            Dim Counter As Integer
+            Dim ValueLenghth As Integer
             Dim InnerValue As String
             Dim Stream As String
             '
@@ -512,53 +470,41 @@ ErrorTrap:
             End If
             '
             PadValue = InnerValue
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "PadValue", Err.Number, Err.Source, Err.Description, True, False)
         End Function
         '
-        Private Function GetSortOrder(Main As Object, CategoryID As Long, IssueID As Long) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim CS As Long
+        Private Function GetSortOrder(cp As CPBaseClass, CategoryID As Integer, IssueID As Integer) As String
+            Dim cs As cpcsBaseClass = cp.csNew()
             Dim Stream As String
             '
-            CS = Main.OpenCSContent("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , , , "SortOrder")
+            Call cs.open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , , , "SortOrder")
             If Main.CSOK(CS) Then
-                Stream = Main.GetCSText(CS, "SortOrder")
+                Stream = cs.getText("SortOrder")
             End If
-            Call Main.CloseCS(CS)
+            Call cs.close()
             '
             If Stream = "" Then
                 Stream = "0"
             End If
             '
             GetSortOrder = Stream
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetSortOrder", Err.Number, Err.Source, Err.Description, True, False)
         End Function
         '
         '
         '
-        Friend Function GetDefaultTemplateID(Main As Object) As Long
-            On Error GoTo ErrorTrap
-            '
-            Dim CS As Long
-            Dim TemplateID As Long
+        Friend Function GetDefaultTemplateID(cp As CPBaseClass) As Integer
+            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim TemplateID As Integer
             Dim TemplateCopy As String
             '
             ' try default template
             '
-            CS = Main.OpenCSContent("Newsletter Templates", "name=" & KmaEncodeSQLText("Default"))
-            If Main.IsCSOK(CS) Then
+            Call cs.open("Newsletter Templates", "name=" & KmaEncodeSQLText("Default"))
+            If cs.ok() Then
                 '
                 ' Use the default template in their Db already
                 '
-                TemplateID = Main.GetCSInteger(CS, "ID")
-                TemplateCopy = Trim(Main.GetCSText(CS, "Template"))
+                TemplateID = cs.getInteger("ID")
+                TemplateCopy = Trim(cs.getText("Template"))
                 If TemplateCopy = "" Then
                     TemplateCopy = DefaultTemplate
                     TemplateCopy = Replace(TemplateCopy, "{{ACID0}}", GetRandomInteger())
@@ -566,82 +512,31 @@ ErrorTrap:
                     Call Main.SetCS(CS, "Template", TemplateCopy)
                 End If
             End If
-            Call Main.CloseCS(CS)
+            Call cs.close()
             If TemplateID = 0 Then
                 '
                 ' build default template
                 '
-                TemplateCopy = GetDefaultTemplateCopy
+                TemplateCopy = GetDefaultTemplateCopy()
                 CS = Main.InsertCSRecord("Newsletter Templates")
-                If Main.IsCSOK(CS) Then
+                If cs.ok() Then
                     Call Main.SetCS(CS, "name", "Default")
                     Call Main.SetCS(CS, "Template", TemplateCopy)
-                    TemplateID = Main.GetCSInteger(CS, "ID")
+                    TemplateID = cs.getInteger("ID")
                 End If
-                Call Main.CloseCS(CS)
+                Call cs.close()
             End If
             '
             GetDefaultTemplateID = TemplateID
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleError("aoNewsletter.CommonClass", "GetDefaultTemplateID", Err.Number, Err.Source, Err.Description, True, False)
         End Function
         '
         '
         '
-        Friend Function GetDefaultTemplateCopy() As String
+        Friend Function GetDefaultTemplateCopy(cp As CPBaseClass) As String
             GetDefaultTemplateCopy = DefaultTemplate
             GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID0}}", GetRandomInteger())
             GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID1}}", GetRandomInteger())
         End Function
-        ''
-        ''
-        ''
-        'Friend Function GetAuthoringLinks(Main As Object, IssuePageID As Long, IssueID As Long, NewsletterID As Long, WorkingQueryStringPlus) As String
-        '    On Error GoTo ErrorTrap
-        '    '
-        '    Dim CSPointer As Long
-        '    Dim QS As String
-        '    '
-        '    If Main.IsLinkAuthoring(ContentNameNewsletterIssues) Then
-        '        ' 1/1/09 added admin hint wrapper
-        '        'GetAuthoringLinks = "<br /><br />"
-        '        If IssuePageID <> 0 Then
-        '            GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink""><a href = ""http://" & Main.ServerHost & Main.SiteProperty_AdminURL & "?cid=" & Main.GetContentID(ContentNameNewsletterIssuePages) & "&af=4&id=" & IssuePageID & "&" & ReferLink & """>Edit this page</a></div>"
-        '        End If
-        '        If IssueID <> 0 Then
-        '            GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink""><a href = ""http://" & Main.ServerHost & Main.SiteProperty_AdminURL & "?cid=" & Main.GetContentID(ContentNameNewsletterIssuePages) & "&af=4&aa=2&ad=1&wc=NewsletterID=" & IssueID & "&" & ReferLink & """>Add a new page</a></div>"
-        '            GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink""><a href = ""http://" & Main.ServerHost & Main.SiteProperty_AdminURL & "?cid=" & Main.GetContentID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div>"
-        '        End If
-        '        GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink""><a href = ""http://" & Main.ServerHost & Main.SiteProperty_AdminURL & "?cid=" & Main.GetContentID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div>"
-        '        If IssueID <> 0 Then
-        '            GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink""><a href=""" & WorkingQueryStringPlus & RequestNameFormID & "=" & FormEmail & "&" & RequestNameIssueID & "=" & IssueID & """>Create&nbsp;email&nbsp;version</a></div>"
-        '        End If
-        '        GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink""><a href = ""http://" & Main.ServerHost & Main.SiteProperty_AdminURL & "?cid=" & Main.GetContentID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div>"
-        '        '
-        '        ' Future Issues
-        '        '
-        '        CSPointer = Main.OpenCSContent(ContentNameNewsletterIssues, "(PublishDate>" & Main.EncodeSQLDate(Now()) & ") OR (PublishDate is Null) OR (PublishDate=" & KmaEncodeSQLDate(0) & ")", "PublishDate desc")
-        '        If Main.CSOK(CSPointer) Then
-        '            GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink"">Unpublished Issues</div>"
-        '            Do While Main.CSOK(CSPointer)
-        '                ' 1/1/09 - JK - always linked to root path, also added qs incase request name was already in wqsp
-        '                QS = WorkingQueryStringPlus
-        '                QS = ModifyQueryString(QS, RequestNameIssueID, Main.GetCSInteger(CSPointer, "ID"), True)
-        '                GetAuthoringLinks = GetAuthoringLinks & "<div class=""AdminLink"" style=""padding-left:5px""><a href=""" & QS & """>" & Main.GetCSText(CSPointer, "Name") & "</a></div>"
-        '                'Stream = Stream & "<div class=""PageList""><a href=""http://" & Main.ServerHost & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssueID & "=" & Main.GetCSInteger(CSPointer, "ID") & """>" & Main.GetCSText(CSPointer, "Name") & "</a></div>"
-        '                Call Main.NextCSRecord(CSPointer)
-        '            Loop
-        '        End If
-        '        Call Main.CloseCS(CSPointer)
-        '    End If
-        '
-        '    '
-        '    Exit Function
-        'ErrorTrap:
-        '    Call HandleError("aoNewsletter.CommonClass", "GetAuthoringLinks", Err.Number, Err.Source, Err.Description, True, False)
-        'End Function
 
     End Class
 End Namespace

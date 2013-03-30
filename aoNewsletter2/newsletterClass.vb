@@ -24,7 +24,8 @@ Namespace newsletter2
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
-                returnHtml = "Visual Studio Contensive Addon - OK response"
+                Dim page As New newsletterPageClass
+                returnHtml = page.GetContent("")
             Catch ex As Exception
                 errorReport(CP, ex, "execute")
             End Try
@@ -35,7 +36,7 @@ Namespace newsletter2
         ' common report for this class
         '=====================================================================================
         '
-        Private Sub errorReport(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
             Try
                 cp.Site.ErrorReport(ex, "Unexpected error in newsletterClass." & method)
             Catch exLost As Exception
