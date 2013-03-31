@@ -9,7 +9,6 @@ Namespace newsletter2
     ' Sample Vb addon
     '
     Public Class newsletterCommonClass
-        Inherits AddonBaseClass
         '
         '=====================================================================================
         ' common report for this class
@@ -55,8 +54,8 @@ Namespace newsletter2
             '
             Dim cs As cpcsBaseClass = cp.csNew()
             '
-            Call cs.open(ContentNameNewsletterIssues, "(PublishDate<=" & Main.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
-            If Main.CSOK(CS) Then
+            Call cs.open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
+            If cs.ok() Then
                 GetCurrentIssueID = cs.getInteger("ID")
             End If
             Call cs.close()
@@ -77,13 +76,13 @@ Namespace newsletter2
             Dim Copy As String
             Dim DateAdded As Date
             '
-            Call cs.open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & Main.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
-            Do While Main.CSOK(CS)
+            Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
+            Do While cs.ok()
                 ID = cs.getInteger("ID")
                 Name = Trim(cs.getText("name"))
-                Active = Main.GetCSBoolean(CS, "active")
-                PublishDate = Main.GetCSDate(CS, "PublishDate")
-                DateAdded = Main.GetCSDate(CS, "DateAdded")
+                Active = cs.getBoolean("active")
+                PublishDate = cs.GetDate("PublishDate")
+                DateAdded = cs.GetDate("DateAdded")
                 Copy = Name
                 If Copy = "" Then
                     Copy = "unnamed #" & ID
@@ -101,7 +100,7 @@ Namespace newsletter2
                     Copy = "<a href=""?" & cp.Doc.RefreshQueryString & "&" & RequestNameIssueID & "=" & ID & """>" & Copy & "</a>"
                 End If
                 GetUnpublishedIssueList = GetUnpublishedIssueList & "<li>" & Copy & "</li>"
-                Call Main.NextCSRecord(CS)
+                Call cs.gonext()
             Loop
             Call cs.close()
             '
@@ -114,55 +113,6 @@ Namespace newsletter2
             'Call HandleError("aoNewsletter.newsletterCommonClass", "GetUnpublishedIssueList")
         End Function
         '
-        Friend Sub UpgradeAddOn(cp As CPBaseClass)
-            'On Error GoTo ErrorTrap
-            '
-            Dim CurrentVersion As String
-            Dim AddOnVersion As String
-            Dim CSPointer As CPCSBaseClass = cp.CSNew()
-            Dim NewsletterID As Integer
-            '
-            AddOnVersion = App.Major & "." & App.Minor & "." & App.Revision
-            '
-            CurrentVersion = Main.GetSiteProperty(PropertyAddOnVersion, "0.0.0")
-            '
-            If CurrentVersion <> AddOnVersion Then
-                '
-                If CurrentVersion < "1.0.54" Then
-                    '
-                    ' Get Default NewsletterID
-                    '
-                    CSPointer = Main.OpenCSContent(ContentNameNewsletters, "Name=" & Main.EncodeSQLText(DefaultRecord))
-                    If Not Main.CSOK(CSPointer) Then
-                        Call Main.CloseCS(CSPointer)
-                        CSPointer = Main.InsertCSContent(ContentNameNewsletters)
-                    End If
-                    If Main.CSOK(CSPointer) Then
-                        NewsletterID = cs.getInteger(CSPointer, "ID")
-                    End If
-                    Call Main.CloseCS(CSPointer)
-                    '
-                    CSPointer = Main.OpenCSContent(ContentNameNewsletterIssues, "NewsletterID is Null")
-                    Do While Main.CSOK(CSPointer)
-                        Call Main.SetCS(CSPointer, "NewsletterID", NewsletterID)
-                        Call Main.NextCSRecord(CSPointer)
-                    Loop
-                    Call Main.CloseCS(CSPointer)
-                End If
-                '
-                If CurrentVersion < "1.0.93" Then
-                    Call Main.ExecuteSQL("Default", "Update NewsletterissuePages Set AllowReadMore=1")
-                End If
-                '
-                Call Main.SetSiteProperty(PropertyAddOnVersion, AddOnVersion)
-                '
-            End If
-            '
-            Exit Sub
-            'ErrorTrap:
-            'Call HandleError("aoNewsletter.newsletterCommonClass", "Upgrade")
-        End Sub
-        '
         Friend Function GetNewsletterID(cp As CPBaseClass, NewsletterName As String) As String
             'On Error GoTo ErrorTrap
             '
@@ -170,62 +120,58 @@ Namespace newsletter2
             Dim TemplateCopy As String
             Dim TemplateID As Integer
             Dim cs As cpcsBaseClass = cp.csNew()
-            Dim CSIssue As Integer
-            Dim AOPointer As Integer
+            Dim CSIssue As CPCSBaseClass = cp.CSNew()
+            Dim AOPointer As CPCSBaseClass = cp.CSNew()
             Dim StyleString As String
             '
-            Call cs.open(ContentNameNewsletters, "Name=" & Main.EncodeSQLText(NewsletterName))
-            If Main.CSOK(CS) Then
-                NewsletterID = cs.getInteger("ID")
+            Call cs.Open(ContentNameNewsletters, "Name=" & cp.Db.EncodeSQLText(NewsletterName))
+            If cs.OK() Then
+                NewsletterID = cs.GetInteger("ID")
             Else
-                Call cs.close()
+                Call cs.Close()
                 '
                 ' moved the entire build newsletter process here - eliminating the optional build step, makes it easier for cm
                 ' Build Default Template
                 '
-                TemplateID = GetDefaultTemplateID(Main)
-                Call cs.open("Newsletter Templates", "id=" & TemplateID)
-                If cs.ok() Then
-                    TemplateCopy = Trim(cs.getText("Template"))
+                TemplateID = GetDefaultTemplateID(cp)
+                Call cs.Open("Newsletter Templates", "id=" & TemplateID)
+                If cs.OK() Then
+                    TemplateCopy = Trim(cs.GetText("Template"))
                     If TemplateCopy = "" Then
-                        TemplateCopy = GetDefaultTemplateCopy()
-                        Call Main.SetCS(CS, "Template", TemplateCopy)
+                        TemplateCopy = GetDefaultTemplateCopy(cp)
+                        Call cs.SetField("Template", TemplateCopy)
                     End If
                 End If
-                Call cs.close()
+                Call cs.Close()
                 '
                 ' Build Newsletter
                 '
-                CS = Main.InsertCSRecord(ContentNameNewsletters)
-                If Main.CSOK(CS) Then
-                    NewsletterID = cs.getInteger("ID")
-                    Call Main.SetCS(CS, "Name", NewsletterName)
-                    Call Main.SetCS(CS, "TemplateID", TemplateID)
-                    AOPointer = Main.OpenCSContent("Add-Ons", "ccGUID=" & Main.EncodeSQLText(NewsletterAddonGuid), , , , , "StylesFileName")
-                    If Main.CSOK(AOPointer) Then
-                        StyleString = Main.GetCS(AOPointer, "StylesFilename")
+                Call cs.insert(ContentNameNewsletters)
+                If cs.OK() Then
+                    NewsletterID = cs.GetInteger("ID")
+                    Call cs.SetField("Name", NewsletterName)
+                    Call cs.SetField("TemplateID", TemplateID)
+                    Call AOPointer.Open("Add-Ons", "ccGUID=" & cp.Db.EncodeSQLText(NewsletterAddonGuid), , , , , "StylesFileName")
+                    If AOPointer.OK Then
+                        StyleString = AOPointer.GetText("StylesFilename")
                     End If
-                    Call Main.CloseCS(AOPointer)
-                    Call Main.SetCS(CS, "StylesFileName", StyleString)
+                    Call AOPointer.Close()
+                    Call cs.SetField("StylesFileName", StyleString)
                 End If
                 '
                 ' Build the first issue in the newsletter
                 '
-                CSIssue = Main.InsertCSRecord("Newsletter Issues")
-                If Main.IsCSOK(CSIssue) Then
-                    Call Main.SetCS(CSIssue, "name", NewsletterName & " - Issue 1")
-                    Call Main.SetCS(CSIssue, "NewsletterID", NewsletterID)
-                    Call Main.SetCS(CSIssue, "PublishDate", Now())
+                Call CSIssue.Insert("Newsletter Issues")
+                If CSIssue.OK() Then
+                    Call CSIssue.SetField("name", NewsletterName & " - Issue 1")
+                    Call CSIssue.SetField("NewsletterID", NewsletterID)
+                    Call CSIssue.SetField("PublishDate", Now())
                 End If
-                Call Main.CloseCS(CSIssue)
+                Call CSIssue.Close()
             End If
             Call cs.close()
             '
             GetNewsletterID = NewsletterID
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("aoNewsletter.newsletterCommonClass", "GetNewsletterID")
         End Function
         '
         Friend Sub SortCategoriesByIssue(cp As CPBaseClass, IssueID As Integer)
@@ -258,8 +204,8 @@ Namespace newsletter2
             ' 1/19/2009 just look for IssuePages within this issue that do not have IssueCategoryRules for this issue
             SQL = SQL & "AND (NIP.NewsletterID=" & Main.EncodeSQLNumber(IssueID) & ")"
             '
-            CS = Main.OpenCSSQL("Default", SQL)
-            Do While Main.CSOK(CS)
+            Call cs.OpenSQL(SQL)
+            Do While cs.ok()
                 Pointer = Main.InsertCSRecord(ContentNameIssueRules)
                 If Main.CSOK(Pointer) Then
                     RuleCategoryID = cs.getInteger("CatID")
@@ -271,7 +217,7 @@ Namespace newsletter2
                     Call Main.SetCS(Pointer, "SortOrder", SortOrder)
                 End If
                 Call Main.CloseCS(Pointer)
-                Call Main.NextCSRecord(CS)
+                Call cs.gonext()
             Loop
             Call cs.close()
             '
@@ -285,7 +231,7 @@ Namespace newsletter2
                 MainSQL = MainSQL & " AND (NIR.Active<>0)"
                 MainSQL = MainSQL & " ORDER BY NIR.SortOrder"
                 '
-                CS = Main.OpenCSSQL("Default", MainSQL)
+                Call cs.OpenSQL(MainSQL)
                 SortArray = Main.GetCSRows(CS)
                 SortArrayCount = UBound(SortArray, 2)
                 For SortArrayPointer = 0 To SortArrayCount
@@ -366,8 +312,8 @@ Namespace newsletter2
             '
             ' first scheck for any unblocked story
             '
-            CS = Main.OpenCSSQL("Default", SQL)
-            If Main.CSOK(CS) Then
+            Call cs.OpenSQL(SQL)
+            If cs.ok() Then
                 '
                 '   no unblocked stories, look for blocked stories
                 '
@@ -377,13 +323,13 @@ Namespace newsletter2
                 SQL = SQL & "Where (GR.NewsletterPageID = NIP.ID) "
                 SQL = SQL & "AND (NIP.CategoryID=" & Main.EncodeSQLNumber(CategoryID) & ") "
                 '
-                CS = Main.OpenCSSQL("Default", SQL)
-                Do While Main.CSOK(CS)
+                Call cs.OpenSQL(SQL)
+                Do While cs.ok()
                     If Stream <> "" Then
                         Stream = Stream & ","
                     End If
                     Stream = Stream & cs.getInteger("GroupID")
-                    Call Main.NextCSRecord(CS)
+                    Call cs.gonext()
                 Loop
                 Call cs.close()
             End If
@@ -406,13 +352,13 @@ Namespace newsletter2
             SQL = SQL & "FROM NewsletterPageGroupRules GR "
             SQL = SQL & "Where (GR.NewsletterPageID=" & Main.EncodeSQLNumber(StoryID) & ")"
             '
-            CS = Main.OpenCSSQL("Default", SQL)
-            Do While Main.CSOK(CS)
+            Call cs.OpenSQL(SQL)
+            Do While cs.ok()
                 If Stream <> "" Then
                     Stream = Stream & ","
                 End If
                 Stream = Stream & cs.getInteger("GroupID")
-                Call Main.NextCSRecord(CS)
+                Call cs.gonext()
             Loop
             Call cs.close()
             '
@@ -477,7 +423,7 @@ Namespace newsletter2
             Dim Stream As String
             '
             Call cs.open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , , , "SortOrder")
-            If Main.CSOK(CS) Then
+            If cs.ok() Then
                 Stream = cs.getText("SortOrder")
             End If
             Call cs.close()
@@ -509,7 +455,7 @@ Namespace newsletter2
                     TemplateCopy = DefaultTemplate
                     TemplateCopy = Replace(TemplateCopy, "{{ACID0}}", GetRandomInteger())
                     TemplateCopy = Replace(TemplateCopy, "{{ACID1}}", GetRandomInteger())
-                    Call Main.SetCS(CS, "Template", TemplateCopy)
+                    Call cs.SetField("Template", TemplateCopy)
                 End If
             End If
             Call cs.close()
@@ -518,10 +464,10 @@ Namespace newsletter2
                 ' build default template
                 '
                 TemplateCopy = GetDefaultTemplateCopy()
-                CS = Main.InsertCSRecord("Newsletter Templates")
+                Call cs.insert("Newsletter Templates")
                 If cs.ok() Then
-                    Call Main.SetCS(CS, "name", "Default")
-                    Call Main.SetCS(CS, "Template", TemplateCopy)
+                    Call cs.SetField("name", "Default")
+                    Call cs.SetField("Template", TemplateCopy)
                     TemplateID = cs.getInteger("ID")
                 End If
                 Call cs.close()
@@ -538,5 +484,80 @@ Namespace newsletter2
             GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID1}}", GetRandomInteger())
         End Function
 
+        '
+        '===================================================================================================
+        '   Wrap the content in a common wrapper if authoring is enabled
+        '===================================================================================================
+        '
+        Public Function GetEditWrapper(cp As CPBaseClass, Caption As Object, Content As Object) As String
+            Dim returnString As String = Content
+            Try
+                '
+                Dim IsAuthoring As Boolean
+                '
+                IsAuthoring = cp.User.IsEditingAnything()()
+                If Not IsAuthoring Then
+                    returnString = Content
+                Else
+                    returnString = GetLegacySiteStyles
+                    If usegreenedges Then
+                        returnString = returnString _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">" _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperInner"">" _
+                                & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
+                                & kmaEncodeText(Caption) _
+                                & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle>" _
+                                & "</td></tr></table>" _
+                                & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & EditWrapperCnt & """>" _
+                                & kmaEncodeText(Content) _
+                                & "</td></tr></table>" _
+                            & "</td></tr></table>" _
+                            & "</td></tr></table>"
+                    Else
+                        returnString = returnString _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">"
+                        If Caption <> "" Then
+                            returnString = returnString _
+                                    & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
+                                    & kmaEncodeText(Caption) _
+                                    & "<!-- <img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle> -->" _
+                                    & "</td></tr></table>"
+                        End If
+                        returnString = returnString _
+                                & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & EditWrapperCnt & """>" _
+                                & kmaEncodeText(Content) _
+                                & "</td></tr></table>" _
+                            & "</td></tr></table>"
+                    End If
+                    EditWrapperCnt = EditWrapperCnt + 1
+                End If
+            Catch ex As Exception
+
+            End Try
+            Return returnString
+        End Function
+        '
+        '===================================================================================================
+        '   Wrap the content in a common wrapper if authoring is enabled
+        '===================================================================================================
+        '
+        Public Function GetAdminHintWrapper(cp As CPBaseClass, Content As String) As String
+            Dim returnString As String = Content
+            Try
+                If cp.User.IsEditingAnything() Or cp.User.IsAdmin Then
+                    returnString = GetLegacySiteStyles _
+                        & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapperContent"">" _
+                            & "<b>Administrator</b>" _
+                            & "<BR>" _
+                            & "<BR>" & kmaEncodeText(Content) _
+                            & "</td></tr></table>" _
+                        & "</td></tr></table>"
+                End If
+            Catch ex As Exception
+
+            End Try
+            Return returnString
+        End Function
     End Class
 End Namespace

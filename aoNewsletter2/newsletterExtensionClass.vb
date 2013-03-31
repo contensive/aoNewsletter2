@@ -86,7 +86,7 @@ Namespace newsletter2
                 If ExtensionName = "" Then
                     ExtensionName = "Default"
                     'If Main.IsAdmin() Then
-                    '    GetContent = Main.GetAdminHintWrapper("The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                    '    GetContent = common.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     'End If
                 Else
                     '
@@ -109,7 +109,7 @@ Namespace newsletter2
                                 GetContent = Main.GetContentCopy("Newsletter-Extension-Issue-Page-" & IssueID & "-" & PageID & "-" & ExtensionName)
                             End If
                         Case Else
-                            GetContent = Main.GetAdminHintWrapper("The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                            GetContent = Common.getAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     End Select
                 End If
             End If

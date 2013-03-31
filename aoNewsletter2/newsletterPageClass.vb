@@ -170,7 +170,7 @@ Namespace newsletter2
                             If TemplateID <> 0 Then
                                 Call cs.OpenRecord("Newsletter Issues", IssueID)
                                 If cs.OK() Then
-                                    Call Main.SetCS(cs, "TemplateID", TemplateID)
+                                    Call cs.SetField("TemplateID", TemplateID)
                                 End If
                                 Call cs.Close()
                             End If
@@ -179,15 +179,9 @@ Namespace newsletter2
                         If TemplateID > 0 Then
                             Call cs.OpenRecord("Newsletter Templates", TemplateID)
                             If cs.OK() Then
-                                EditLink = Main.GetCSRecordEditLink(cs)
-                                'If EditLink <> "" Then
-                                '    EditLink = EditLink & "(Edit this Newsletter Template)" & GetContent
-                                'End If
-                                GetContent = cs.getText("Template")
-                                'GetContent = "" _
-                                '    & EditLink _
-                                '    &cs.getText( "Template")
-                                GetContent = Main.GetEditWrapper("Newsletter Template [" & cs.getText("Name") & "] " & EditLink, GetContent)
+                                EditLink = cs.GetEditLink()
+                                GetContent = cs.GetText("Template")
+                                GetContent = Common.GetEditWrapper(cp, "Newsletter Template [" & cs.GetText("Name") & "] " & EditLink, GetContent)
                             End If
                             Call cs.Close()
                         End If
@@ -204,20 +198,21 @@ Namespace newsletter2
                         '
                         ' There is a template, encoding it captures the newsletterBodyClass
                         '
-                        GetContent = Main.EncodeContent3(GetContent, Main.memberID, "Newsletter Templates", TemplateID, 0, False, False, True, True, False, True, "", cp.Request.Protocol & cp.Site.DomainPrimary, False)
+
+                        GetContent = cp.Utils.EncodeContentForWeb(GetContent, "Newsletter Templates", TemplateID)
                     Else
                         '
                         ' No valid template, call just the body so get Archive Lists
                         '
                         Body = New newsletterBodyClass
                         Call Body.Init(cp)
-                        GetContent = Body.GetContent("")
+                        GetContent = Body.GetContent(cp, "")
                     End If
                 End If
                 '
                 ' List Unpublished issues for admins
                 '
-                If Main.IsAuthoring(ContentNameNewsletters) Then
+                If cp.User.IsAuthoring(ContentNameNewsletters) Then
                     '
                     ' Controls
                     '
@@ -233,8 +228,8 @@ Namespace newsletter2
                         ' For this issue
                         '
                         Controls = Controls & "<h3>For this Issue</h3><ul>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText("adminUrl") & "?cid=" & cp.Content.getid(ContentNameNewsletterIssuePages) & "&af=4&aa=2&ad=1&wc=" & cp.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText("adminUrl") & "?cid=" & cp.Content.getid(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssuePages) & "&af=4&aa=2&ad=1&wc=" & cp.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
                         If (InStr(1, cp.Request.PathPage, "/admin", vbTextCompare) <> 0) Or (LCase(cp.Site.GetText("adminUrl")) = LCase(cp.Request.PathPage)) Then
                             Controls = Controls & "<li><div class=""AdminLink"">Create&nbsp;email&nbsp;version (not available from admin site)</div></li>"
                         Else
@@ -247,8 +242,8 @@ Namespace newsletter2
                         ' For this newsletter
                         '
                         Controls = Controls & "<h3>For this Newsletter</h3><ul>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText("adminUrl") & "?cid=" & cp.Content.getid(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText("adminUrl") & "?cid=" & cp.Content.getid(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit the styles for this newsletter</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit the styles for this newsletter</a></div></li>"
                         Controls = Controls & "</ul>"
                         '
                         ' Search for unpublished versions
@@ -263,8 +258,8 @@ Namespace newsletter2
                     ' General Controls
                     '
                     Controls = Controls & "<h3>General Controls</h3><ul>"
-                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText("adminUrl") & "?cid=" & cp.Content.getid(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
-                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText("adminUrl") & "?cid=" & cp.Content.getid(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
+                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
+                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
                     Controls = Controls & "</ul>"
                     '
                     ' instructions
@@ -278,20 +273,20 @@ Namespace newsletter2
                          & "<P>To create a new newsletter, click the 'Add a new Newsletter' link. To make your new newsletter appear here, turn on Advanced Edit and click the Options icon at the top of add-on (wrench icon). Select the newsletter you want to display and hit update.</P>" _
                          & ""
                     If Controls <> "" Then
-                        GetContent = GetContent & Main.GetAdminHintWrapper(Controls)
+                        GetContent = GetContent & Common.GetAdminHintWrapper(cp, Controls)
                     End If
                 End If
                 '
                 ' Add any user errors
                 '
-                If Main.IsUserError Then
-                    GetContent = "<div style=""padding:10px"">" & Main.GetUserError() & "</div>" & GetContent
+                If Not cp.UserError.OK Then
+                    GetContent = "<div style=""padding:10px"">" & cp.UserError.GetList() & "</div>" & GetContent
                 End If
                 '
                 ' Add newsletter edit wrapper
                 '
-                If Main.IsEditing("Newsletters") Then
-                    GetContent = Main.GetEditWrapper("Newsletter [" & NewsletterName & "] " & Main.GetRecordEditLink2("Newsletters", NewsletterID, False, NewsletterName, True), GetContent)
+                If cp.User.IsEditing("Newsletters") Then
+                    GetContent = Common.GetEditWrapper(cp, "Newsletter [" & NewsletterName & "] " & cp.Content.GetEditLink("Newsletters", NewsletterID, False, NewsletterName, True), GetContent)
                 End If
             Catch ex As Exception
                 'Call HandleError(cp, ex, "GetContent")
@@ -362,7 +357,7 @@ Namespace newsletter2
                         posEnd = InStr(posStart, Copy, ">")
                         If posEnd > 0 Then
                             NavObj = New newsletterNavClass
-                            Copy = Mid(Copy, 1, posStart - 1) & NavObj.GetContent("newsletter=" & NewsletterName) & Mid(Copy, posEnd + 1)
+                            Copy = Mid(Copy, 1, posStart - 1) & NavObj.GetContent(cp, "newsletter=" & NewsletterName) & Mid(Copy, posEnd + 1)
                             NavObj = Nothing
                         End If
                     End If
@@ -376,7 +371,7 @@ Namespace newsletter2
                         If posEnd > 0 Then
                             BodyObj = New newsletterBodyClass
                             Call BodyObj.Init(Main)
-                            Copy = Mid(Copy, 1, posStart - 1) & BodyObj.GetContent("newsletter=" & NewsletterName) & Mid(Copy, posEnd + 1)
+                            Copy = Mid(Copy, 1, posStart - 1) & BodyObj.GetContent(cp, "newsletter=" & NewsletterName) & Mid(Copy, posEnd + 1)
                             BodyObj = Nothing
                         End If
                     End If
@@ -385,7 +380,7 @@ Namespace newsletter2
                 '
                 '   JF 6/23/09 - this will catch any add-ons droppped anywhere, but more importnatly in the template itself
                 '
-                Copy = Main.EncodeContent(Copy, Main.memberID, -1, False, False, True, True, False, True)
+                Copy = Main.EncodeContent(Copy, cp.user.id, -1, False, False, True, True, False, True)
 
             Else
                 '
@@ -393,7 +388,7 @@ Namespace newsletter2
                 '
                 Body = New newsletterBodyClass
                 Call Body.Init(Main)
-                Copy = Body.GetContent("")
+                Copy = Body.GetContent(cp, "")
             End If
 
             If Styles <> "" Then
@@ -449,7 +444,7 @@ Namespace newsletter2
                 Call Main.SetCS(EmailPointer, "Name", "Newsletter " & NewsletterName)
                 Call Main.SetCS(EmailPointer, "Subject", NewsletterName)
                 Call Main.SetCS(EmailPointer, "FromAddress", EmailAddress)
-                Call Main.SetCS(EmailPointer, "TestMemberID", Main.memberID)
+                Call Main.SetCS(EmailPointer, "TestMemberID", cp.user.id)
                 Call Main.SetCSTextFile(EmailPointer, "CopyFileName", Copy, ContentNameGroupEmail)
                 Call Main.SaveCSRecord(EmailPointer)
             End If

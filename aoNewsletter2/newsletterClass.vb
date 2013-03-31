@@ -25,7 +25,7 @@ Namespace newsletter2
             Dim returnHtml As String = ""
             Try
                 Dim page As New newsletterPageClass
-                returnHtml = page.GetContent("")
+                returnHtml = page.GetContent(CP, "")
             Catch ex As Exception
                 errorReport(CP, ex, "execute")
             End Try
