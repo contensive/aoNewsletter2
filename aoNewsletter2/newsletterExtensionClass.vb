@@ -27,7 +27,7 @@ Namespace newsletter2
             Try
                 returnHtml = "Visual Studio Contensive Addon - OK response"
             Catch ex As Exception
-                errorReport(CP, ex, "execute")
+                handleError(CP, ex, "execute")
             End Try
             Return returnHtml
         End Function
@@ -64,29 +64,29 @@ Namespace newsletter2
             Dim IssueID As Integer
             Dim IsWorkflowRendering As Boolean
             Dim IsQuickEditing As Boolean
-            Dim Common As New CommonClass
+            Dim cn As New newsletterCommonClass
             Dim NewsletterProperty As String
             Dim Parts() As String
             Dim NewsletterID As Integer
             '
-            If Not (Main Is Nothing) Then
+            If True Then
                 '
                 ' Assume newsletterNavClass is used within a PageClass
                 ' Get the Issue and Newsletter from the visit properties set in PageClass
                 '
                 ExtensionName = Trim(cp.Doc.GetText("ExtensionName", OptionString))
-                NewsletterProperty = Main.GetVisitProperty(VisitPropertyNewsletter)
-                Parts() = Split(NewsletterProperty, ".")
+                NewsletterProperty = cp.Visit.GetText(VisitPropertyNewsletter)
+                Parts = Split(NewsletterProperty, ".")
                 If UBound(Parts) > 2 Then
-                    NewsletterID = kmaEncodeInteger(Parts(0))
-                    IssueID = kmaEncodeInteger(Parts(1))
-                    PageID = kmaEncodeInteger(Parts(2))
-                    'FormID = kmaEncodeInteger(Parts(3))
+                    NewsletterID = cp.Utils.EncodeInteger(Parts(0))
+                    IssueID = cp.Utils.EncodeInteger(Parts(1))
+                    PageID = cp.Utils.EncodeInteger(Parts(2))
+                    'FormID = cp.Utils.EncodeInteger(Parts(3))
                 End If
                 If ExtensionName = "" Then
                     ExtensionName = "Default"
                     'If Main.IsAdmin() Then
-                    '    GetContent = common.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                    '    GetContent = cn.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     'End If
                 Else
                     '
@@ -94,22 +94,22 @@ Namespace newsletter2
                     '
                     ExtensionType = LCase(Trim(cp.Doc.GetText("ExtensionType", OptionString)))
                     Call cp.Site.TestPoint("GetIssueID call 1, NewsletterID=" & NewsletterID)
-                    IssueID = Common.GetIssueID(cp, NewsletterID)
-                    PageID = cp.doc.getInteger(RequestNameIssuePageID)
-                    IsQuickEditing = Main.IsQuickEditing("Page Content")
-                    IsWorkflowRendering = Main.IsWorkflowRendering
+                    IssueID = cn.GetIssueID(cp, NewsletterID)
+                    PageID = cp.Doc.GetInteger(RequestNameIssuePageID)
+                    IsQuickEditing = cp.User.IsQuickEditing("Page Content")
+                    IsWorkflowRendering = cp.User.IsWorkflowRendering
                     '
                     Select Case ExtensionType
                         Case "issue"
                             If IssueID <> 0 Then
-                                GetContent = Main.GetContentCopy("Newsletter-Extension-Issue-" & IssueID & "-" & ExtensionName)
+                                GetContent = cp.Content.GetCopy("Newsletter-Extension-Issue-" & IssueID & "-" & ExtensionName)
                             End If
                         Case "page"
                             If PageID <> 0 Then
-                                GetContent = Main.GetContentCopy("Newsletter-Extension-Issue-Page-" & IssueID & "-" & PageID & "-" & ExtensionName)
+                                GetContent = cp.Content.GetCopy("Newsletter-Extension-Issue-Page-" & IssueID & "-" & PageID & "-" & ExtensionName)
                             End If
                         Case Else
-                            GetContent = Common.getAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                            GetContent = cn.getAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     End Select
                 End If
             End If

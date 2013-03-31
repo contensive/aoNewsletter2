@@ -8,42 +8,7 @@ Namespace newsletter2
     ' Sample Vb addon
     '
     Public Class newsletterBodyClass
-        Inherits AddonBaseClass
         '
-        ' - update references to your installed version of cpBase
-        ' - Verify project root name space is empty
-        ' - Change the namespace to the collection name
-        ' - Change this class name to the addon name
-        ' - Create a Contensive Addon record with the namespace apCollectionName.ad
-        ' - add reference to CPBase.DLL, typically installed in c:\program files\kma\contensive\
-        '
-        '=====================================================================================
-        ' 
-        '=====================================================================================
-        '
-        Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim returnHtml As String = ""
-            Try
-                returnHtml = "Visual Studio Contensive Addon - OK response"
-            Catch ex As Exception
-                errorReport(CP, ex, "execute")
-            End Try
-            Return returnHtml
-        End Function
-        '
-        '=====================================================================================
-        ' common report for this class
-        '=====================================================================================
-        '
-        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
-            Try
-                cp.Site.ErrorReport(ex, "Unexpected error in newsletterBodyClass." & method)
-            Catch exLost As Exception
-                '
-                ' stop anything thrown from cp errorReport
-                '
-            End Try
-        End Sub
         Private WorkingQueryStringPlus As String
         Private ErrorString As String
         '
@@ -69,59 +34,34 @@ Namespace newsletter2
         Private cp As CPBaseClass
         Private EncodeCopyNeeded As Boolean
         'Private Csv As Object
-
-        Public Function Execute(CsvObject As Object, MainObject As Object, OptionString As String, FilterInput As String) As String
-            'On Error GoTo ErrorTrap
-
-            Csv = CsvObject
-
-            Call Init(MainObject)
-
-            Execute = GetContent(OptionString)
-
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("newsletterBodyClass", "Execute")
-        End Function
-
-        Public Sub Init(MainObject As Object)
-            '
-            Main = MainObject
-            '
-            Dim Common As New newsletterCommonClass
-            '
-            Call Common.UpgradeAddOn(Main)
-            EncodeCopyNeeded = (Main.ContentServerVersion < "3.3.947")
-
-            isManager = cp.User.IsContentManager("Newsletters")
-
-            Exit Sub
-            '
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "Init")
+        '
+        '=====================================================================================
+        ' common report for this class
+        '=====================================================================================
+        '
+        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+            Try
+                cp.Site.ErrorReport(ex, "Unexpected error in newsletterBodyClass." & method)
+            Catch exLost As Exception
+                '
+                ' stop anything thrown from cp errorReport
+                '
+            End Try
         End Sub
         '
         Public Function GetContent(cp As CPBaseClass, OptionString As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim Stream As String
-            Dim FileToField As Integer
-            Dim DaFile As String
-            Dim DaField As String
-            Dim FileCounter As Integer
-            Dim sql2 As String
-            Dim sqlP As Integer
-            Dim FileCount As Integer
-            Dim FileId As Integer
-            Dim Common As New newsletterCommonClass
+            Dim cn As New newsletterCommonClass
             Dim NewsletterName As String
             Dim NewsletterProperty As String
             Dim Parts() As String
             '
-            If Not (Main Is Nothing) Then
+            If True Then
                 '
-                NewsletterName = cp.Doc.GetText("Newsletter", OptionString)
-                archiveIssuesToDisplay = kmaEncodeInteger(cp.Doc.GetText("Archive Issues To Display", OptionString))
+                NewsletterName = cp.Doc.GetText("Newsletter")
+                archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
                 '
                 If NewsletterName <> "" Then
                     '
@@ -129,7 +69,7 @@ Namespace newsletter2
                     '
                     NewsletterID = cp.Content.GetRecordID(ContentNameNewsletters, NewsletterName)
                     Call cp.Site.TestPoint("GetIssueID call 2, NewsletterID=" & NewsletterID)
-                    IssueID = Common.GetIssueID(cp, NewsletterID)
+                    IssueID = cn.GetIssueID(cp, NewsletterID)
                     IssuePageID = cp.Doc.GetInteger(RequestNameIssuePageID)
                     FormID = cp.Doc.GetInteger(RequestNameFormID)
                 Else
@@ -137,30 +77,22 @@ Namespace newsletter2
                     ' Without a Newsletter option, assume newsletterNavClass is used within a PageClass
                     ' Get the Issue and Newsletter from the visit properties set in PageClass
                     '
-                    NewsletterProperty = Main.GetVisitProperty(VisitPropertyNewsletter)
-                    Parts() = Split(NewsletterProperty, ".")
+                    NewsletterProperty = cp.Visit.GetText(VisitPropertyNewsletter)
+                    Parts = Split(NewsletterProperty, ".")
                     If UBound(Parts) > 2 Then
-                        NewsletterID = kmaEncodeInteger(Parts(0))
-                        IssueID = kmaEncodeInteger(Parts(1))
-                        IssuePageID = kmaEncodeInteger(Parts(2))
-                        FormID = kmaEncodeInteger(Parts(3))
+                        NewsletterID = cp.Utils.EncodeInteger(Parts(0))
+                        IssueID = cp.Utils.EncodeInteger(Parts(1))
+                        IssuePageID = cp.Utils.EncodeInteger(Parts(2))
+                        FormID = cp.Utils.EncodeInteger(Parts(3))
                     End If
-                End If
-                '
-                WorkingQueryStringPlus = cp.Doc.RefreshQueryString
-                '
-                If WorkingQueryStringPlus = "" Then
-                    WorkingQueryStringPlus = "?"
-                Else
-                    WorkingQueryStringPlus = "?" & WorkingQueryStringPlus & "&"
                 End If
                 '
                 MonthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
                 YearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
-                ButtonValue = Main.GetStreamText("Button")
-                SearchKeywords = Main.GetStreamText(RequestNameSearchKeywords)
+                ButtonValue = cp.Doc.GetText("Button")
+                SearchKeywords = cp.Doc.GetText(RequestNameSearchKeywords)
                 '
-                RecordsPerPage = Main.GetSiteProperty("Newsletter Search Results Records Per Page", "3", True)
+                RecordsPerPage = cp.Site.GetInteger("Newsletter Search Results Records Per Page", "3")
                 '
                 RecordTop = cp.Doc.GetInteger(RequestNameRecordTop)
                 '
@@ -169,7 +101,7 @@ Namespace newsletter2
                     PageNumber = 1
                 End If
 
-                Stream = GetForm()
+                Stream = GetForm(cp, cn)
                 GetContent = Stream
             End If
             '
@@ -178,7 +110,7 @@ Namespace newsletter2
             'Call HandleError(cp, ex, "GetContent")
         End Function
         '
-        Private Function GetForm() As String
+        Private Function GetForm(cp As CPBaseClass, cn As newsletterCommonClass) As String
             'On Error GoTo ErrorTrap
             '
             Dim Stream As String
@@ -200,21 +132,21 @@ Namespace newsletter2
             '
             Select Case FormID
                 Case FormArchive
-                    Stream = Stream & GetArchiveList()
+                    Stream &= GetArchiveList(cp)
                 Case FormDetails
                     Call cp.Site.TestPoint("GetForm Entering GetNewsletterBodyDetails")
-                    Stream = Stream & GetNewsletterBodyDetails(IssuePageID)
+                    Stream &= GetNewsletterBodyDetails(cp, cn, IssuePageID)
                 Case Else
                     Call cp.Site.TestPoint("GetForm Entering GetNewsletterBodyOverview")
                     FormID = FormIssue
-                    Stream = Stream & GetNewsletterBodyOverview(IssueID, IssuePageID)
+                    Stream &= GetNewsletterBodyOverview(cp, IssueID, IssuePageID, )
             End Select
             '    '
             '    Select Case ButtonValue
             '        Case FormButtonViewArchives
-            ' '           Stream = Stream & GetArchiveList()
+            ' '           stream &=  GetArchiveList()
             '        Case FormButtonViewNewsLetter
-            ' '           Stream = Stream & GetArchiveList()
+            ' '           stream &=  GetArchiveList()
             '    End Select
             '
             GetForm = Stream
@@ -224,10 +156,11 @@ Namespace newsletter2
             'Call HandleError(cp, ex, "GetForm")
         End Function
         '
-        Private Function GetArchiveList() As String
+        Private Function GetArchiveList(cp As CPBaseClass) As String
             'On Error GoTo ErrorTrap
             '
-            Dim CSPointer As CPCSBaseClass = cp.CSNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
+            '
             Dim Stream As String
             Dim Colors As String
             Dim ThisSQL As String
@@ -240,7 +173,6 @@ Namespace newsletter2
             Dim SelectedIssuePointer As Integer
             Dim SelectedIssue As String
             '
-            Dim SearchPointer As Integer
             Dim SearchResult As String
             Dim SearchSQL As String
             '
@@ -248,7 +180,6 @@ Namespace newsletter2
             Dim PageCount As Integer
             '
             Dim sql2 As String
-            Dim SQLPointer As Integer
             Dim FileCount As Integer
             '
             Dim BriefCopyFileName As String
@@ -258,8 +189,9 @@ Namespace newsletter2
             '
             Dim YearsWanted As Integer
             Dim BlockSearchForm As Boolean
+            Dim qs As String
             '
-            YearsWanted = kmaEncodeInteger(Main.GetSiteProperty("Newsletter years wanted", 1))
+            YearsWanted = cp.Utils.EncodeInteger(cp.Site.GetText("Newsletter years wanted", 1))
             If YearsWanted < 1 Then
                 YearsWanted = 1
             End If
@@ -274,7 +206,7 @@ Namespace newsletter2
             sql2 = " select count(nlp.id) as count"
             sql2 = sql2 & " from newsletterissues nl, newsletterissuepages nlp"
             sql2 = sql2 & " Where (NL.ID = nlp.newsletterid)"
-            sql2 = sql2 & " AND (NL.NewsletterID=" & Main.EncodeSQLNumber(NewsletterID) & ")"
+            sql2 = sql2 & " AND (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
             If MonthSelected <> 0 Then
                 ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & MonthSelected
             End If
@@ -284,9 +216,8 @@ Namespace newsletter2
             If SearchKeywords <> "" Then
                 sql2 = sql2 & " and ((nlp.Body like '%" & SearchKeywords & "%' )or (nlp.name  like '%" & SearchKeywords & "%') or (nlp.Overview  like '%" & SearchKeywords & "%'))"
             End If
-            SQLPointer = Main.OpenCSSQL("Default", sql2)
-            If Main.CSOK(SQLPointer) Then
-                FileCount = cs.getInteger(SQLPointer, "count")
+            If cs.OpenSQL(sql2) Then
+                FileCount = cs.GetInteger("count")
                 NumberofPages = FileCount / RecordsPerPage
                 If NumberofPages <> Int(NumberofPages) Then
                     NumberofPages = NumberofPages + 1
@@ -296,10 +227,8 @@ Namespace newsletter2
                     NumberofPages = 1
                 End If
             End If
-            Call Main.CloseCS(SQLPointer)
+            Call cs.Close()
             '
-            Stream = Stream & Main.GetFormStart
-            Stream = Stream & Main.GetFormInputHidden(RequestNameFormID, FormArchive)
             'Colors = "#ffffff"
             '
             '
@@ -308,33 +237,24 @@ Namespace newsletter2
                 ' List a page of archive issues
                 '
                 If (MonthSelected = 0) And (YearSelected = 0) Then
-                    'Stream = Stream & "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
+                    'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                     '
-                    'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & Main.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
-                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & Main.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
                     '
-                    CSPointer = Main.OpenCSSQL("Default", ThisSQL)
-                    If Main.CSOK(CSPointer) Then
-                        'Stream = Stream & "<TR>"
-                        Stream = Stream & Main.GetContentCopy2(PageNameArchives, , "<h2>Archive Issues</h2>")
-                        'Stream = Stream & "<TD>" & Main.GetContentCopy2(PageNameArchives, , "<h2>Archive Issues</h2>") & "</TD>"
-                        'Stream = Stream & "</TR>"
-                        Do While Main.CSOK(CSPointer)
-                            'Stream = Stream & "<TR>"
-                            'Stream = Stream & "<TD BGCOLOR= """ & Colors & """>"
-                            ' 1/1/09 - JK - always linked to the root path (approotpath)
-                            Stream = Stream & cs.GetEditLink(CSPointer) & "<a href=""" & WorkingQueryStringPlus & RequestNameIssueID & "=" & cs.getInteger(CSPointer, "ID") & """>" & GetIssuePublishDate(cs.getInteger(CSPointer, "ID")) & " " & Main.GetCSText(CSPointer, "Name") & "</a>"
-                            'Stream = Stream & cs.GetEditLink(CSPointer) & "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssueID & "=" & cs.getInteger(CSPointer, "ID") & """>" & GetIssuePublishDate(cs.getInteger(CSPointer, "ID")) & " " & Main.GetCSText(CSPointer, "Name") & "</a>"
-                            Stream = Stream & "<br>"
+                    Call cs.OpenSQL(ThisSQL)
+                    If cs.OK Then
+                        Stream &= cp.Content.GetCopy(PageNameArchives, "<h2>Archive Issues</h2>")
+                        Do While cs.OK
+                            Stream &= cs.GetEditLink() & "<a href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameIssueID & "=" & cs.GetInteger("ID") & """>" & GetIssuePublishDate(cp, cs.GetInteger("ID")) & " " & cs.GetText("Name") & "</a>"
+                            Stream &= "<br>"
                             If EncodeCopyNeeded Then
-                                Stream = Stream & Main.EncodeContent(Main.GetCS(CSPointer, "Overview"), , True, False, False, True, True, True, True, "")
-                                'Stream = Stream & Main.EncodeContent(Main.GetCS(CSPointer, "Overview"), , True, False, False, True, True, True, True, False) & "</TD>"
+                                Stream &= cp.Utils.EncodeContentForWeb(cs.GetText("Overview"))
                             Else
-                                Stream = Stream & Main.GetCS(CSPointer, "Overview")
-                                'Stream = Stream & Main.GetCS(CSPointer, "Overview") & "</TD>"
+                                Stream &= cs.GetText("Overview")
                             End If
-                            'Stream = Stream & "</TR>"
-                            Call Main.NextCSRecord(CSPointer)
+                            'stream &=  "</TR>"
+                            Call cs.GoNext()
                             If Colors = "#ffffff" Then
                                 Colors = "#E0E0E0"
                             Else
@@ -343,20 +263,20 @@ Namespace newsletter2
                         Loop
                     Else
                         BlockSearchForm = True
-                        'Stream = Stream & "<TR>"
-                        Stream = Stream & "<span class=""ccError"">" & Main.GetSiteProperty(SitePropertyNoNewsletterArchives, "There are currently no archived issues.", True) & "</span>"
-                        'Stream = Stream & "<TD><span class=""ccError"">" & Main.GetSiteProperty(SitePropertyNoNewsletterArchives, "There are currently no archived issues.", True) & "</span></TD>"
-                        'Stream = Stream & "</TR>"
+                        'stream &=  "<TR>"
+                        Stream &= "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>"
+                        'stream &=  "<TD><span class=""ccError"">" & cp.site.getText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.", True) & "</span></TD>"
+                        'stream &=  "</TR>"
                     End If
-                    Call Main.CloseCS(CSPointer)
-                    'Stream = Stream & "</TABLE>"
+                    Call cs.Close()
+                    'stream &=  "</TABLE>"
                 End If
             End If
             If ButtonValue = FormButtonViewArchives Then
                 '
                 ' List search results of archive issues
                 '
-                'Stream = Stream & "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
+                'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                 ThisSQL2 = " select NL.id, nl.name, nl.publishdate, nlp.AllowReadMore, nlp.Overview, nlp.Body, nlp.id as ThisID ,nlp.newsletterid, nlp.name as nlpname"
                 ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages nlp"
                 ThisSQL2 = ThisSQL2 & " Where (NL.ID = nlp.newsletterid)"
@@ -371,116 +291,121 @@ Namespace newsletter2
                 End If
                 ThisSQL2 = ThisSQL2 & "  ORDER BY PublishDate DESC"
                 '
-                SearchPointer = Main.OpenCSSQL("Default", ThisSQL2, RecordsPerPage, PageNumber)
-                If Not Main.CSOK(SearchPointer) Then
-                    Stream = Stream & Main.GetContentCopy2("Newsletter Search No Results Found", , "No results were found")
+                Call cs.OpenSQL(ThisSQL2, RecordsPerPage, PageNumber)
+                If Not cs.OK Then
+                    Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
                 Else
-                    Stream = Stream & Main.GetContentCopy2("Newsletter Search Results Found", , "Search results")
-                    Do While Main.CSOK(SearchPointer) And RowCount < RecordsPerPage
-                        SearchResult = Main.GetCSText(SearchPointer, "nlpname")
+                    Stream &= cp.Content.GetCopy("Newsletter Search Results Found", "Search results")
+                    Do While cs.OK And RowCount < RecordsPerPage
+                        SearchResult = cs.GetText("nlpname")
                         Dim thisid As Integer
-                        thisid = cs.getInteger(SearchPointer, "ID")
+                        thisid = cs.GetInteger("ID")
                         If Colors = "#E0E0E0" Then
                             Colors = "#ffffff"
                         Else
                             Colors = "#E0E0E0"
                         End If
-                        'Stream = Stream & "<tr><td  BGCOLOR= """ & Colors & """ style=""border-top:1px solid #c0c0c0;padding:20px;"">"
-                        Stream = Stream & "<div  class=""NewsletterBody"">"
-                        Stream = Stream & "<div  class=""Headline"">" & SearchResult & "</div>"
-                        BriefCopyFileName = Main.GetCSText(SearchPointer, "Overview")
+                        'stream &=  "<tr><td  BGCOLOR= """ & Colors & """ style=""border-top:1px solid #c0c0c0;padding:20px;"">"
+                        Stream &= "<div  class=""NewsletterBody"">"
+                        Stream &= "<div  class=""Headline"">" & SearchResult & "</div>"
+                        BriefCopyFileName = cs.GetText("Overview")
                         If BriefCopyFileName = "" Then
-                            If Main.GetCSBoolean(SearchPointer, "AllowReadMore") Then
-                                BriefCopyFileName = Main.GetCS(SearchPointer, "Body")
+                            If cs.GetBoolean("AllowReadMore") Then
+                                BriefCopyFileName = cs.GetText("Body")
                             Else
-                                BriefCopyFileName = Main.GetContentCopy2("Newsletter Article Access Denied", , "You do not have access to this article")
+                                BriefCopyFileName = cp.Content.GetCopy("Newsletter Article Access Denied", "You do not have access to this article")
                             End If
                         End If
-                        Stream = Stream & "<div  class=""Overview"">" & Main.GetCS(SearchPointer, "Overview") & "</div>"
-                        'Stream = Stream & Main.GetCSText(SearchPointer, "Overview")
-                        'Stream = Stream & "<br><br>"
-                        'Stream = Stream & "</tr></td>"
-                        If (Main.GetCSBoolean(SearchPointer, "AllowReadMore")) And (Main.GetCS(SearchPointer, "Body") <> "") Then
-                            Stream = Stream & "<a href=""" & WorkingQueryStringPlus & "formid=400&" & RequestNameIssuePageID & "=" & cs.getInteger(SearchPointer, "ThisID") & """>"
-                            Stream = Stream & "Read More"
-                            Stream = Stream & "</a>"
+                        Stream &= "<div  class=""Overview"">" & cs.GetText("Overview") & "</div>"
+                        'stream &=  cs.gettext( "Overview")
+                        'stream &=  "<br><br>"
+                        'stream &=  "</tr></td>"
+                        If (cs.GetBoolean("AllowReadMore")) And (cs.GetText("Body") <> "") Then
+                            qs = cp.Doc.RefreshQueryString
+                            qs = cp.Utils.ModifyQueryString(qs, "formid", "400")
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameIssuePageID, cs.GetInteger("ThisID"))
+                            Stream &= "<a href=""?" & qs & """>"
+                            Stream &= "Read More"
+                            Stream &= "</a>"
                         End If
-                        Stream = Stream & "</div>"
-                        Call Main.NextCSRecord(SearchPointer)
+                        Stream &= "</div>"
+                        Call cs.GoNext()
                         RowCount = RowCount + 1
                     Loop
                 End If
                 '
                 If FileCount <> 0 Then
-                    'Stream = Stream & "<tr><td align=center>"
-                    Stream = Stream & "<div  class=""NewsletterBody""><div class=""GoToPageLine"">Go to Page&nbsp;&nbsp;"
+                    'stream &=  "<tr><td align=center>"
+                    Stream &= "<div  class=""NewsletterBody""><div class=""GoToPageLine"">Go to Page&nbsp;&nbsp;"
                     Do While PageCount <= NumberofPages
-                        'Stream = Stream & "<a href=""" & Main.ServerPage & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """> Page " & (PageCount) & "</a>"
+                        'stream &=  "<a href=""" & Main.ServerPage & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """> Page " & (PageCount) & "</a>"
                         ' 1/1/09 - JK - alays linked to root path
-                        Stream = Stream & "<a href=""" & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """>" & (PageCount) & "</a>"
-                        'Stream = Stream & "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """>" & (PageCount) & "</a>"
+                        Stream &= "<a href=""" & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """>" & (PageCount) & "</a>"
+                        'stream &=  "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """>" & (PageCount) & "</a>"
                         PageCount = PageCount + 1
-                        Stream = Stream & "&nbsp;&nbsp;&nbsp;"
+                        Stream &= "&nbsp;&nbsp;&nbsp;"
                     Loop
-                    Stream = Stream & "</div></div>"
+                    Stream &= "</div></div>"
                 End If
-                'Stream = Stream & "</TABLE>"
+                'stream &=  "</TABLE>"
             End If
             '
             If Not BlockSearchForm Then
                 '
                 ' Display search form
                 '
-                'Stream = Stream & "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
-                'Stream = Stream & "<tr>"
-                'Stream = Stream & "<td>"
-                Stream = Stream & Main.GetContentCopy2("Newsletter Search Copy", , "<h2>Archive Search</h2>")
-                'Stream = Stream & "</td>"
-                'Stream = Stream & "</tr>"
+                'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
+                'stream &=  "<tr>"
+                'stream &=  "<td>"
+                Stream &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
+                'stream &=  "</td>"
+                'stream &=  "</tr>"
                 '
-                'Stream = Stream & "<tr>"
-                'Stream = Stream & "<td>"
+                'stream &=  "<tr>"
+                'stream &=  "<td>"
                 ' 1 ** drop down select list 2007 Issues (all issues in 2007)
-                Stream = Stream & "<div>" & Main.GetFormInputSelect(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & KmaEncodeSQLDate(Now) & ")AND(NewsletterID=" & Main.EncodeSQLNumber(NewsletterID) & ")") & " " & Main.GetFormButton(FormButtonViewNewsLetter) & "</div>"
+                Stream &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
                 ' ** need a button to view the newsletter
-                'Stream = Stream & "</td>"
-                'Stream = Stream & "</tr>"
+                'stream &=  "</td>"
+                'stream &=  "</tr>"
                 '
-                Stream = Stream & "<div>&nbsp;</div>"
-                'Stream = Stream & "<tr>"
-                'Stream = Stream & "<td>"
-                Stream = Stream & "<div>keyword search<br>"
-                Stream = Stream & Main.GetFormInputText(RequestNameSearchKeywords, , , 50) & "</div>"
-                'Stream = Stream & "</td>"
-                'Stream = Stream & "</tr>"
+                Stream &= "<div>&nbsp;</div>"
+                'stream &=  "<tr>"
+                'stream &=  "<td>"
+                Stream &= "<div>keyword search<br>"
+                Stream &= cp.Html.InputText(RequestNameSearchKeywords, , , 50) & "</div>"
+                'stream &=  "</td>"
+                'stream &=  "</tr>"
                 '
-                'Stream = Stream & "<tr>"
-                'Stream = Stream & "<td>"
-                MonthString = MonthString & "Month <select size=""1"" name=""" & RequestNameMonthSelectd & """>"
-                MonthString = MonthString & "<option selected>Month</option>"
+                'stream &=  "<tr>"
+                'stream &=  "<td>"
+                MonthString = ""
+                MonthString &= "Month <select size=""1"" name=""" & RequestNameMonthSelectd & """>"
+                MonthString &= "<option selected>Month</option>"
                 For MonthCounter = 1 To 12
-                    MonthString = MonthString & "<option "
-                    MonthString = MonthString & "value=""" & MonthCounter & """>" & MonthName(MonthCounter) & "</option>"
+                    MonthString &= "<option "
+                    MonthString &= "value=""" & MonthCounter & """>" & MonthName(MonthCounter) & "</option>"
                 Next
-                MonthString = MonthString & "</select> "
+                MonthString &= "</select> "
                 '
-                YearString = YearString & "Year <select size=""1"" name=""" & RequestNameYearSelected & """>"
-                YearString = YearString & "<option selected>Year</option>"
+                YearString = ""
+                YearString &= "Year <select size=""1"" name=""" & RequestNameYearSelected & """>"
+                YearString &= "<option selected>Year</option>"
                 'For YearCounter = (Year(Now) - 5) To (Year(Now))
                 For YearCounter = (Year(Now) - YearsWanted) To (Year(Now))
-                    YearString = YearString & "<option "
-                    YearString = YearString & "value=""" & YearCounter & """>" & YearCounter & "</option>"
+                    YearString &= "<option "
+                    YearString &= "value=""" & YearCounter & """>" & YearCounter & "</option>"
                 Next
-                YearString = YearString & "</select>"
-                Stream = Stream & "<div>&nbsp;</div>"
-                Stream = Stream & "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & Main.GetFormButton(FormButtonViewArchives) & "</div>"
-                'Stream = Stream & "</td>"
-                'Stream = Stream & "</tr>"
-                'Stream = Stream & "</TABLE>"
+                YearString &= "</select>"
+                Stream &= "<div>&nbsp;</div>"
+                Stream &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
+                'stream &=  "</td>"
+                'stream &=  "</tr>"
+                'stream &=  "</TABLE>"
             End If
             '
-            'Stream = Stream & "</TABLE>"
-            Stream = Stream & Main.GetFormEnd
+            Stream &= cp.Html.Hidden(RequestNameFormID, FormArchive)
+            Stream &= cp.Html.Form(Stream)
             '
             GetArchiveList = Stream
             '
@@ -494,9 +419,9 @@ Namespace newsletter2
             '
             Dim Stream As String
             '
-            Stream = Stream & "<TR>"
-            Stream = Stream & "<TD colspan=2 width=""60%"">" & Innards & "</TD>"
-            Stream = Stream & "</TR>"
+            stream &= "<TR>"
+            stream &= "<TD colspan=2 width=""60%"">" & Innards & "</TD>"
+            stream &= "</TR>"
             '
             GetFormRow = Stream
             '
@@ -505,17 +430,10 @@ Namespace newsletter2
             'Call HandleError("DonationClass", "GetFormRow2")
         End Function
         '
-Private Function GetSpacer(Optional Height As Integer, Optional Width As Integer) As String
+        Private Function GetSpacer(Optional Height As Integer = 1, Optional Width As Integer = 1) As String
             'On Error GoTo ErrorTrap
             '
             Dim Stream As String
-            '
-            If Height = 0 Then
-                Height = 1
-            End If
-            If Width = 0 Then
-                Width = 1
-            End If
             '
             Stream = "<img src=""/ccLib/images/spacer.gif"" width=""" & Width & """ height=""" & Height & """>"
             '
@@ -526,7 +444,7 @@ Private Function GetSpacer(Optional Height As Integer, Optional Width As Integer
             'Call HandleError("LeftSideNavigation", "GetSpacer")
         End Function
         '
-Private Function GetArticleAccess(ArticleID As Integer, Optional GivenGroupID As Integer) As Boolean
+        Private Function GetArticleAccess(cp As CPBaseClass, ArticleID As Integer, Optional GivenGroupID As Integer = 0) As Boolean
             'On Error GoTo ErrorTrap
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
@@ -534,37 +452,37 @@ Private Function GetArticleAccess(ArticleID As Integer, Optional GivenGroupID As
             Dim ThisTest As String
             '
             If GivenGroupID <> 0 Then
-                Call cs.open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-                If Not cs.ok() Then
+                Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
+                If Not cs.OK() Then
                     GetArticleAccess = True
                 Else
-                    Do While cs.ok()
-                        If cs.getInteger("GroupID") = GivenGroupID Then
+                    Do While cs.OK()
+                        If cs.GetInteger("GroupID") = GivenGroupID Then
                             GetArticleAccess = True
                         End If
-                        Call cs.gonext()
+                        Call cs.GoNext()
                     Loop
                 End If
-                Call cs.close()
+                Call cs.Close()
             Else
                 If Not isManager Then
-                    Call cs.open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-                    If Not cs.ok() Then
+                    Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
+                    If Not cs.OK() Then
                         GetArticleAccess = True
                     Else
-                        Do While cs.ok()
-                            ThisTest = Main.GetCSLookup(cs, "GroupID")
+                        Do While cs.OK()
+                            ThisTest = cs.GetText("GroupID")
                             '
                             '
                             If ThisTest <> "" Then
-                                If Main.IsGroupMember(ThisTest) Then
+                                If cp.User.IsInGroup(ThisTest) Then
                                     GetArticleAccess = True
                                 End If
                             End If
-                            Call cs.gonext()
+                            Call cs.GoNext()
                         Loop
                     End If
-                    Call cs.close()
+                    Call cs.Close()
                 Else
                     GetArticleAccess = True
                 End If
@@ -575,31 +493,28 @@ Private Function GetArticleAccess(ArticleID As Integer, Optional GivenGroupID As
             'Call HandleError(cp, ex, "GetArticleAccess")
         End Function
         '
-        Private Function GetIssuePublishDate(IssueID As Integer) As String
+        Private Function GetIssuePublishDate(cp As CPBaseClass, IssueID As Integer) As String
             'On Error GoTo ErrorTrap
             '
-            Dim CSPointer As CPCSBaseClass = cp.CSNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim IssueDate As String
-            Dim Stream As String
+            Dim Stream As String = ""
             '
-            CSPointer = Main.OpenCSContent(ContentNameNewsletterIssues, "ID=" & IssueID, , , "PublishDate")
-            If Main.CSOK(CSPointer) Then
-                IssueDate = Main.GetCSDate(CSPointer, "PublishDate")
+            cs.Open(ContentNameNewsletterIssues, "ID=" & IssueID, , , "PublishDate")
+            If cs.OK Then
+                IssueDate = cs.GetDate("PublishDate")
                 If IsDate(IssueDate) Then
                     Stream = MonthName(Month(IssueDate), True) & " " & Day(IssueDate) & ", " & Year(IssueDate)
                 End If
             End If
-            Call Main.CloseCS(CSPointer)
+            Call cs.Close()
             '
             '
             GetIssuePublishDate = Stream
             '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetArticleAccess")
         End Function
         '
-        Private Function GetEmailBody(TemplateCopy As String, LocalGroupID As Integer) As String
+        Private Function GetEmailBody(cp As CPBaseClass, TemplateCopy As String, LocalGroupID As Integer) As String
             'On Error GoTo ErrorTrap
             '
             Dim Stream As String
@@ -626,20 +541,13 @@ Private Function GetArticleAccess(ArticleID As Integer, Optional GivenGroupID As
                     InnerValue = InnerTemplateArray(0)
                     Select Case InnerValue
                         Case TemplateReplacementBody
-                            Stream = Stream & Replace(InnerValue, TemplateReplacementBody, GetNewsletterBodyOverview(IssueID, IssuePageID, LocalGroupID))
+                            Stream &= Replace(InnerValue, TemplateReplacementBody, GetNewsletterBodyOverview(cp, IssueID, IssuePageID, LocalGroupID))
                         Case TemplateReplacementNav
-                            Call Navigation.Init(Main)
-                            Stream = Stream & Replace(InnerValue, TemplateReplacementNav, Navigation.GetContent(cp, "NavigationLayout=Vertical", LocalGroupID))
-                            'Case TemplateReplacementTitle
-                            '    Call Mast.Init(Main)
-                            '    Stream = Stream & Replace(InnerValue, TemplateReplacementTitle, Mast.GetContent(cp,"MastMode=TitleOnly"))
-                            'Case TemplateReplacementPubDate
-                            '    Call Mast.Init(Main)
-                            '    Stream = Stream & Replace(InnerValue, TemplateReplacementPubDate, Mast.GetContent(cp,"MastMode=PubDateOnly"))
+                            Stream &= Replace(InnerValue, TemplateReplacementNav, Navigation.GetContent(cp, "NavigationLayout=Vertical", LocalGroupID))
                     End Select
-                    Stream = Stream & InnerTemplateArray(1)
+                    stream &= InnerTemplateArray(1)
                 Else
-                    Stream = Stream & TemplateArray(TemplateArrayPointer)
+                    stream &= TemplateArray(TemplateArrayPointer)
                 End If
             Next
             '
@@ -650,32 +558,27 @@ Private Function GetArticleAccess(ArticleID As Integer, Optional GivenGroupID As
             'Call HandleError(cp, ex, "GetEmailBody")
         End Function
         '
-        Private Function GetOverview(PageID As Integer) As String
+        Private Function GetOverview(cp As CPBaseClass, PageID As Integer) As String
             '
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             '
-            Call cs.open(ContentNameNewsletterIssuePages, "ID=" & Main.EncodeSQLNumber(PageID), , , , , "Overview")
-            If cs.ok() Then
-                GetOverview = cs.getText("Overview")
+            Call cs.Open(ContentNameNewsletterIssuePages, "ID=" & cp.Db.EncodeSQLNumber(PageID), , , , , "Overview")
+            If cs.OK() Then
+                GetOverview = cs.GetText("Overview")
             End If
-            Call cs.close()
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("Newsletter.newsletterBodyClass", "GetOverview")
+            Call cs.Close()
         End Function
         '
-Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Integer, Optional GivenGroupID As Integer) As String
+        Friend Function GetNewsletterBodyOverview(cp As CPBaseClass, IssueID As Integer, IssuePageID As Integer, Optional GivenGroupID As Integer = 0) As String
             'On Error GoTo ErrorTrap
             '
             Dim AddLink As String
             Dim Controls As String
             Dim IssueSQL As String
-            Dim IssuePointer As Integer
             Dim NewIssueId As Integer
             Dim MaxIssueID As Integer
             Dim Stream As String
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Criteria As String
             Dim Link As String
             Dim HasArticleAccess As Boolean
@@ -686,7 +589,7 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
             Dim PreviousCategoryName As String
             Dim CategoryName As String
             Dim RecordCount As Integer
-            Dim Common As New newsletterCommonClass
+            Dim cn As New newsletterCommonClass
             Dim AccessString As String
             Dim StoryID As Integer
             Dim StoryAccessString As String
@@ -700,9 +603,9 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
             '
             Call cs.OpenRecord("Newsletter Issues", IssueID)
             If cs.OK() Then
-                Stream = Stream & cs.GetEditLink() & Main.GetCS(cs, "Cover")
+                Stream &= cs.GetEditLink() & cs.getText("Cover")
             End If
-            Call cs.close()
+            Call cs.Close()
             '
             If IssuePageID <> 0 Then
                 Criteria = ""
@@ -710,7 +613,7 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
                     & " select p.categoryId,c.name as CategoryName" _
                     & " from NewsletterIssuePages p" _
                     & " left join NewsletterIssueCategories c on c.id=p.categoryId" _
-                    & " where (p.ID=" & Main.EncodeSQLNumber(IssuePageID) & ")" _
+                    & " where (p.ID=" & cp.Db.EncodeSQLNumber(IssuePageID) & ")" _
                     & ""
                 'call cs.open(ContentNameNewsletterIssuePages, Criteria, "SortOrder,DateAdded")
             Else
@@ -732,76 +635,58 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
             Call cp.Site.TestPoint("MainSQL: " & MainSQL)
             Call cs.OpenSQL(MainSQL)
             '
-            Stream = Stream & vbCrLf & "<!-- Start NewsletterBody -->" & vbCrLf
-            Stream = Stream & "<div class=""NewsletterBody"">"
+            Stream &= vbCrLf & "<!-- Start NewsletterBody -->" & vbCrLf
+            Stream &= "<div class=""NewsletterBody"">"
             '
-            If cs.ok() Then
-                Do While cs.ok()
-                    CategoryID = cs.getInteger("CategoryID")
-                    CategoryName = cs.getText("CategoryName")
+            If cs.OK() Then
+                Do While cs.OK()
+                    CategoryID = cs.GetInteger("CategoryID")
+                    CategoryName = cs.GetText("CategoryName")
                     '
-                    CS2 = Main.OpenCSContent(ContentNameNewsletterIssuePages, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder")
-                    If Main.IsCSOK(CS2) Then
+                    Call CS2.Open(ContentNameNewsletterIssuePages, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder")
+                    If CS2.OK Then
                         '
                         ' there are stories under this topic, wrap in div to allow a story indent
                         '
-                        Stream = Stream & vbCrLf & "<div class=""NewsletterTopic"">"
+                        Stream &= vbCrLf & "<div class=""NewsletterTopic"">"
                         If RecordCount <> 0 Then
-                            If Main.IsLinkAuthoring(ContentNameNewsletterIssuePages) Then
-                                ' 1/1/09 JK added hint wrapper
-                                Stream = Stream & Common.GetAdminHintWrapper(cp, "<a href=""" & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssueID & "=" & IssueID & "&" & RequestNameSortUp & "=" & CategoryID & """>[Move Up]</a> ")
+                            If cp.User.IsAuthoring(ContentNameNewsletterIssuePages) Then
+                                Stream &= cn.GetAdminHintWrapper(cp, "<a href=""" & WorkingQueryStringPlus & RequestNameIssueID & "=" & IssueID & "&" & RequestNameSortUp & "=" & CategoryID & """>[Move Up]</a> ")
                             End If
                         End If
-                        Stream = Stream & CategoryName
-                        Stream = Stream & "</div>"
+                        Stream &= CategoryName
+                        Stream &= "</div>"
                         '
-                        Stream = Stream & vbCrLf & "<div class=""NewsletterTopicStory"">"
-                        Do While Main.CSOK(CS2)
-                            Stream = Stream & GetStoryOverview(CS2)
-                            Call Main.NextCSRecord(CS2)
+                        Stream &= vbCrLf & "<div class=""NewsletterTopicStory"">"
+                        Do While CS2.OK
+                            Stream &= GetStoryOverview(CS2)
+                            Call CS2.GoNext()
                         Loop
-                        Stream = Stream & "</div>"
+                        Stream &= "</div>"
                     End If
-                    Call Main.CloseCS(CS2)
-                    Call cs.gonext()
+                    Call CS2.Close()
+                    Call cs.GoNext()
                     RecordCount = RecordCount + 1
                 Loop
             End If
             '
-            Call cs.close()
+            Call cs.Close()
             '
-            Stream = Stream & GetUnrelatedStories(IssuePageID)
+            Stream &= GetUnrelatedStories(IssuePageID)
             '
             IssueSQL = " Select max(id) as MaxIssueID from newsletterissues"
-            IssuePointer = Main.OpenCSSQL("Default", IssueSQL)
-            If Main.CSOK(IssuePointer) Then
-                MaxIssueID = cs.getInteger(IssuePointer, "maxissueid")
+            Call cs.OpenSQL(IssueSQL)
+            If cs.OK Then
+                MaxIssueID = cs.GetInteger("maxissueid")
             End If
             NewIssueId = MaxIssueID + 1
-            Call Main.CloseCS(IssuePointer)
-            'Controls = Common.GetAuthoringLinks(cp, IssuePageID, IssueID, NewsletterID, WorkingQueryStringPlus)
-            'If Controls <> "" Then
-            '    Stream = Stream & common.getAdminHintWrapper( cp,Controls)
-            'End If
-            '    If Main.IsLinkAuthoring(ContentNameNewsletterIssues) Then
-            '        ' 1/1/09 added admin hint wrapper
-            '        Controls = "<br /><br />"
-            '        If IssuePageID <> 0 Then
-            '            Controls = Controls & "<div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText( "adminUrl" ) & "?cid=" & cp.Content.getid(ContentNameNewsletterIssuePages) & "&af=4&id=" & IssuePageID & "&" & ReferLink & """>Edit this page</a></div>"
-            '        End If
-            '        If IssueID <> 0 Then
-            '            Controls = Controls & "<div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText( "adminUrl" ) & "?cid=" & cp.Content.getid(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div>"
-            '            Controls = Controls & "<div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText( "adminUrl" ) & "?cid=" & cp.Content.getid(ContentNameNewsletterIssuePages) & "&af=4&aa=2&ad=1&wc=NewsletterID=" & IssueID & "&" & ReferLink & """>Add a new page to this issue</a></div>"
-            '        End If
-            '        Controls = Controls & "<div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.site.getText( "adminUrl" ) & "?cid=" & cp.Content.getid(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div>"
-            '        Stream = Stream & common.getAdminHintWrapper( cp,Controls)
-            '    End If
+            Call cs.Close()
             '
-            Stream = Stream & "</div>"
+            Stream &= "</div>"
             '
-            Stream = Stream & Main.GetRecordAddLink(ContentNameNewsletterIssuePages, "Newsletterid=" & IssueID)
+            Stream &= cp.Content.GetAddLink(ContentNameNewsletterIssuePages, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything)
             '
-            Stream = Stream & vbCrLf & "<!-- End NewsletterBody -->" & vbCrLf
+            Stream &= vbCrLf & "<!-- End NewsletterBody -->" & vbCrLf
             '
             GetNewsletterBodyOverview = Stream
             '
@@ -823,12 +708,12 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
                 Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")"
                 Call cs.open(ContentNameNewsletterIssuePages, Criteria, "SortOrder,DateAdded")
                 If cs.ok() Then
-                    Caption = Main.GetSiteProperty("Newsletter Caption Other Stories", "")
+                    Caption = cp.site.getText("Newsletter Caption Other Stories", "")
                     If Caption <> "" Then
-                        Stream = Stream & vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
+                        stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
                     End If
                     Do While cs.ok()
-                        Stream = Stream & GetStoryOverview(CS)
+                        stream &= GetStoryOverview(CS)
                         Call cs.gonext()
                     Loop
                 End If
@@ -842,50 +727,49 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
             'Call HandleError(cp, ex, "GetUnrelatedStories")
         End Function
         '
-        Private Function GetStoryOverview(CS As Integer) As String
+        Private Function GetStoryOverview(CS As CPCSBaseClass) As String
             'On Error GoTo ErrorTrap
             '
             Dim StoryID As Integer
             Dim StoryAccessString As String
             Dim Stream As String
-            Dim Common As New newsletterCommonClass
+            Dim cn As New newsletterCommonClass
             Dim storyBookmark As String
             '
-            StoryID = cs.getInteger("ID")
+            StoryID = CS.getInteger("ID")
             storyBookmark = "story" & StoryID
-            StoryAccessString = Common.GetArticleAccessString(cp, StoryID)
+            StoryAccessString = cn.GetArticleAccessString(cp, StoryID)
             '
             If StoryAccessString <> "" Then
-                Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>"
+                Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>"
             End If
             '
-            Stream = Stream & vbCrLf & "<div class=""Headline"" id=""" & storyBookmark & """>"
+            Stream &= vbCrLf & "<div class=""Headline"" id=""" & storyBookmark & """>"
             If FormID <> FormEmail Then
-                Stream = Stream & cs.GetEditLink()
+                Stream &= CS.GetEditLink()
             End If
-            Stream = Stream & cs.getText("Name") & "</div>"
-            'Stream = Stream & "<a name=""" & storyBookmark & """>" &cs.getText( "Name") & "&nbsp;" & "</a></div>"
+            Stream &= CS.getText("Name") & "</div>"
+            'stream &=  "<a name=""" & storyBookmark & """>" &cs.getText( "Name") & "&nbsp;" & "</a></div>"
             If IssuePageID <> 0 Then
-                Call Main.TrackContent(ContentNameNewsletterIssuePages, IssuePageID)
                 If EncodeCopyNeeded Then
-                    Stream = Stream & "<div class=""Copy"">" & Main.EncodeContent(cs.getText("Body "), , True, False, False, True, True, True, True, "") & "</div>"
+                    Stream &= "<div class=""Copy"">" & cp.Utils.EncodeContentForWeb(CS.GetText("Body ")) & "</div>"
                 Else
-                    Stream = Stream & "<div class=""Copy"">" & cs.getText("Body ") & "</div>"
+                    Stream &= "<div class=""Copy"">" & CS.GetText("Body ") & "</div>"
                 End If
             Else
-                Stream = Stream & "<div class=""Overview"">"
-                Stream = Stream & cs.getText("Overview")
-                If cs.getBoolean("AllowReadMore") Then
+                Stream &= "<div class=""Overview"">"
+                Stream &= CS.getText("Overview")
+                If CS.getBoolean("AllowReadMore") Then
                     ' 1/1/09 JK - always linked to root path
-                    Stream = Stream & "<div class=""ReadMore""><a href=""" & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & cs.getInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
-                    'Stream = Stream & "<div class=""ReadMore""><a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & cs.getInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
+                    Stream &= "<div class=""ReadMore""><a href=""" & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & CS.getInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
+                    'stream &=  "<div class=""ReadMore""><a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & cs.getInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
                     'Else
-                    '    Stream = Stream & "<div class=""ReadMore"">&nbsp;</div>"
+                    '    stream &=  "<div class=""ReadMore"">&nbsp;</div>"
                 End If
-                Stream = Stream & "</div>"
+                Stream &= "</div>"
             End If
             If StoryAccessString <> "" Then
-                Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
+                Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
             End If
             '
             GetStoryOverview = Stream
@@ -895,18 +779,18 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
             'Call HandleError(cp, ex, "GetStoryOverview")
         End Function
         '
-        Private Function GetNewsletterBodyDetails(IssuePageID As Integer) As String
+        Private Function GetNewsletterBodyDetails(cp As CPBaseClass, cn As newsletterCommonClass, IssuePageID As Integer) As String
             'On Error GoTo ErrorTrap
             '
+            Dim cs As CPCSBaseClass = cp.CSNew()
+            Dim CSIssue As CPCSBaseClass = cp.CSNew()
             Dim rssChange As Boolean
             Dim expirationDate As Date
             Dim PublishDate As Date
             Dim Pos As Integer
             Dim recordDate As Date
-            Dim CSIssue As Integer
             Dim Copy As String
             Dim Stream As String
-            Dim cs As cpcsBaseClass = cp.csNew()
             Dim Link As String
             Dim PrinterIcon As String
             Dim EmailIcon As String
@@ -919,37 +803,37 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
             If IssuePageID = 0 Then
                 Stream = "<span class=""ccError"">The requested story is currently unavailable.</span>"
             Else
-                Call cs.open(ContentNameNewsletterIssuePages, "ID=" & IssuePageID)
-                If cs.ok() Then
-                    storyName = cs.getText("name")
-                    storyOverview = cs.getText("Overview")
-                    IssueID = cs.getInteger("newsletterId")
+                Call cs.Open(ContentNameNewsletterIssuePages, "ID=" & IssuePageID)
+                If cs.OK() Then
+                    storyName = cs.GetText("name")
+                    storyOverview = cs.GetText("Overview")
+                    IssueID = cs.GetInteger("newsletterId")
                     '
-                    Stream = Stream & cs.GetEditLink()
-                    If cs.getBoolean("AllowPrinterPage") Then
+                    Stream &= cs.GetEditLink()
+                    If cs.GetBoolean("AllowPrinterPage") Then
                         Link = WorkingQueryStringPlus & RequestNameIssuePageID & "=" & IssuePageID & "&" & RequestNameFormID & "=" & FormDetails & "&ccIPage=l6d09a10sP"
-                        Stream = Stream & "<div class=""PrintIcon""><a target=_blank href=""" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
+                        Stream &= "<div class=""PrintIcon""><a target=_blank href=""" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
                     End If
-                    If cs.getBoolean("AllowEmailPage") Then
-                        Link = "mailto:?SUBJECT=" & Main.GetSiteProperty("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter", True) & "&amp;BODY=http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & Replace(WorkingQueryStringPlus, "&", "%26") & RequestNameIssuePageID & "=" & IssuePageID & "%26" & RequestNameFormID & "=" & FormDetails
-                        Stream = Stream & "<div class=""EmailIcon""><a target=_blank href=""" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
+                    If cs.GetBoolean("AllowEmailPage") Then
+                        Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(WorkingQueryStringPlus, "&", "%26") & RequestNameIssuePageID & "=" & IssuePageID & "%26" & RequestNameFormID & "=" & FormDetails
+                        Stream &= "<div class=""EmailIcon""><a target=_blank href=""" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
                     End If
-                    Stream = Stream & "<div class=""NewsletterBody"">"
-                    Stream = Stream & "<div class=""Headline"">" & cs.getText("Name") & "</div>"
-                    Stream = Stream & "<div class=""Copy"">" & cs.getText("Body") & "</div>"
-                    Stream = Stream & "</div>"
+                    Stream &= "<div class=""NewsletterBody"">"
+                    Stream &= "<div class=""Headline"">" & cs.GetText("Name") & "</div>"
+                    Stream &= "<div class=""Copy"">" & cs.GetText("Body") & "</div>"
+                    Stream &= "</div>"
                     '
                     ' update RSS fields if empty
                     '
                     rssChange = False
                     If (IssueID <> 0) Then
-                        If (cs.GetDate("RSSDatePublish") = CDate(0)) Then
-                            CSIssue = Main.OpenCSContent(ContentNameNewsletterIssues, "id=" & KmaEncodeSQLNumber(IssueID))
-                            If Main.IsCSOK(CSIssue) Then
-                                PublishDate = Main.GetCSDate(CSIssue, "publishDate")
+                        If (cn.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
+                            CSIssue.Open(ContentNameNewsletterIssues, "id=" & cp.Db.EncodeSQLNumber(IssueID))
+                            If CSIssue.OK() Then
+                                PublishDate = CSIssue.GetDate("publishDate")
                             End If
-                            Call Main.CloseCS(CSIssue)
-                            If (PublishDate <> CDate(0)) Then
+                            Call CSIssue.Close()
+                            If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
                                 rssChange = True
                                 Call cs.SetField("RSSDatePublish", PublishDate)
                             End If
@@ -963,12 +847,12 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
                     '
                     If (storyOverview <> "") And (cs.GetText("RSSDescription") = "") Then
                         rssChange = True
-                        Copy = Main.ConvertHTML2Text(storyOverview)
+                        Copy = cp.Utils.ConvertHTML2Text(storyOverview)
                         Call cs.SetField("RSSDescription", Copy)
                     End If
                     '
                     If (cs.GetText("RSSLink") = "") Then
-                        Link = Main.ServerLink
+                        Link = cp.Request.Link
                         If InStr(1, Link, cp.Site.GetText("adminUrl"), vbTextCompare) = 0 Then
                             Pos = InStr(1, Link, "?")
                             If Pos > 0 Then
@@ -983,10 +867,10 @@ Friend Function GetNewsletterBodyOverview(IssueID As Integer, IssuePageID As Int
                         End If
                     End If
                     If rssChange Then
-                        Call Main.ExecuteAddonAsProcess("RSS Feed Process")
+                        Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
                     End If
                 End If
-                Call cs.close()
+                Call cs.Close()
             End If
             '
             GetNewsletterBodyDetails = Stream

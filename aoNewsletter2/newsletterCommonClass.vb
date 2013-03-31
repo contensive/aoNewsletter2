@@ -10,6 +10,12 @@ Namespace newsletter2
     '
     Public Class newsletterCommonClass
         '
+        Public Const cr As String = vbCrLf & vbTab
+        '
+        Private Private_LegacySiteSites_Loaded As Boolean
+        Private Private_LegacySiteSites As String
+        Private EditWrapperCnt As Integer = 0
+        '
         '=====================================================================================
         ' common report for this class
         '=====================================================================================
@@ -31,7 +37,7 @@ Namespace newsletter2
             '
             Dim IssueID As Integer
             '
-            IssueID = cp.doc.getInteger(RequestNameIssueID)
+            IssueID = cp.Doc.GetInteger(RequestNameIssueID)
             '
             Call cp.Site.TestPoint("GetIssueID - IssueID From Stream: " & IssueID)
             Call cp.Site.TestPoint("GetIssueID - NewsletterID: " & NewsletterID)
@@ -52,23 +58,23 @@ Namespace newsletter2
         Friend Function GetCurrentIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
             'On Error GoTo ErrorTrap
             '
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             '
-            Call cs.open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
-            If cs.ok() Then
-                GetCurrentIssueID = cs.getInteger("ID")
+            Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
+            If cs.OK() Then
+                GetCurrentIssueID = cs.GetInteger("ID")
             End If
-            Call cs.close()
+            Call cs.Close()
             '
             'Exit Function
             'ErrorTrap:
             'Call HandleError(cp, ex, "GetCurrentIssueID")
         End Function
         '
-        Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer) As String
+        Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As newsletterCommonClass) As String
             'On Error GoTo ErrorTrap
             '
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim ID As Integer
             Dim Name As String
             Dim Active As Boolean
@@ -77,10 +83,10 @@ Namespace newsletter2
             Dim DateAdded As Date
             '
             Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
-            Do While cs.ok()
-                ID = cs.getInteger("ID")
-                Name = Trim(cs.getText("name"))
-                Active = cs.getBoolean("active")
+            Do While cs.OK()
+                ID = cs.GetInteger("ID")
+                Name = Trim(cs.GetText("name"))
+                Active = cs.GetBoolean("active")
                 PublishDate = cs.GetDate("PublishDate")
                 DateAdded = cs.GetDate("DateAdded")
                 Copy = Name
@@ -90,19 +96,19 @@ Namespace newsletter2
                 If Not Active Then
                     Copy = Copy & ",inactive"
                 End If
-                If DateAdded <> CDate(0) Then
+                If cn.encodeMinDate(DateAdded) <> Date.MinValue Then
                     Copy = Copy & ", created " & Int(DateAdded)
                 End If
-                If PublishDate <> CDate(0) Then
+                If PublishDate <> Date.MinValue Then
                     Copy = Copy & ", publish " & Int(PublishDate)
                 End If
                 If cp.User.IsContentManager("Newsletters") Then
                     Copy = "<a href=""?" & cp.Doc.RefreshQueryString & "&" & RequestNameIssueID & "=" & ID & """>" & Copy & "</a>"
                 End If
                 GetUnpublishedIssueList = GetUnpublishedIssueList & "<li>" & Copy & "</li>"
-                Call cs.gonext()
+                Call cs.GoNext()
             Loop
-            Call cs.close()
+            Call cs.Close()
             '
             If GetUnpublishedIssueList <> "" Then
                 GetUnpublishedIssueList = "<UL>" & GetUnpublishedIssueList & "</UL>"
@@ -119,7 +125,7 @@ Namespace newsletter2
             Dim NewsletterID As Integer
             Dim TemplateCopy As String
             Dim TemplateID As Integer
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim CSIssue As CPCSBaseClass = cp.CSNew()
             Dim AOPointer As CPCSBaseClass = cp.CSNew()
             Dim StyleString As String
@@ -146,7 +152,7 @@ Namespace newsletter2
                 '
                 ' Build Newsletter
                 '
-                Call cs.insert(ContentNameNewsletters)
+                Call cs.Insert(ContentNameNewsletters)
                 If cs.OK() Then
                     NewsletterID = cs.GetInteger("ID")
                     Call cs.SetField("Name", NewsletterName)
@@ -169,19 +175,19 @@ Namespace newsletter2
                 End If
                 Call CSIssue.Close()
             End If
-            Call cs.close()
+            Call cs.Close()
             '
             GetNewsletterID = NewsletterID
         End Function
         '
         Friend Sub SortCategoriesByIssue(cp As CPBaseClass, IssueID As Integer)
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
+            Dim Pointer As CPCSBaseClass = cp.CSNew()
             Dim CategoryID As Integer
             Dim Sort As Integer
             Dim SortUp As Integer
             Dim SortDown As Integer
             Dim SQL As String
-            Dim Pointer As Integer
             Dim MainSQL As String
             Dim PreviousID As Integer
             Dim PreviousCategoryID As Integer
@@ -192,34 +198,34 @@ Namespace newsletter2
             Dim RuleCategoryID As Integer
             Dim RuleIssueID As Integer
             '
-            CategoryID = cp.doc.getInteger(RequestNameSortUp)
+            CategoryID = cp.Doc.GetInteger(RequestNameSortUp)
             '
             '   Check for Categories without rules, since rules decide sort order of categories, no stories show if
             '       associated to a category without a rule, join fails.
             '
             SQL = "SELECT NIP.CategoryID AS CatID, NewsletterID AS IssueID "
             SQL = SQL & "FROM NewsletterIssuePages NIP "
-            SQL = SQL & "WHERE (NIP.CategoryID Not IN (SELECT CategoryID FROM NewsletterIssueCategoryRules WHERE NewsletterIssueID=" & Main.EncodeSQLNumber(IssueID) & ")) "
+            SQL = SQL & "WHERE (NIP.CategoryID Not IN (SELECT CategoryID FROM NewsletterIssueCategoryRules WHERE NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")) "
             SQL = SQL & "AND (NIP.CategoryID Is Not Null)"
             ' 1/19/2009 just look for IssuePages within this issue that do not have IssueCategoryRules for this issue
-            SQL = SQL & "AND (NIP.NewsletterID=" & Main.EncodeSQLNumber(IssueID) & ")"
+            SQL = SQL & "AND (NIP.NewsletterID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
             '
             Call cs.OpenSQL(SQL)
-            Do While cs.ok()
-                Pointer = Main.InsertCSRecord(ContentNameIssueRules)
-                If Main.CSOK(Pointer) Then
-                    RuleCategoryID = cs.getInteger("CatID")
-                    RuleIssueID = cs.getInteger("IssueID")
+            Do While cs.OK()
+                Call Pointer.Insert(ContentNameIssueRules)
+                If Pointer.OK Then
+                    RuleCategoryID = cs.GetInteger("CatID")
+                    RuleIssueID = cs.GetInteger("IssueID")
                     SortOrder = GetSortOrder(cp, RuleCategoryID, RuleIssueID)
-                    Call Main.SetCS(Pointer, "NewsletterIssueID", RuleIssueID)
-                    Call Main.SetCS(Pointer, "Active", 1)
-                    Call Main.SetCS(Pointer, "CategoryID", RuleCategoryID)
-                    Call Main.SetCS(Pointer, "SortOrder", SortOrder)
+                    Call Pointer.SetField("NewsletterIssueID", RuleIssueID)
+                    Call Pointer.SetField("Active", 1)
+                    Call Pointer.SetField("CategoryID", RuleCategoryID)
+                    Call Pointer.SetField("SortOrder", SortOrder)
                 End If
-                Call Main.CloseCS(Pointer)
-                Call cs.gonext()
+                Call Pointer.GoNext()
+                Call cs.GoNext()
             Loop
-            Call cs.close()
+            Call cs.Close()
             '
             If CategoryID <> 0 Then
                 '
@@ -231,15 +237,27 @@ Namespace newsletter2
                 MainSQL = MainSQL & " AND (NIR.Active<>0)"
                 MainSQL = MainSQL & " ORDER BY NIR.SortOrder"
                 '
-                Call cs.OpenSQL(MainSQL)
-                SortArray = Main.GetCSRows(CS)
+                ' b/c cp has no cp.getRows
+                '
+                If cs.OpenSQL(MainSQL) Then
+                    SortArrayCount = cs.GetRowCount
+                    ReDim SortArray(2, SortArrayCount)
+                    Dim ptr As Integer = 0
+                    Do While cs.OK()
+                        SortArray(0, ptr) = cs.GetText("categoryId")
+                        SortArray(1, ptr) = cs.GetText("sortOrder")
+                        Call cs.GoNext()
+                    Loop
+                End If
+                'SortArray = cs.Main.GetCSRows(cs)
+                '
                 SortArrayCount = UBound(SortArray, 2)
                 For SortArrayPointer = 0 To SortArrayCount
                     If (CategoryID = SortArray(0, SortArrayPointer)) And (SortArrayPointer <> 0) Then
-                        SortArray(1, SortArrayPointer - 1) = PadValue(Sort, 4)
-                        SortArray(1, SortArrayPointer) = PadValue(Sort - 10, 4)
+                        SortArray(1, SortArrayPointer - 1) = PadValue(cp, Sort, 4)
+                        SortArray(1, SortArrayPointer) = PadValue(cp, Sort - 10, 4)
                     Else
-                        SortArray(1, SortArrayPointer) = PadValue(Sort, 4)
+                        SortArray(1, SortArrayPointer) = PadValue(cp, Sort, 4)
                     End If
                     Sort = Sort + 10
                 Next
@@ -247,51 +265,51 @@ Namespace newsletter2
                 SortArrayPointer = 0
                 '
                 For SortArrayPointer = 0 To SortArrayCount
-                    SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & Main.EncodeSQLNumber(SortArray(0, SortArrayPointer)) & ") AND (NewsletterIssueID=" & Main.EncodeSQLNumber(IssueID) & ")"
+                    SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & cp.Db.EncodeSQLNumber(SortArray(0, SortArrayPointer)) & ") AND (NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
                     'Call Main.WriteStream("SQL " & SortArrayPointer & ": " & SQL)
-                    Call Main.ExecuteSQL("Default", SQL)
+                    Call cp.Db.ExecuteSQL(SQL)
                 Next
                 '
             End If
         End Sub
         '
-        Friend Function HasArticleAccess(cp As CPBaseClass,  ArticleID As Integer, Optional GivenGroupID As Integer) As Boolean
+        Friend Function HasArticleAccess(cp As CPBaseClass, ArticleID As Integer, Optional GivenGroupID As Integer = 0) As Boolean
             '
-            Dim CSPointer As CPCSBaseClass = cp.CSNew()
-            Dim AccessFlag As Boolean
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim ThisTest As String
             '
             If GivenGroupID <> 0 Then
-                CSPointer = Main.OpenCSContent(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-                If Not Main.CSOK(CSPointer) Then
+                Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , "GroupID")
+                If Not cs.OK Then
                     HasArticleAccess = True
                 Else
-                    Do While Main.CSOK(CSPointer)
-                        If cs.getInteger(CSPointer, "GroupID") = GivenGroupID Then
+                    Do While cs.OK
+                        If cs.GetInteger("GroupID") = GivenGroupID Then
                             HasArticleAccess = True
                         End If
-                        Call Main.NextCSRecord(CSPointer)
+                        Call cs.GoNext()
                     Loop
                 End If
-                Call Main.CloseCS(CSPointer)
+                Call cs.Close()
             Else
-                If Notcp.User.IsContentManager("Newsletters") Then
-                    CSPointer = Main.OpenCSContent(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-                    If Not Main.CSOK(CSPointer) Then
+                If Not cp.User.IsContentManager("Newsletters") Then
+                    Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , "GroupID")
+                    If Not cs.OK Then
                         HasArticleAccess = True
                     Else
-                        Do While Main.CSOK(CSPointer)
-                            ThisTest = Main.GetCSLookup(CSPointer, "GroupID")
+                        Do While cs.OK
+                            ThisTest = cs.GetText("GroupID")
+                            'ThisTest = cs.getText( "GroupID")
                             '
                             If ThisTest <> "" Then
-                                If Main.IsGroupMember(ThisTest) Then
+                                If cp.User.IsInGroup(ThisTest) Then
                                     HasArticleAccess = True
                                 End If
                             End If
-                            Call Main.NextCSRecord(CSPointer)
+                            Call cs.GoNext()
                         Loop
                     End If
-                    Call Main.CloseCS(CSPointer)
+                    Call cs.Close()
                 Else
                     HasArticleAccess = True
                 End If
@@ -301,42 +319,42 @@ Namespace newsletter2
         Friend Function GetCategoryAccessString(cp As CPBaseClass, CategoryID As Integer) As String
             'On Error GoTo ErrorTrap
             '
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim SQL As String
             Dim Stream As String
             '
             SQL = "SELECT ID "
             SQL = SQL & "From NewsletterIssuePages "
-            SQL = SQL & "WHERE (CategoryID=" & Main.EncodeSQLNumber(CategoryID) & ") "
+            SQL = SQL & "WHERE (CategoryID=" & cp.Db.EncodeSQLNumber(CategoryID) & ") "
             SQL = SQL & "AND (ID not in(Select NewsletterPageID FROM NewsletterPageGroupRules))"
             '
             ' first scheck for any unblocked story
             '
             Call cs.OpenSQL(SQL)
-            If cs.ok() Then
+            If cs.OK() Then
                 '
                 '   no unblocked stories, look for blocked stories
                 '
-                Call cs.close()
+                Call cs.Close()
                 SQL = "SELECT GR.GroupID "
                 SQL = SQL & "FROM NewsletterPageGroupRules GR, NewsletterIssuePages NIP "
                 SQL = SQL & "Where (GR.NewsletterPageID = NIP.ID) "
-                SQL = SQL & "AND (NIP.CategoryID=" & Main.EncodeSQLNumber(CategoryID) & ") "
+                SQL = SQL & "AND (NIP.CategoryID=" & cp.Db.EncodeSQLNumber(CategoryID) & ") "
                 '
                 Call cs.OpenSQL(SQL)
-                Do While cs.ok()
+                Do While cs.OK()
                     If Stream <> "" Then
-                        Stream = Stream & ","
+                        Stream &= ","
                     End If
-                    Stream = Stream & cs.getInteger("GroupID")
-                    Call cs.gonext()
+                    Stream &= cs.GetInteger("GroupID")
+                    Call cs.GoNext()
                 Loop
-                Call cs.close()
+                Call cs.Close()
             End If
-            Call cs.close()
+            Call cs.Close()
             '
             '    If Stream <> "" Then
-            '        Stream = Stream & ","
+            '        stream &=  ","
             '    End If
             '
             GetCategoryAccessString = Stream
@@ -344,26 +362,26 @@ Namespace newsletter2
         '
         Friend Function GetArticleAccessString(cp As CPBaseClass, StoryID As Integer) As String
             '
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim SQL As String
             Dim Stream As String
             '
             SQL = "SELECT GR.GroupID "
             SQL = SQL & "FROM NewsletterPageGroupRules GR "
-            SQL = SQL & "Where (GR.NewsletterPageID=" & Main.EncodeSQLNumber(StoryID) & ")"
+            SQL = SQL & "Where (GR.NewsletterPageID=" & cp.Db.EncodeSQLNumber(StoryID) & ")"
             '
             Call cs.OpenSQL(SQL)
-            Do While cs.ok()
+            Do While cs.OK()
                 If Stream <> "" Then
-                    Stream = Stream & ","
+                    Stream &= ","
                 End If
-                Stream = Stream & cs.getInteger("GroupID")
-                Call cs.gonext()
+                Stream &= cs.GetInteger("GroupID")
+                Call cs.GoNext()
             Loop
-            Call cs.close()
+            Call cs.Close()
             '
             '    If Stream <> "" Then
-            '        Stream = Stream & ","
+            '        stream &=  ","
             '    End If
             '
             GetArticleAccessString = Stream
@@ -381,10 +399,10 @@ Namespace newsletter2
             Else
                 If GroupString <> "" Then
                     If InStr(1, GroupString, ",", vbTextCompare) <> 0 Then
-                        ListArray() = Split(GroupString, ",", , vbTextCompare)
-                        ListArrayCount = UBound(ListArray())
+                        ListArray = Split(GroupString, ",", , vbTextCompare)
+                        ListArrayCount = UBound(ListArray)
                         For ListArrayPointer = 0 To ListArrayCount
-                            If Main.IsGroupMember(Main.GetRecordName("Groups", ListArray(ListArrayPointer))) Then
+                            If cp.User.IsInGroup(cp.Content.GetRecordName("Groups", ListArray(ListArrayPointer))) Then
                                 HasAccess = True
                                 Exit Function
                             End If
@@ -419,14 +437,14 @@ Namespace newsletter2
         End Function
         '
         Private Function GetSortOrder(cp As CPBaseClass, CategoryID As Integer, IssueID As Integer) As String
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Stream As String
             '
-            Call cs.open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , , , "SortOrder")
-            If cs.ok() Then
-                Stream = cs.getText("SortOrder")
+            Call cs.Open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , , , "SortOrder")
+            If cs.OK() Then
+                Stream = cs.GetText("SortOrder")
             End If
-            Call cs.close()
+            Call cs.Close()
             '
             If Stream = "" Then
                 Stream = "0"
@@ -435,22 +453,20 @@ Namespace newsletter2
             GetSortOrder = Stream
         End Function
         '
-        '
-        '
         Friend Function GetDefaultTemplateID(cp As CPBaseClass) As Integer
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim TemplateID As Integer
             Dim TemplateCopy As String
             '
             ' try default template
             '
-            Call cs.open("Newsletter Templates", "name=" & KmaEncodeSQLText("Default"))
-            If cs.ok() Then
+            Call cs.Open("Newsletter Templates", "name=" & cp.Db.EncodeSQLText("Default"))
+            If cs.OK() Then
                 '
                 ' Use the default template in their Db already
                 '
-                TemplateID = cs.getInteger("ID")
-                TemplateCopy = Trim(cs.getText("Template"))
+                TemplateID = cs.GetInteger("ID")
+                TemplateCopy = Trim(cs.GetText("Template"))
                 If TemplateCopy = "" Then
                     TemplateCopy = DefaultTemplate
                     TemplateCopy = Replace(TemplateCopy, "{{ACID0}}", GetRandomInteger())
@@ -458,77 +474,59 @@ Namespace newsletter2
                     Call cs.SetField("Template", TemplateCopy)
                 End If
             End If
-            Call cs.close()
+            Call cs.Close()
             If TemplateID = 0 Then
                 '
                 ' build default template
                 '
-                TemplateCopy = GetDefaultTemplateCopy()
-                Call cs.insert("Newsletter Templates")
-                If cs.ok() Then
+                TemplateCopy = GetDefaultTemplateCopy(cp)
+                Call cs.Insert("Newsletter Templates")
+                If cs.OK() Then
                     Call cs.SetField("name", "Default")
                     Call cs.SetField("Template", TemplateCopy)
-                    TemplateID = cs.getInteger("ID")
+                    TemplateID = cs.GetInteger("ID")
                 End If
-                Call cs.close()
+                Call cs.Close()
             End If
             '
             GetDefaultTemplateID = TemplateID
         End Function
-        '
-        '
         '
         Friend Function GetDefaultTemplateCopy(cp As CPBaseClass) As String
             GetDefaultTemplateCopy = DefaultTemplate
             GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID0}}", GetRandomInteger())
             GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID1}}", GetRandomInteger())
         End Function
-
         '
         '===================================================================================================
         '   Wrap the content in a common wrapper if authoring is enabled
         '===================================================================================================
         '
-        Public Function GetEditWrapper(cp As CPBaseClass, Caption As Object, Content As Object) As String
+        Public Function GetEditWrapper(cp As CPBaseClass, Caption As String, Content As String) As String
             Dim returnString As String = Content
             Try
                 '
                 Dim IsAuthoring As Boolean
                 '
-                IsAuthoring = cp.User.IsEditingAnything()()
+                IsAuthoring = cp.User.IsEditingAnything()
                 If Not IsAuthoring Then
                     returnString = Content
                 Else
-                    returnString = GetLegacySiteStyles
-                    If usegreenedges Then
+                    returnString = GetLegacySiteStyles()
+                    returnString = returnString _
+                    & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">"
+                    If Caption <> "" Then
                         returnString = returnString _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">" _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperInner"">" _
                                 & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
-                                & kmaEncodeText(Caption) _
-                                & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle>" _
-                                & "</td></tr></table>" _
-                                & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & EditWrapperCnt & """>" _
-                                & kmaEncodeText(Content) _
-                                & "</td></tr></table>" _
-                            & "</td></tr></table>" _
-                            & "</td></tr></table>"
-                    Else
-                        returnString = returnString _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">"
-                        If Caption <> "" Then
-                            returnString = returnString _
-                                    & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
-                                    & kmaEncodeText(Caption) _
-                                    & "<!-- <img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle> -->" _
-                                    & "</td></tr></table>"
-                        End If
-                        returnString = returnString _
-                                & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & EditWrapperCnt & """>" _
-                                & kmaEncodeText(Content) _
-                                & "</td></tr></table>" _
-                            & "</td></tr></table>"
+                                & Caption _
+                                & "<!-- <img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle> -->" _
+                                & "</td></tr></table>"
                     End If
+                    returnString = returnString _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & EditWrapperCnt & """>" _
+                            & Content _
+                            & "</td></tr></table>" _
+                        & "</td></tr></table>"
                     EditWrapperCnt = EditWrapperCnt + 1
                 End If
             Catch ex As Exception
@@ -545,12 +543,12 @@ Namespace newsletter2
             Dim returnString As String = Content
             Try
                 If cp.User.IsEditingAnything() Or cp.User.IsAdmin Then
-                    returnString = GetLegacySiteStyles _
+                    returnString = GetLegacySiteStyles() _
                         & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
                             & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapperContent"">" _
                             & "<b>Administrator</b>" _
                             & "<BR>" _
-                            & "<BR>" & kmaEncodeText(Content) _
+                            & "<BR>" & Content _
                             & "</td></tr></table>" _
                         & "</td></tr></table>"
                 End If
@@ -558,6 +556,43 @@ Namespace newsletter2
 
             End Try
             Return returnString
+        End Function
+        '
+        Friend Function encodeMinDate(source As Date) As Date
+            Dim returnDate As Date = source
+            If returnDate < CDate("1/1/1990") Then
+                returnDate = Date.MinValue
+            End If
+        End Function
+        '
+        '=================================================================================
+        '   Get a Random Long Value
+        '=================================================================================
+        '
+        Public Function GetRandomInteger() As Long
+            Dim RandomLimit As Long
+            RandomLimit = 32767
+            Randomize()
+            GetRandomInteger = (Rnd() * RandomLimit)
+        End Function
+        '
+        '
+        '
+        Private Function GetLegacySiteStyles()
+            If Not Private_LegacySiteSites_Loaded Then
+                Private_LegacySiteSites_Loaded = True
+                '
+                ' compatibility with old sites - if they do not get the default style sheet, put it in here
+                '
+                    GetLegacySiteStyles = "" _
+                    & cr & "<!-- compatibility with legacy framework --><style type=text/css>" _
+                    & cr & " .ccEditWrapper {border:1px dashed #808080;}" _
+                    & cr & " .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}" _
+                    & cr & " .ccEditWrapperContent{padding:4px;}" _
+                    & cr & " .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}" _
+                    & cr & " .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}" _
+                    & "</style>"
+            End If
         End Function
     End Class
 End Namespace

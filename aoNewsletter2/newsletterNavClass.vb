@@ -8,22 +8,6 @@ Namespace newsletter2
     '
     '
     Public Class newsletterNavClass
-        Inherits AddonBaseClass
-        '
-        '
-        '=====================================================================================
-        ' 
-        '=====================================================================================
-        '
-        Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim returnHtml As String = ""
-            Try
-                returnHtml = "Visual Studio Contensive Addon - OK response"
-            Catch ex As Exception
-                errorReport(CP, ex, "execute")
-            End Try
-            Return returnHtml
-        End Function
         '
         '=====================================================================================
         ' common report for this class
@@ -39,11 +23,10 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Public Function GetContent(cp As CPBaseClass, OptionString As String, Optional LocalGroupID As Integer) As String
+        Public Function GetContent(cp As CPBaseClass, isContentManager As Boolean, Optional LocalGroupID As Integer = 0) As String
             Dim returnString As String = ""
             Try
 
-                Dim WorkingQueryStringPlus As String
                 Dim ErrorString As String
                 Dim FormID As Integer
                 Dim IssueID As Integer
@@ -59,16 +42,16 @@ Namespace newsletter2
                 Dim NavMode As String
                 Dim OptionArray() As String
                 Dim BracketPosition As Integer
-                Dim Common As New newsletterCommonClass
+                Dim cn As New newsletterCommonClass
                 '
-                NewsletterName = cp.Doc.GetText("Newsletter", OptionString)
+                NewsletterName = cp.Doc.GetText("Newsletter")
                 If NewsletterName <> "" Then
                     '
                     ' If newsletterNavClass used without PageClass, Newsletter is in the OptionString, Issue is in QS
                     '
                     NewsletterID = cp.Content.GetRecordID(ContentNameNewsletters, NewsletterName)
                     Call cp.Site.TestPoint("GetIssueID call 3, NewsletterID=" & NewsletterID)
-                    IssueID = Common.GetIssueID(cp, NewsletterID)
+                    IssueID = cn.GetIssueID(cp, NewsletterID)
                     IssuePageID = cp.Doc.GetInteger(RequestNameIssuePageID)
                     FormID = cp.Doc.GetInteger(RequestNameFormID)
                 Else
@@ -76,28 +59,20 @@ Namespace newsletter2
                     ' Without a Newsletter option, assume newsletterNavClass is used within a PageClass
                     ' Get the Issue and Newsletter from the visit properties set in PageClass
                     '
-                    NewsletterProperty = Main.GetVisitProperty(VisitPropertyNewsletter)
-                    Parts() = Split(NewsletterProperty, ".")
+                    NewsletterProperty = cp.Visit.GetText(VisitPropertyNewsletter)
+                    Parts = Split(NewsletterProperty, ".")
                     If UBound(Parts) > 2 Then
-                        NewsletterID = kmaEncodeInteger(Parts(0))
-                        IssueID = kmaEncodeInteger(Parts(1))
-                        IssuePageID = kmaEncodeInteger(Parts(2))
-                        FormID = kmaEncodeInteger(Parts(3))
+                        NewsletterID = cp.Utils.EncodeInteger(Parts(0))
+                        IssueID = cp.Utils.EncodeInteger(Parts(1))
+                        IssuePageID = cp.Utils.EncodeInteger(Parts(2))
+                        FormID = cp.Utils.EncodeInteger(Parts(3))
                     End If
                 End If
-                CurrentIssueID = Common.GetCurrentIssueID(cp, NewsletterID)
+                CurrentIssueID = cn.GetCurrentIssueID(cp, NewsletterID)
                 '
-                WorkingQueryStringPlus = cp.Doc.RefreshQueryString
+                '        IssueID = cn.GetIssueID(cp, NewsletterID)
                 '
-                If WorkingQueryStringPlus = "" Then
-                    WorkingQueryStringPlus = "?"
-                Else
-                    WorkingQueryStringPlus = "?" & WorkingQueryStringPlus & "&"
-                End If
-                '
-                '        IssueID = Common.GetIssueID(cp, NewsletterID)
-                '
-                Stream = GetNavigationVertical(LocalGroupID)
+                Stream = GetNavigationVertical(cp, IssueID, CurrentIssueID, NewsletterID, isContentManager, FormID, LocalGroupID)
                 '
                 returnString = Stream
                 '
@@ -107,166 +82,166 @@ Namespace newsletter2
             Return returnString
         End Function
         '
-        Private Function GetNavigationVertical(cp As CPBaseClass, Optional LocalGroupID As Integer) As String
+        Private Function GetNavigationVertical(cp As CPBaseClass, issueid As Integer, currentIssueId As Integer, NewsletterID As Integer, isContentManager As Boolean, FormID As Integer, Optional LocalGroupID As Integer = 0) As String
             Dim returnString As String = ""
             Try
+                Dim CS As CPCSBaseClass = cp.CSNew()
+                Dim CS2 As CPCSBaseClass = cp.CSNew()
                 Dim CSPointer As CPCSBaseClass = cp.CSNew()
                 Dim ThisSQL As String
                 Dim Controls As String
                 Dim Link As String
                 Dim Stream As String
-                Dim CS As String
                 Dim WorkingIssuePageID As Integer
                 Dim NavSQL As String
                 Dim CategoryName As String
                 Dim PreviousCategoryName As String
-                Dim Common As New newsletterCommonClass
+                Dim cn As New newsletterCommonClass
                 Dim AccessString As String
-                Dim CS2 As Integer
                 Dim CategoryID As Integer
                 Dim QS As String
                 Dim ArticleCount As Integer
                 '
                 Stream = "<div class=""NewsletterNav"">"
-                Stream = Stream & "<div class=""caption"">" & Main.GetSiteProperty(SitePropertyPageListCaption, "In This Issue", True) & "</div>"
-                QS = WorkingQueryStringPlus
-                QS = cp.Utils.ModifyQueryString(QS, RequestNameIssueID, CStr(IssueID), True)
+                Stream &= "<div class=""caption"">" & cp.Site.GetText(SitePropertyPageListCaption, "In This Issue") & "</div>"
+                QS = cp.Doc.RefreshQueryString
+                QS = cp.Utils.ModifyQueryString(QS, RequestNameIssueID, CStr(issueid), True)
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormIssue, True)
-                Stream = Stream & "<div class=""PageList""><a href=""" & QS & """>Home</a></div>"
+                Stream &= "<div class=""PageList""><a href=""?" & QS & """>Home</a></div>"
                 '
                 NavSQL = "SELECT DISTINCT NIC.ID AS CategoryID, NIR.SortOrder, NIC.Name AS CategoryName"
                 NavSQL = NavSQL & " FROM NewsletterIssueCategories NIC, NewsletterIssueCategoryRules NIR"
                 NavSQL = NavSQL & " Where (NIC.ID = NIR.CategoryID)"
-                NavSQL = NavSQL & " AND (NIR.NewsletterIssueID=" & IssueID & ")"
+                NavSQL = NavSQL & " AND (NIR.NewsletterIssueID=" & issueid & ")"
                 NavSQL = NavSQL & " AND (NIC.Active<>0)"
                 NavSQL = NavSQL & " AND (NIR.Active<>0)"
                 NavSQL = NavSQL & " ORDER BY NIR.SortOrder"
                 '
-                Call cs.OpenSQL(NavSQL)
-                If cs.ok() Then
-                    Do While cs.ok()
-                        CategoryID = CS.getInteger("CategoryID")
-                        CS2 = Main.OpenCSContent(ContentNameNewsletterIssuePages, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder")
-                        If Main.IsCSOK(CS2) Then
-                            CategoryName = CS.getText("CategoryName")
+                Call CS.OpenSQL(NavSQL)
+                If CS.OK() Then
+                    Do While CS.OK()
+                        CategoryID = CS.GetInteger("CategoryID")
+                        Call CS2.Open(ContentNameNewsletterIssuePages, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & issueid & ")", "SortOrder")
+                        If CS2.OK Then
+                            CategoryName = CS.GetText("CategoryName")
                             If (CategoryName <> PreviousCategoryName) Then
-                                AccessString = Common.GetCategoryAccessString(cp, CS.getInteger("CategoryID"))
+                                AccessString = cn.GetCategoryAccessString(cp, CS.GetInteger("CategoryID"))
                                 If AccessString <> "" Then
-                                    Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
+                                    Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                                 End If
-                                Stream = Stream & vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
+                                Stream &= vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
                                 If AccessString <> "" Then
-                                    Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
+                                    Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
                                 End If
                                 PreviousCategoryName = CategoryName
                             End If
                             '
-                            Do While Main.CSOK(CS2)
+                            Do While CS2.OK
                                 '
-                                WorkingIssuePageID = CS.getInteger(CS2, "ID")
-                                AccessString = Common.GetArticleAccessString(cp, WorkingIssuePageID)
+                                WorkingIssuePageID = CS2.GetInteger("ID")
+                                AccessString = cn.GetArticleAccessString(cp, WorkingIssuePageID)
                                 If AccessString <> "" Then
-                                    Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
+                                    Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                                 End If
                                 ' 1/1/09 - JK - always links to root page '/', removed path from link, added modify call incase requests are already in the qs
-                                QS = WorkingQueryStringPlus
+                                QS = cp.Doc.RefreshQueryString
                                 QS = cp.Utils.ModifyQueryString(QS, RequestNameIssuePageID, CStr(WorkingIssuePageID), True)
                                 QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
-                                Stream = Stream & "<div class=""PageList"">" & CS.GetEditLink(CS2) & "<a href=""" & QS & """>" & Main.GetCSText(CS2, "Name") & "</a></div>"
-                                'Stream = Stream & "<div class=""PageList"">" & cs.GetEditLink(CS2) & "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & WorkingIssuePageID & "&" & RequestNameFormID & "=" & FormDetails & """>" & Main.GetCSText(CS2, "Name") & "</a></div>"
+                                Stream &= "<div class=""PageList"">" & CS2.GetEditLink() & "<a href=""?" & QS & """>" & CS.GetText("Name") & "</a></div>"
+                                'stream &=  "<div class=""PageList"">" & cs.GetEditLink(CS2) & "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & "?" & cp.Doc.RefreshQueryString & RequestNameIssuePageID & "=" & WorkingIssuePageID & "&" & RequestNameFormID & "=" & FormDetails & """>" & cs.gettext2, "Name") & "</a></div>"
                                 If AccessString <> "" Then
-                                    Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
+                                    Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
                                 End If
                                 '
                                 ArticleCount = ArticleCount + 1
-                                Call Main.NextCSRecord(CS2)
+                                Call CS2.GoNext()
                             Loop
                         End If
-                        Call Main.CloseCS(CS2)
+                        Call CS2.Close()
                         '
-                        Call cs.gonext()
+                        Call CS.GoNext()
                     Loop
                 End If
-                Call CS.close()
+                Call CS.Close()
                 '
-                Call CS.open(ContentNameNewsletterIssuePages, "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")", "SortOrder,DateAdded")
-                If cs.ok() Then
+                Call CS.Open(ContentNameNewsletterIssuePages, "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & issueid & ")", "SortOrder,DateAdded")
+                If CS.OK() Then
                     If ArticleCount > 0 Then
                         '
                         ' This is a list of uncategorized articles following the categories -- give it a heading
                         '
-                        CategoryName = Main.GetSiteProperty("Newsletter Nav Caption Other Articles", "Other Articles")
-                        Stream = Stream & vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
+                        CategoryName = cp.Site.GetText("Newsletter Nav Caption Other Articles", "Other Articles")
+                        Stream &= vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
                     End If
-                    Do While cs.ok()
-                        WorkingIssuePageID = CS.getInteger("ID")
-                        AccessString = Common.GetArticleAccessString(cp, WorkingIssuePageID)
+                    Do While CS.OK()
+                        WorkingIssuePageID = CS.GetInteger("ID")
+                        AccessString = cn.GetArticleAccessString(cp, WorkingIssuePageID)
                         If AccessString <> "" Then
-                            Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
+                            Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                         End If
                         ' 1/1/09 - JK - always links to root page '/', removed path from link, added modify call incase requests are already in the qs
-                        If cs.getBoolean("AllowReadMore") Then
+                        If CS.GetBoolean("AllowReadMore") Then
                             '
                             ' link to the story page
                             '
-                            QS = WorkingQueryStringPlus
+                            QS = cp.Doc.RefreshQueryString
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameIssuePageID, CStr(WorkingIssuePageID), True)
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
-                            Stream = Stream & "<div class=""PageList"">" & CS.GetEditLink() & "<a href=""" & QS & """>" & CS.getText("Name") & "</a></div>"
+                            Stream &= "<div class=""PageList"">" & CS.GetEditLink() & "<a href=""?" & QS & """>" & CS.GetText("Name") & "</a></div>"
                         Else
                             '
                             ' link to the bookmark 'story#' on the cover
                             '
-                            QS = WorkingQueryStringPlus
+                            QS = "?" & cp.Doc.RefreshQueryString
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameIssuePageID, "", False)
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormIssue, True)
                             QS = QS & "#story" & WorkingIssuePageID
-                            Stream = Stream & "<div class=""PageList"">" & CS.GetEditLink() & "<a href=""" & QS & """>" & CS.getText("Name") & "</a></div>"
+                            Stream &= "<div class=""PageList"">" & CS.GetEditLink() & "<a href=""" & QS & """>" & CS.GetText("Name") & "</a></div>"
                         End If
-                        'Stream = Stream & "<div class=""PageList"">" & cs.GetEditLink() & "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & WorkingIssuePageID & "&" & RequestNameFormID & "=" & FormDetails & """>" &cs.getText( "Name") & "</a></div>"
+                        'stream &=  "<div class=""PageList"">" & cs.GetEditLink() & "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & "?" & cp.Doc.RefreshQueryString & RequestNameIssuePageID & "=" & WorkingIssuePageID & "&" & RequestNameFormID & "=" & FormDetails & """>" &cs.getText( "Name") & "</a></div>"
                         If AccessString <> "" Then
-                            Stream = Stream & "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
+                            Stream &= "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
                         End If
-                        Call cs.gonext()
+                        Call CS.GoNext()
                     Loop
                 End If
-                Call CS.close()
+                Call CS.Close()
                 '
                 ' Link to Current Issues
                 '
-                If (IssueID <> CurrentIssueID) And (CurrentIssueID <> 0) Then
-                    Stream = Stream & vbCrLf & "<div class=""caption""><a href=""" & WorkingQueryStringPlus & RequestNameFormID & "=" & FormIssue & """>" & Main.GetSiteProperty(SitePropertyCurrentIssue, "Current Issue", True) & "</a></div>"
+                If (issueid <> currentIssueId) And (currentIssueId <> 0) Then
+                    Stream &= vbCrLf & "<div class=""caption""><a href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameFormID & "=" & FormIssue & """>" & cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue") & "</a></div>"
                 End If
                 '
                 ' Display Archive Link if there are archive issues
                 ' can not just lookup issues that are not the issueid because if you are editing a future issue, the current issue shows up as an archive
                 '
-                ThisSQL = "SELECT TOP 2 ID From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (NewsletterID=" & Main.EncodeSQLNumber(NewsletterID) & ")"
-                CSPointer = Main.OpenCSSQL("Default", ThisSQL)
-                If Main.CSOK(CSPointer) Then
+                ThisSQL = "SELECT TOP 2 ID From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
+                Call CS.OpenSQL(ThisSQL)
+                If CS.OK Then
                     '
                     ' First one is the current issue
                     '
-                    Call Main.NextCSRecord(CSPointer)
-                    If Main.IsCSOK(CSPointer) Then
+                    Call CS.GoNext()
+                    If CS.OK Then
                         '
                         ' If there are more then one published issues, the others are archive issues
                         '
-                        Stream = Stream & vbCrLf & "<div class=""caption""><a href=""" & WorkingQueryStringPlus & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive & """>" & Main.GetSiteProperty(SitePropertyIssueArchive, "Archives", True) & "</a></div>"
+                        Stream &= vbCrLf & "<div class=""caption""><a href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive & """>" & cp.Site.GetText(SitePropertyIssueArchive, "Archives") & "</a></div>"
                     End If
                 End If
-                Call Main.CloseCS(CSPointer)
+                Call CS.Close()
                 '
                 ' Admin Links
                 '
-                If (isManager) And (FormID <> FormEmail) Then
+                If (isContentManager) And (FormID <> FormEmail) Then
                     Controls = ""
                     If Link <> "" Then
                         Controls = Controls & vbCrLf & "<div class=""LinkLine"">" & Link & "</div>"
                     End If
-                    'Controls = Controls & Common.GetAuthoringLinks(cp, IssuePageID, IssueID, NewsletterID, WorkingQueryStringPlus)
+                    'Controls = Controls & cn.GetAuthoringLinks(cp, IssuePageID, IssueID, NewsletterID, "?" & cp.Doc.RefreshQueryString)
                     If Controls <> "" Then
-                        Stream = Stream & "<BR /><BR />" & Common.GetAdminHintWrapper(cp, Controls)
+                        Stream &= "<BR /><BR />" & cn.GetAdminHintWrapper(cp, Controls)
                     End If
                 End If
                 '
@@ -278,14 +253,14 @@ Namespace newsletter2
             Return returnString
         End Function
         '
-        Private Function GetArchiveLink(cp As CPBaseClass) As String
+        Private Function GetArchiveLink(cp As CPBaseClass, newsletterId As Integer) As String
             'On Error GoTo ErrorTrap
             '
             Dim Stream As String
             '
             ' 1/1/09 - JK - fixed link - always pointed to the current page in the site's root directory (/index.asp), should point to the current page
-            Stream = Stream & "<a class=""caption"" href=""" & WorkingQueryStringPlus & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive & """>" & Main.GetSiteProperty(SitePropertyIssueArchive, "Archives", True) & "</a>"
-            'Stream = Stream & "<a class=""caption"" href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive & """>" & Main.GetSiteProperty(SitePropertyIssueArchive, "Archives", True) & "</a>"
+            Stream &= "<a class=""caption"" href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & newsletterId & "&" & RequestNameFormID & "=" & FormArchive & """>" & cp.Site.GetText(SitePropertyIssueArchive, "Archives") & "</a>"
+            'stream &=  "<a class=""caption"" href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive & """>" & cp.site.getText(SitePropertyIssueArchive, "Archives", True) & "</a>"
             '
             GetArchiveLink = Stream
             '
@@ -300,8 +275,8 @@ Namespace newsletter2
             Dim Stream As String
             '
             ' 1/1/09 - JK - fixed link - always pointed to the current page in the site's root directory (/index.asp), should point to the current page
-            Stream = Stream & "<a class=""caption"" href=""" & WorkingQueryStringPlus & RequestNameFormID & "=" & FormIssue & """>" & Main.GetSiteProperty(SitePropertyCurrentIssue, "Current Issue", True) & "</a>"
-            'Stream = Stream & "<a class=""caption"" href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameFormID & "=" & FormIssue & """>" & Main.GetSiteProperty(SitePropertyCurrentIssue, "Current Issue", True) & "</a>"
+            Stream &= "<a class=""caption"" href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameFormID & "=" & FormIssue & """>" & cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue") & "</a>"
+            'stream &=  "<a class=""caption"" href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & "?" & cp.Doc.RefreshQueryString & RequestNameFormID & "=" & FormIssue & """>" & cp.site.getText(SitePropertyCurrentIssue, "Current Issue", True) & "</a>"
             '
             GetCurrentIssueLink = Stream
             '
