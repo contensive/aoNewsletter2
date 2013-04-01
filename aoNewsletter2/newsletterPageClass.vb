@@ -181,7 +181,7 @@ Namespace newsletter2
                             If cs.OK() Then
                                 EditLink = cs.GetEditLink()
                                 GetContent = cs.GetText("Template")
-                                GetContent = cn.GetEditWrapper(cp, "Newsletter Template [" & cs.GetText("Name") & "] " & EditLink, GetContent)
+                                'GetContent = cn.GetEditWrapper(cp, "Newsletter Template [" & cs.GetText("Name") & "] " & EditLink, GetContent)
                             End If
                             Call cs.Close()
                         End If
@@ -242,7 +242,7 @@ Namespace newsletter2
                         '
                         Controls = Controls & "<h3>For this Newsletter</h3><ul>"
                         Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit the styles for this newsletter</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit this newsletter</a></div></li>"
                         Controls = Controls & "</ul>"
                         '
                         ' Search for unpublished versions
@@ -284,9 +284,9 @@ Namespace newsletter2
                 '
                 ' Add newsletter edit wrapper
                 '
-                If cp.User.IsEditing("Newsletters") Then
-                    GetContent = cn.GetEditWrapper(cp, "Newsletter [" & NewsletterName & "] " & cp.Content.GetEditLink("Newsletters", NewsletterID, False, NewsletterName, True), GetContent)
-                End If
+                'If cp.User.IsEditing("Newsletters") Then
+                '    GetContent = cn.GetEditWrapper(cp, "Newsletter [" & NewsletterName & "] " & cp.Content.GetEditLink("Newsletters", NewsletterID, False, NewsletterName, True), GetContent)
+                'End If
             Catch ex As Exception
                 'Call HandleError(cp, ex, "GetContent")
             End Try
