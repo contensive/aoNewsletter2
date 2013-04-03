@@ -82,7 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="newsletterBodyClass.vb" />
-    <Compile Include="newsletterClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -102,7 +101,7 @@
     <Compile Include="newsletterExtensionClass.vb" />
     <Compile Include="newsletterModule.vb" />
     <Compile Include="newsletterNavClass.vb" />
-    <Compile Include="newsletterPageClass.vb" />
+    <Compile Include="newsletterClass.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

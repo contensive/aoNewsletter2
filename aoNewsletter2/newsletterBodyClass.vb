@@ -9,32 +9,6 @@ Namespace newsletter2
     '
     Public Class newsletterBodyClass
         '
-        Private WorkingQueryStringPlus As String
-        Private ErrorString As String
-        '
-        Private PageNumber As Integer
-        '
-        Private FormID As Integer
-        Private RecordsPerPage As Integer
-        '
-        Private IssueID As Integer
-        Private IssuePageID As Integer
-        Private MonthSelected As Integer
-        Private YearSelected As Integer
-        Private ButtonValue As String
-        Private RecordTop As Integer
-        Private SearchKeywords As String
-
-        Private isManager As Boolean
-
-        Private NewsletterID As Integer
-        Private archiveIssuesToDisplay As Integer
-        '
-        'Private Main As MainClass
-        Private cp As CPBaseClass
-        Private EncodeCopyNeeded As Boolean
-        'Private Csv As Object
-        '
         '=====================================================================================
         ' common report for this class
         '=====================================================================================
@@ -49,18 +23,27 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Public Function GetContent(cp As CPBaseClass, OptionString As String) As String
-            'On Error GoTo ErrorTrap
-            '
-            Dim Stream As String
-            Dim cn As New newsletterCommonClass
-            Dim NewsletterName As String
-            Dim NewsletterProperty As String
-            Dim Parts() As String
-            '
-            If True Then
+        Public Function GetContent(cp As CPBaseClass, NewsletterName As String, WorkingQueryStringPlus As String) As String
+            Dim returnHtml As String = ""
+            Try
                 '
-                NewsletterName = cp.Doc.GetText("Newsletter")
+                Dim PageNumber As Integer
+                Dim FormID As Integer
+                Dim RecordsPerPage As Integer
+                Dim IssueID As Integer
+                Dim IssuePageID As Integer
+                Dim MonthSelected As Integer
+                Dim YearSelected As Integer
+                Dim ButtonValue As String
+                Dim RecordTop As Integer
+                Dim SearchKeywords As String
+                Dim NewsletterID As Integer
+                Dim archiveIssuesToDisplay As Integer
+                Dim EncodeCopyNeeded As Boolean
+                Dim cn As New newsletterCommonClass
+                Dim NewsletterProperty As String
+                Dim Parts() As String
+                '
                 archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
                 '
                 If NewsletterName <> "" Then
@@ -100,64 +83,50 @@ Namespace newsletter2
                 If PageNumber = 0 Then
                     PageNumber = 1
                 End If
-
-                Stream = GetForm(cp, cn)
-                GetContent = Stream
-            End If
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetContent")
+                returnHtml = GetForm(cp, cn, FormID, ButtonValue, IssueID, IssuePageID, archiveIssuesToDisplay, NewsletterID, MonthSelected, YearSelected, SearchKeywords, RecordsPerPage, EncodeCopyNeeded, PageNumber, WorkingQueryStringPlus)
+            Catch ex As Exception
+                Call handleError(cp, ex, "getContent")
+            End Try
+            Return returnHtml
         End Function
         '
-        Private Function GetForm(cp As CPBaseClass, cn As newsletterCommonClass) As String
-            'On Error GoTo ErrorTrap
-            '
-            Dim Stream As String
-            '
-            ' Process forms
-            '
-            Select Case FormID
-                Case FormArchive
-                    Select Case ButtonValue
-                        Case FormButtonViewNewsLetter
-                            '
-                            ' Archive form pressing the view button
-                            '
-                            FormID = FormIssue
-                    End Select
-            End Select
-            '
-            ' Display Forms
-            '
-            Select Case FormID
-                Case FormArchive
-                    Stream &= GetArchiveList(cp)
-                Case FormDetails
-                    Call cp.Site.TestPoint("GetForm Entering GetNewsletterBodyDetails")
-                    Stream &= GetNewsletterBodyDetails(cp, cn, IssuePageID)
-                Case Else
-                    Call cp.Site.TestPoint("GetForm Entering GetNewsletterBodyOverview")
-                    FormID = FormIssue
-                    Stream &= GetNewsletterBodyOverview(cp, IssueID, IssuePageID, )
-            End Select
-            '    '
-            '    Select Case ButtonValue
-            '        Case FormButtonViewArchives
-            ' '           stream &=  GetArchiveList()
-            '        Case FormButtonViewNewsLetter
-            ' '           stream &=  GetArchiveList()
-            '    End Select
-            '
-            GetForm = Stream
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetForm")
+        Private Function GetForm(cp As CPBaseClass, cn As newsletterCommonClass, formId As Integer, buttonValue As String, issueId As Integer, issuePageId As Integer, archiveIssuesToDisplay As Integer, NewsletterID As Integer, monthSelected As Integer, yearSelected As Integer, SearchKeywords As String, RecordsPerPage As Integer, EncodeCopyNeeded As Boolean, PageNumber As Integer, WorkingQueryStringPlus As String) As String
+            Dim returnHtml As String = ""
+            Try
+                '
+                ' Process forms
+                '
+                Select Case formId
+                    Case FormArchive
+                        Select Case buttonValue
+                            Case FormButtonViewNewsLetter
+                                '
+                                ' Archive form pressing the view button
+                                '
+                                formId = FormIssue
+                        End Select
+                End Select
+                '
+                ' Display Forms
+                '
+                Select Case formId
+                    Case FormArchive
+                        returnHtml &= GetArchiveList(cp, archiveIssuesToDisplay, NewsletterID, monthSelected, yearSelected, SearchKeywords, RecordsPerPage, buttonValue, issueId, EncodeCopyNeeded, PageNumber, WorkingQueryStringPlus)
+                    Case FormDetails
+                        Call cp.Site.TestPoint("GetForm Entering GetNewsletterBodyDetails")
+                        returnHtml &= GetNewsletterBodyDetails(cp, cn, issuePageId, issueId, WorkingQueryStringPlus)
+                    Case Else
+                        Call cp.Site.TestPoint("GetForm Entering GetNewsletterBodyOverview")
+                        formId = FormIssue
+                        returnHtml &= GetNewsletterBodyOverview(cp, issueId, issuePageId, WorkingQueryStringPlus, formId, EncodeCopyNeeded)
+                End Select
+            Catch ex As Exception
+                Call handleError(cp, ex, "getForm")
+            End Try
+            Return returnHtml
         End Function
         '
-        Private Function GetArchiveList(cp As CPBaseClass) As String
-            'On Error GoTo ErrorTrap
+        Private Function GetArchiveList(cp As CPBaseClass, ByRef archiveIssuesToDisplay As Integer, NewsletterID As Integer, monthSelected As Integer, yearSelected As Integer, SearchKeywords As String, RecordsPerPage As Integer, ButtonValue As String, issueId As Integer, EncodeCopyNeeded As Boolean, PageNumber As Integer, WorkingQueryStringPlus As String) As String
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
             '
@@ -207,11 +176,11 @@ Namespace newsletter2
             sql2 = sql2 & " from newsletterissues nl, newsletterissuepages nlp"
             sql2 = sql2 & " Where (NL.ID = nlp.newsletterid)"
             sql2 = sql2 & " AND (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
-            If MonthSelected <> 0 Then
-                ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & MonthSelected
+            If monthSelected <> 0 Then
+                ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
             End If
-            If YearSelected <> 0 Then
-                ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & YearSelected
+            If yearSelected <> 0 Then
+                ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & yearSelected
             End If
             If SearchKeywords <> "" Then
                 sql2 = sql2 & " and ((nlp.Body like '%" & SearchKeywords & "%' )or (nlp.name  like '%" & SearchKeywords & "%') or (nlp.Overview  like '%" & SearchKeywords & "%'))"
@@ -236,11 +205,11 @@ Namespace newsletter2
                 '
                 ' List a page of archive issues
                 '
-                If (MonthSelected = 0) And (YearSelected = 0) Then
+                If (monthSelected = 0) And (yearSelected = 0) Then
                     'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                     '
                     'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
-                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & issueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
                     '
                     Call cs.OpenSQL(ThisSQL)
                     If cs.OK Then
@@ -280,11 +249,11 @@ Namespace newsletter2
                 ThisSQL2 = " select NL.id, nl.name, nl.publishdate, nlp.AllowReadMore, nlp.Overview, nlp.Body, nlp.id as ThisID ,nlp.newsletterid, nlp.name as nlpname"
                 ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages nlp"
                 ThisSQL2 = ThisSQL2 & " Where (NL.ID = nlp.newsletterid)"
-                If MonthSelected <> 0 Then
-                    ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & MonthSelected
+                If monthSelected <> 0 Then
+                    ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
                 End If
-                If YearSelected <> 0 Then
-                    ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & YearSelected
+                If yearSelected <> 0 Then
+                    ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & yearSelected
                 End If
                 If SearchKeywords <> "" Then
                     ThisSQL2 = ThisSQL2 & " and ((nlp.Body like '%" & SearchKeywords & "%' )or (nlp.name  like '%" & SearchKeywords & "%') or (nlp.Overview  like '%" & SearchKeywords & "%'))"
@@ -443,55 +412,55 @@ Namespace newsletter2
             'ErrorTrap:
             'Call HandleError("LeftSideNavigation", "GetSpacer")
         End Function
-        '
-        Private Function GetArticleAccess(cp As CPBaseClass, ArticleID As Integer, Optional GivenGroupID As Integer = 0) As Boolean
-            'On Error GoTo ErrorTrap
-            '
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim AccessFlag As Boolean
-            Dim ThisTest As String
-            '
-            If GivenGroupID <> 0 Then
-                Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-                If Not cs.OK() Then
-                    GetArticleAccess = True
-                Else
-                    Do While cs.OK()
-                        If cs.GetInteger("GroupID") = GivenGroupID Then
-                            GetArticleAccess = True
-                        End If
-                        Call cs.GoNext()
-                    Loop
-                End If
-                Call cs.Close()
-            Else
-                If Not isManager Then
-                    Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-                    If Not cs.OK() Then
-                        GetArticleAccess = True
-                    Else
-                        Do While cs.OK()
-                            ThisTest = cs.GetText("GroupID")
-                            '
-                            '
-                            If ThisTest <> "" Then
-                                If cp.User.IsInGroup(ThisTest) Then
-                                    GetArticleAccess = True
-                                End If
-                            End If
-                            Call cs.GoNext()
-                        Loop
-                    End If
-                    Call cs.Close()
-                Else
-                    GetArticleAccess = True
-                End If
-            End If
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetArticleAccess")
-        End Function
+        ''
+        'Private Function GetArticleAccess(cp As CPBaseClass, ArticleID As Integer, isManager As Boolean, Optional GivenGroupID As Integer = 0) As Boolean
+        '    'On Error GoTo ErrorTrap
+        '    '
+        '    Dim cs As CPCSBaseClass = cp.CSNew()
+        '    Dim AccessFlag As Boolean
+        '    Dim ThisTest As String
+        '    '
+        '    If GivenGroupID <> 0 Then
+        '        Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
+        '        If Not cs.OK() Then
+        '            GetArticleAccess = True
+        '        Else
+        '            Do While cs.OK()
+        '                If cs.GetInteger("GroupID") = GivenGroupID Then
+        '                    GetArticleAccess = True
+        '                End If
+        '                Call cs.GoNext()
+        '            Loop
+        '        End If
+        '        Call cs.Close()
+        '    Else
+        '        If Not isManager Then
+        '            Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
+        '            If Not cs.OK() Then
+        '                GetArticleAccess = True
+        '            Else
+        '                Do While cs.OK()
+        '                    ThisTest = cs.GetText("GroupID")
+        '                    '
+        '                    '
+        '                    If ThisTest <> "" Then
+        '                        If cp.User.IsInGroup(ThisTest) Then
+        '                            GetArticleAccess = True
+        '                        End If
+        '                    End If
+        '                    Call cs.GoNext()
+        '                Loop
+        '            End If
+        '            Call cs.Close()
+        '        Else
+        '            GetArticleAccess = True
+        '        End If
+        '    End If
+        '    '
+        '    'Exit Function
+        '    'ErrorTrap:
+        '    'Call HandleError(cp, ex, "GetArticleAccess")
+        'End Function
         '
         Private Function GetIssuePublishDate(cp As CPBaseClass, IssueID As Integer) As String
             'On Error GoTo ErrorTrap
@@ -514,7 +483,7 @@ Namespace newsletter2
             '
         End Function
         '
-        Private Function GetEmailBody(cp As CPBaseClass, TemplateCopy As String, LocalGroupID As Integer) As String
+        Private Function GetEmailBody(cp As CPBaseClass, TemplateCopy As String, LocalGroupID As Integer, IssueID As Integer, IssuePageID As Integer, formId As Integer, encodeCopyNeeded As Boolean) As String
             'On Error GoTo ErrorTrap
             '
             Dim Stream As String
@@ -541,13 +510,13 @@ Namespace newsletter2
                     InnerValue = InnerTemplateArray(0)
                     Select Case InnerValue
                         Case TemplateReplacementBody
-                            Stream &= Replace(InnerValue, TemplateReplacementBody, GetNewsletterBodyOverview(cp, IssueID, IssuePageID, LocalGroupID))
+                            Stream &= Replace(InnerValue, TemplateReplacementBody, GetNewsletterBodyOverview(cp, IssueID, IssuePageID, LocalGroupID, formId, encodeCopyNeeded))
                         Case TemplateReplacementNav
                             Stream &= Replace(InnerValue, TemplateReplacementNav, Navigation.GetContent(cp, "NavigationLayout=Vertical", LocalGroupID))
                     End Select
-                    stream &= InnerTemplateArray(1)
+                    Stream &= InnerTemplateArray(1)
                 Else
-                    stream &= TemplateArray(TemplateArrayPointer)
+                    Stream &= TemplateArray(TemplateArrayPointer)
                 End If
             Next
             '
@@ -569,7 +538,7 @@ Namespace newsletter2
             Call cs.Close()
         End Function
         '
-        Friend Function GetNewsletterBodyOverview(cp As CPBaseClass, IssueID As Integer, IssuePageID As Integer, Optional GivenGroupID As Integer = 0) As String
+        Friend Function GetNewsletterBodyOverview(cp As CPBaseClass, IssueID As Integer, IssuePageID As Integer, WorkingQueryStringPlus As String, formid As Integer, encodeCopyNeeded As Boolean, Optional GivenGroupID As Integer = 0) As String
             'On Error GoTo ErrorTrap
             '
             Dim AddLink As String
@@ -603,7 +572,7 @@ Namespace newsletter2
             '
             Call cs.OpenRecord("Newsletter Issues", IssueID)
             If cs.OK() Then
-                Stream &= cs.GetEditLink() & cs.getText("Cover")
+                Stream &= cs.GetEditLink() & cs.GetText("Cover")
             End If
             Call cs.Close()
             '
@@ -659,7 +628,7 @@ Namespace newsletter2
                         '
                         Stream &= vbCrLf & "<div class=""NewsletterTopicStory"">"
                         Do While CS2.OK
-                            Stream &= GetStoryOverview(CS2)
+                            Stream &= GetStoryOverview(cp, CS2, formid, IssuePageID, encodeCopyNeeded, WorkingQueryStringPlus)
                             Call CS2.GoNext()
                         Loop
                         Stream &= "</div>"
@@ -672,7 +641,7 @@ Namespace newsletter2
             '
             Call cs.Close()
             '
-            Stream &= GetUnrelatedStories(IssuePageID)
+            Stream &= GetUnrelatedStories(cp, IssuePageID, IssueID, formid, encodeCopyNeeded, WorkingQueryStringPlus)
             '
             IssueSQL = " Select max(id) as MaxIssueID from newsletterissues"
             Call cs.OpenSQL(IssueSQL)
@@ -696,28 +665,28 @@ Namespace newsletter2
         End Function
         '
 
-        Private Function GetUnrelatedStories(IssuePageID As Integer) As String
+        Private Function GetUnrelatedStories(cp As CPBaseClass, IssuePageID As Integer, IssueID As Integer, formId As Integer, encodeCopyNeeded As Boolean, WorkingQueryStringPlus As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim Criteria As String
-            Dim cs As cpcsBaseClass = cp.csNew()
+            Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Caption As String
             Dim Stream As String
             '
             If IssuePageID = 0 Then
                 Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")"
-                Call cs.open(ContentNameNewsletterIssuePages, Criteria, "SortOrder,DateAdded")
-                If cs.ok() Then
-                    Caption = cp.site.getText("Newsletter Caption Other Stories", "")
+                Call cs.Open(ContentNameNewsletterIssuePages, Criteria, "SortOrder,DateAdded")
+                If cs.OK() Then
+                    Caption = cp.Site.GetText("Newsletter Caption Other Stories", "")
                     If Caption <> "" Then
-                        stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
+                        Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
                     End If
-                    Do While cs.ok()
-                        stream &= GetStoryOverview(CS)
-                        Call cs.gonext()
+                    Do While cs.OK()
+                        Stream &= GetStoryOverview(cp, cs, formId, IssuePageID, encodeCopyNeeded, WorkingQueryStringPlus)
+                        Call cs.GoNext()
                     Loop
                 End If
-                Call cs.close()
+                Call cs.Close()
             End If
             '
             GetUnrelatedStories = Stream
@@ -727,7 +696,7 @@ Namespace newsletter2
             'Call HandleError(cp, ex, "GetUnrelatedStories")
         End Function
         '
-        Private Function GetStoryOverview(CS As CPCSBaseClass) As String
+        Private Function GetStoryOverview(cp As CPBaseClass, CS As CPCSBaseClass, formId As Integer, IssuePageID As Integer, EncodeCopyNeeded As Boolean, WorkingQueryStringPlus As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim StoryID As Integer
@@ -736,7 +705,7 @@ Namespace newsletter2
             Dim cn As New newsletterCommonClass
             Dim storyBookmark As String
             '
-            StoryID = CS.getInteger("ID")
+            StoryID = CS.GetInteger("ID")
             storyBookmark = "story" & StoryID
             StoryAccessString = cn.GetArticleAccessString(cp, StoryID)
             '
@@ -745,10 +714,10 @@ Namespace newsletter2
             End If
             '
             Stream &= vbCrLf & "<div class=""Headline"" id=""" & storyBookmark & """>"
-            If FormID <> FormEmail Then
+            If formId <> FormEmail Then
                 Stream &= CS.GetEditLink()
             End If
-            Stream &= CS.getText("Name") & "</div>"
+            Stream &= CS.GetText("Name") & "</div>"
             'stream &=  "<a name=""" & storyBookmark & """>" &cs.getText( "Name") & "&nbsp;" & "</a></div>"
             If IssuePageID <> 0 Then
                 If EncodeCopyNeeded Then
@@ -758,10 +727,10 @@ Namespace newsletter2
                 End If
             Else
                 Stream &= "<div class=""Overview"">"
-                Stream &= CS.getText("Overview")
-                If CS.getBoolean("AllowReadMore") Then
+                Stream &= CS.GetText("Overview")
+                If CS.GetBoolean("AllowReadMore") Then
                     ' 1/1/09 JK - always linked to root path
-                    Stream &= "<div class=""ReadMore""><a href=""" & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & CS.getInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
+                    Stream &= "<div class=""ReadMore""><a href=""" & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & CS.GetInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
                     'stream &=  "<div class=""ReadMore""><a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameIssuePageID & "=" & cs.getInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails & """>Read More</a></div>"
                     'Else
                     '    stream &=  "<div class=""ReadMore"">&nbsp;</div>"
@@ -779,7 +748,7 @@ Namespace newsletter2
             'Call HandleError(cp, ex, "GetStoryOverview")
         End Function
         '
-        Private Function GetNewsletterBodyDetails(cp As CPBaseClass, cn As newsletterCommonClass, IssuePageID As Integer) As String
+        Private Function GetNewsletterBodyDetails(cp As CPBaseClass, cn As newsletterCommonClass, IssuePageID As Integer, IssueID As String, WorkingQueryStringPlus As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
@@ -878,6 +847,16 @@ Namespace newsletter2
             'Exit Function
             'ErrorTrap:
             'Call HandleError(cp, ex, "GetNewsletterBodyDetails")
+        End Function
+        '
+        Private Function template(x As Integer) As String
+            Dim returnHtml As String = ""
+            Try
+
+            Catch ex As Exception
+                'Call handleError(cp, ex, "template")
+            End Try
+            Return returnHtml
         End Function
     End Class
 End Namespace

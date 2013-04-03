@@ -30,8 +30,6 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        '
-        '
         Friend Function GetIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
             'On Error GoTo ErrorTrap
             '
