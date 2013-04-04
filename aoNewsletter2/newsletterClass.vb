@@ -102,7 +102,7 @@ Namespace newsletter2
                     '
                     ' PageID given, get Issue from PageID (and check against Newsletter)
                     '
-                    Call cs.Open(ContentNameNewsletterIssuePages, "(id=" & IssuePageID & ")", , , , , "NewsletterID")
+                    Call cs.Open(ContentNameNewsletterStories, "(id=" & IssuePageID & ")", , , , , "NewsletterID")
                     If cs.OK() Then
                         IssueID = cs.GetInteger("NewsletterID")
                     End If
@@ -251,7 +251,7 @@ Namespace newsletter2
                         ' For this issue
                         '
                         Controls = Controls & "<h3>For this Issue</h3><ul>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssuePages) & "&af=4&aa=2&ad=1&wc=" & cp.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterStories) & "&af=4&aa=2&ad=1&wc=" & cp.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
                         Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
                         If (InStr(1, cp.Request.PathPage, "/admin", vbTextCompare) <> 0) Or (LCase(cp.Site.GetText("adminUrl")) = LCase(cp.Request.PathPage)) Then
                             Controls = Controls & "<li><div class=""AdminLink"">Create&nbsp;email&nbsp;version (not available from admin site)</div></li>"

@@ -11,7 +11,7 @@
         '
         Public Const ContentNameNewsletters = "Newsletters"
         Public Const ContentNameNewsletterIssues = "Newsletter Issues"
-        Public Const ContentNameNewsletterIssuePages = "Newsletter Issue Pages"
+        Public Const ContentNameNewsletterStories = "Newsletter Stories"
         Public Const ContentNameNewsLetterGroupRules = "Newsletter Group Rules"
         Public Const ContentNameMemberRules = "Member Rules"
         Public Const ContentNameGroupEmail = "Group Email"

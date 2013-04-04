@@ -531,14 +531,14 @@ Namespace newsletter2
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
             '
-            Call cs.Open(ContentNameNewsletterIssuePages, "ID=" & cp.Db.EncodeSQLNumber(PageID), , , , , "Overview")
+            Call cs.Open(ContentNameNewsletterStories, "ID=" & cp.Db.EncodeSQLNumber(PageID), , , , , "Overview")
             If cs.OK() Then
                 GetOverview = cs.GetText("Overview")
             End If
             Call cs.Close()
         End Function
         '
-        Friend Function GetNewsletterBodyOverview(cp As CPBaseClass, IssueID As Integer, IssuePageID As Integer, WorkingQueryStringPlus As String, formid As Integer, encodeCopyNeeded As Boolean, Optional GivenGroupID As Integer = 0) As String
+        Friend Function GetNewsletterBodyOverview(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal IssuePageID As Integer, ByVal WorkingQueryStringPlus As String, ByVal formid As Integer, ByVal encodeCopyNeeded As Boolean, Optional ByVal GivenGroupID As Integer = 0) As String
             'On Error GoTo ErrorTrap
             '
             Dim AddLink As String
@@ -584,7 +584,7 @@ Namespace newsletter2
                     & " left join NewsletterIssueCategories c on c.id=p.categoryId" _
                     & " where (p.ID=" & cp.Db.EncodeSQLNumber(IssuePageID) & ")" _
                     & ""
-                'call cs.open(ContentNameNewsletterIssuePages, Criteria, "SortOrder,DateAdded")
+                'call cs.open(ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded")
             Else
                 '
                 FetchFlag = True
@@ -612,14 +612,14 @@ Namespace newsletter2
                     CategoryID = cs.GetInteger("CategoryID")
                     CategoryName = cs.GetText("CategoryName")
                     '
-                    Call CS2.Open(ContentNameNewsletterIssuePages, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder")
+                    Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder")
                     If CS2.OK Then
                         '
                         ' there are stories under this topic, wrap in div to allow a story indent
                         '
                         Stream &= vbCrLf & "<div class=""NewsletterTopic"">"
                         If RecordCount <> 0 Then
-                            If cp.User.IsAuthoring(ContentNameNewsletterIssuePages) Then
+                            If cp.User.IsAuthoring(ContentNameNewsletterStories) Then
                                 Stream &= cn.GetAdminHintWrapper(cp, "<a href=""" & WorkingQueryStringPlus & RequestNameIssueID & "=" & IssueID & "&" & RequestNameSortUp & "=" & CategoryID & """>[Move Up]</a> ")
                             End If
                         End If
@@ -653,7 +653,7 @@ Namespace newsletter2
             '
             Stream &= "</div>"
             '
-            Stream &= cp.Content.GetAddLink(ContentNameNewsletterIssuePages, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything)
+            Stream &= cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything)
             '
             Stream &= vbCrLf & "<!-- End NewsletterBody -->" & vbCrLf
             '
@@ -665,7 +665,7 @@ Namespace newsletter2
         End Function
         '
 
-        Private Function GetUnrelatedStories(cp As CPBaseClass, IssuePageID As Integer, IssueID As Integer, formId As Integer, encodeCopyNeeded As Boolean, WorkingQueryStringPlus As String) As String
+        Private Function GetUnrelatedStories(ByVal cp As CPBaseClass, ByVal IssuePageID As Integer, ByVal IssueID As Integer, ByVal formId As Integer, ByVal encodeCopyNeeded As Boolean, ByVal WorkingQueryStringPlus As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim Criteria As String
@@ -675,7 +675,7 @@ Namespace newsletter2
             '
             If IssuePageID = 0 Then
                 Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")"
-                Call cs.Open(ContentNameNewsletterIssuePages, Criteria, "SortOrder,DateAdded")
+                Call cs.Open(ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded")
                 If cs.OK() Then
                     Caption = cp.Site.GetText("Newsletter Caption Other Stories", "")
                     If Caption <> "" Then
@@ -696,7 +696,7 @@ Namespace newsletter2
             'Call HandleError(cp, ex, "GetUnrelatedStories")
         End Function
         '
-        Private Function GetStoryOverview(cp As CPBaseClass, CS As CPCSBaseClass, formId As Integer, IssuePageID As Integer, EncodeCopyNeeded As Boolean, WorkingQueryStringPlus As String) As String
+        Private Function GetStoryOverview(ByVal cp As CPBaseClass, ByVal CS As CPCSBaseClass, ByVal formId As Integer, ByVal IssuePageID As Integer, ByVal EncodeCopyNeeded As Boolean, ByVal WorkingQueryStringPlus As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim StoryID As Integer
@@ -748,7 +748,7 @@ Namespace newsletter2
             'Call HandleError(cp, ex, "GetStoryOverview")
         End Function
         '
-        Private Function GetNewsletterBodyDetails(cp As CPBaseClass, cn As newsletterCommonClass, IssuePageID As Integer, IssueID As String, WorkingQueryStringPlus As String) As String
+        Private Function GetNewsletterBodyDetails(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal IssuePageID As Integer, ByVal IssueID As String, ByVal WorkingQueryStringPlus As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
@@ -772,7 +772,7 @@ Namespace newsletter2
             If IssuePageID = 0 Then
                 Stream = "<span class=""ccError"">The requested story is currently unavailable.</span>"
             Else
-                Call cs.Open(ContentNameNewsletterIssuePages, "ID=" & IssuePageID)
+                Call cs.Open(ContentNameNewsletterStories, "ID=" & IssuePageID)
                 If cs.OK() Then
                     storyName = cs.GetText("name")
                     storyOverview = cs.GetText("Overview")

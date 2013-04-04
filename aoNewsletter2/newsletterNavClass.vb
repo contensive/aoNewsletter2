@@ -121,7 +121,7 @@ Namespace newsletter2
                 If CS.OK() Then
                     Do While CS.OK()
                         CategoryID = CS.GetInteger("CategoryID")
-                        Call CS2.Open(ContentNameNewsletterIssuePages, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & issueid & ")", "SortOrder")
+                        Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & issueid & ")", "SortOrder")
                         If CS2.OK Then
                             CategoryName = CS.GetText("CategoryName")
                             If (CategoryName <> PreviousCategoryName) Then
@@ -164,7 +164,7 @@ Namespace newsletter2
                 End If
                 Call CS.Close()
                 '
-                Call CS.Open(ContentNameNewsletterIssuePages, "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & issueid & ")", "SortOrder,DateAdded")
+                Call CS.Open(ContentNameNewsletterStories, "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & issueid & ")", "SortOrder,DateAdded")
                 If CS.OK() Then
                     If ArticleCount > 0 Then
                         '
