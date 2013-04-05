@@ -1,0 +1,24 @@
+
+
+
+
+.NewsletterBody{}
+.NewsletterBody .Headline{font-weight:bold;margin-top:20px;}
+.NewsletterBody .Overview{margin-top:10px;}
+.NewsletterBody .PrintIcon{float:right;}
+.NewsletterBody .EmailIcon{float:right;}
+.NewsletterBody .AdminLink{}
+.NewsletterBody .Overview .ReadMore{margin-top:5px;margin-bottom:10px;}
+.NewsletterBody .NewsletterTopic{font-weight:bold;padding-top:15px}
+.NewsletterBody .NewsletterTopicStory{padding-left:20px;}
+.NewsletterBody .GoToPageLine{text-align:left;margin-top:10px;padding-top:10px;border-top:1px solid black;}
+.NewsletterNav{}
+.NewsletterNav .LinkLine{padding-top: 10px;}
+.NewsletterNav .caption{font-weight:bold;margin-top: 10px;}
+.NewsletterNav .PageList{margin-top: 10px;margin-left:10px;}
+.NewsletterNav .PageList A{}
+.NewsletterNav .PageList A:hover{}
+.NewsletterNav .PageList A:visited{}
+.NewsletterNav .NewsletterNavTopic{margin-top: 15px}
+.PrintIcon{text-align: right; margin-top:5px;margin-bottom:10px;}
+.EmailIcon{text-align: right; margin-top:5px;margin-bottom:10px;}

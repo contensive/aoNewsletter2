@@ -2,9 +2,11 @@
     Module newsletterModule
         Public Const DefaultEmailLinkSubject = "A link to NCA Currents newsletter"
         '
+        Public Const guidLayoutDefaultTemplate = "{24AB7755-C205-4C12-AE51-A58F885F1596}"
+        '
         Public Const RequestNameFormID = "formid"
         Public Const RequestNameIssueID = "issue"
-        Public Const RequestNameIssuePageID = "issuepage"
+        Public Const RequestNameStoryId = "issuepage"
         Public Const RequestNameChildPageID = "bid"
         '
         Public Const RequestNameEmailGroups = "Groups"
@@ -54,7 +56,7 @@
         Public Const StringReplaceStart = "{{"
         Public Const StringReplaceEnd = "}}"
         '
-        Public Const FormIssue = 100
+        Public Const FormCover = 100
         Public Const FormArchive = 200
         Public Const FormEmail = 300
         Public Const FormDetails = 400

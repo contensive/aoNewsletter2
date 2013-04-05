@@ -11,13 +11,6 @@ Namespace newsletter2
     Public Class newsletterClass
         Inherits AddonBaseClass
         '
-        ' - update references to your installed version of cpBase
-        ' - Verify project root name space is empty
-        ' - Change the namespace to the collection name
-        ' - Change this class name to the addon name
-        ' - Create a Contensive Addon record with the namespace apCollectionName.ad
-        ' - add reference to CPBase.DLL, typically installed in c:\program files\kma\contensive\
-        '
         '=====================================================================================
         ' 
         '=====================================================================================
@@ -27,82 +20,69 @@ Namespace newsletter2
             Try
                 Dim WorkingQueryStringPlus As String = ""
                 '
-                WorkingQueryStringPlus = CP.Doc.RefreshQueryString
-                If WorkingQueryStringPlus <> "" Then
-                    WorkingQueryStringPlus = "?" & WorkingQueryStringPlus
-                End If
-                '
-                returnHtml = GetContent(CP, WorkingQueryStringPlus)
-            Catch ex As Exception
-                handleError(CP, ex, "execute")
-            End Try
-            Return returnHtml
-        End Function
-        '
-        '
-        '=====================================================================================
-        ' common report for this class
-        '=====================================================================================
-        '
-        Private Sub HandleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
-            Try
-                cp.Site.ErrorReport(ex, "Unexpected error in newsletterPageClass." & method)
-            Catch exLost As Exception
-                '
-                ' stop anything thrown from cp errorReport
-                '
-            End Try
-        End Sub
-        '
-        Public Function GetContent(cp As CPBaseClass, WorkingQueryStringPlus As String) As String
-            Try
+                Dim layout As CPBlockBaseClass = CP.BlockNew()
+                Dim newsBody As String = ""
+                Dim newsNav As String = ""
                 '
                 Dim EditLink As String
                 Dim Controls As String
                 Dim UnpublishedIssueList As String
                 Dim BuildDefault As Boolean
                 Dim IssueID As Integer
-                Dim IssuePageID As Integer
+                Dim storyID As Integer
                 Dim cn As New newsletterCommonClass
-                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim cs As CPCSBaseClass = CP.CSNew()
                 Dim Body As newsletterBodyClass
+                Dim nav As newsletterNavClass
                 Dim TemplateID As Integer
                 Dim FormID As Integer
                 Dim EmailID As Integer
-                Dim TemplateCopy As String
+                Dim TemplateCopy As String = ""
                 Dim NewsletterName As String
                 Dim QS As String
-                '
+                Dim ButtonValue As String
                 Dim NewsletterID As Integer
                 Dim isManager As Boolean
                 Dim ReferLink As String
                 Dim currentLink As String = ""
+                Dim isContentManager As Boolean = CP.User.IsContentManager("newsletters")
+                Dim newsCoverItemList As String = ""
+                Dim newsArchiveList As String = ""
+                Dim newsCoverStoryItem As String = ""
+                Dim newsCoverCategoryItem As String = ""
+                ' deal with this later
+                Dim archiveIssueID As Integer = 0
                 '
-                currentLink = cp.Request.Protocol & cp.Site.DomainPrimary & cp.Request.PathPage & "?" & cp.Doc.RefreshQueryString
-                ReferLink = RequestNameRefer & "=" & cp.Utils.EncodeRequestVariable(cp.Utils.ModifyQueryString(currentLink, RequestNameRefer, ""))
-                isManager = cp.User.IsContentManager("Newsletters")
+                WorkingQueryStringPlus = CP.Doc.RefreshQueryString
+                If WorkingQueryStringPlus <> "" Then
+                    WorkingQueryStringPlus = "?" & WorkingQueryStringPlus
+                End If
                 '
-                NewsletterName = cp.Doc.GetText("Newsletter")
+                currentLink = CP.Request.Protocol & CP.Site.DomainPrimary & CP.Request.PathPage & "?" & CP.Doc.RefreshQueryString
+                ReferLink = RequestNameRefer & "=" & CP.Utils.EncodeRequestVariable(CP.Utils.ModifyQueryString(currentLink, RequestNameRefer, ""))
+                isManager = CP.User.IsContentManager("Newsletters")
+                '
+                NewsletterName = CP.Doc.GetText("Newsletter")
                 If NewsletterName = "" Then
                     NewsletterName = DefaultRecord
                 End If
-                NewsletterID = cn.GetNewsletterID(cp, NewsletterName)
-                Call cp.Site.TestPoint("PC NewsletterID After Option: " & NewsletterID)
+                NewsletterID = cn.GetNewsletterID(CP, NewsletterName)
+                Call CP.Site.TestPoint("PC NewsletterID After Option: " & NewsletterID)
                 '
-                BuildDefault = cp.Doc.GetBoolean("BuildDefault")
-                FormID = cp.Doc.GetInteger(RequestNameFormID)
-                IssuePageID = cp.Doc.GetInteger(RequestNameIssuePageID)
-                If IssuePageID = 0 Then
+                BuildDefault = CP.Doc.GetBoolean("BuildDefault")
+                FormID = CP.Doc.GetInteger(RequestNameFormID)
+                storyID = CP.Doc.GetInteger(RequestNameStoryId)
+                If storyID = 0 Then
                     '
                     ' No page given, use the QS for the Issue, or get current
                     '
-                    Call cp.Site.TestPoint("GetIssueID call 4, NewsletterID=" & NewsletterID)
-                    IssueID = cn.GetIssueID(cp, NewsletterID)
+                    Call CP.Site.TestPoint("GetIssueID call 4, NewsletterID=" & NewsletterID)
+                    IssueID = cn.GetIssueID(CP, NewsletterID)
                 Else
                     '
                     ' PageID given, get Issue from PageID (and check against Newsletter)
                     '
-                    Call cs.Open(ContentNameNewsletterStories, "(id=" & IssuePageID & ")", , , , , "NewsletterID")
+                    Call cs.Open(ContentNameNewsletterStories, "(id=" & storyID & ")", , , , , "NewsletterID")
                     If cs.OK() Then
                         IssueID = cs.GetInteger("NewsletterID")
                     End If
@@ -113,18 +93,18 @@ Namespace newsletter2
                         '
                         ' Bad Issue, reset to current issue of current newsletter
                         '
-                        Call cp.Site.TestPoint("GetIssueID call 5, NewsletterID=" & NewsletterID)
-                        IssueID = cn.GetIssueID(cp, NewsletterID)
-                        IssuePageID = 0
-                        FormID = FormIssue
+                        Call CP.Site.TestPoint("GetIssueID call 5, NewsletterID=" & NewsletterID)
+                        IssueID = cn.GetIssueID(CP, NewsletterID)
+                        storyID = 0
+                        FormID = FormCover
                     End If
                     Call cs.Close()
                 End If
-                Call cp.Site.SetProperty(VisitPropertyNewsletter, NewsletterID & "." & IssueID & "." & IssuePageID & "." & FormID)
+                Call CP.Site.SetProperty(VisitPropertyNewsletter, NewsletterID & "." & IssueID & "." & storyID & "." & FormID)
                 '
-                Call cp.Site.TestPoint("PageClass NLID: " & NewsletterID)
+                Call CP.Site.TestPoint("PageClass NLID: " & NewsletterID)
                 '
-                Call cn.SortCategoriesByIssue(cp, IssueID)
+                Call cn.SortCategoriesByIssue(CP, IssueID)
                 '
                 If FormID = FormEmail Then
                     '
@@ -134,22 +114,17 @@ Namespace newsletter2
                         '
                         ' Not administrators
                         '
-                        Call cp.UserError.Add("Only administrators can use the Create Email feature.")
-                        FormID = FormIssue
-                        'ElseIf Main.PageContent = "" Then
-                        '    '
-                        '    ' Public Site Only (need a destination in all the links)
-                        '    '
-                        '    Call cp.UserError.Add("This feature can only be used after the Newsletter Add-on has been placed on a page of the public website.")
-                        '    FormID = FormIssue
+                        Call CP.UserError.Add("Only administrators can use the Create Email feature.")
+                        FormID = FormCover
                     Else
                         '
                         ' create email version -- use Print Version to block edit links
                         ' ????? 
                         '
                         'Main.ServerPagePrintVersion = True
-                        EmailID = CreateEmailGetID(cp, IssueID, NewsletterName, NewsletterID, WorkingQueryStringPlus)
-                        cp.Response.Redirect(cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameGroupEmail) & "&id=" & EmailID & "&af=4")
+                        EmailID = CreateEmailGetID(CP, IssueID, NewsletterName, NewsletterID, WorkingQueryStringPlus)
+                        CP.Response.Redirect(CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameGroupEmail) & "&id=" & EmailID & "&af=4")
+                        Return ""
                         Exit Function
                     End If
                 End If
@@ -160,13 +135,13 @@ Namespace newsletter2
                     '
                     ' There are no current issues, diplay a message and tell the admin what to do next
                     '
-                    GetContent = "<p>There are currently no published issues of this newsletter</p>"
+                    returnHtml = "<p>There are currently no published issues of this newsletter</p>"
                 Else
                     If NewsletterID <> 0 Then
                         Call cs.OpenRecord("Newsletters", NewsletterID, "StylesFilename,TemplateID")
                         If cs.OK() Then
                             TemplateID = cs.GetInteger("TemplateID")
-                            Call cp.Doc.AddHeadStyleLink(cp.Request.Protocol & cp.Site.DomainPrimary & cp.Site.FilePath & cs.GetText("StylesFileName"))
+                            Call CP.Doc.AddHeadStyleLink(CP.Request.Protocol & CP.Site.DomainPrimary & CP.Site.FilePath & cs.GetText("StylesFileName"))
                         End If
                         Call cs.Close()
                         '
@@ -190,7 +165,7 @@ Namespace newsletter2
                         End If
                         '
                         If TemplateID = 0 Then
-                            TemplateID = cn.GetDefaultTemplateID(cp)
+                            TemplateID = cn.GetDefaultTemplateID(CP)
                             If TemplateID <> 0 Then
                                 Call cs.OpenRecord("Newsletter Issues", IssueID)
                                 If cs.OK() Then
@@ -204,43 +179,79 @@ Namespace newsletter2
                             Call cs.OpenRecord("Newsletter Templates", TemplateID)
                             If cs.OK() Then
                                 EditLink = cs.GetEditLink()
-                                GetContent = cs.GetText("Template")
-                                'GetContent = cn.GetEditWrapper(cp, "Newsletter Template [" & cs.GetText("Name") & "] " & EditLink, GetContent)
+                                TemplateCopy = cs.GetText("Template")
+                                'returnHtml = cn.GetEditWrapper(cp, "Newsletter Template [" & cs.GetText("Name") & "] " & EditLink, returnHtml)
                             End If
                             Call cs.Close()
                         End If
                     End If
                     '
-                    'If IssueID <> 0 And Main.IsAdmin() Then
-                    '    Copy = Main.GetRecordEditLink("Newsletter Issues", IssueID)
-                    '    If Copy <> "" Then
-                    '        GetContent = Copy & "(Edit this Newsletter Issue)" & GetContent
-                    '    End If
-                    'End If
+                    ' Process forms
                     '
-                    If GetContent <> "" Then
+                    ButtonValue = CP.Doc.GetText("Button")
+                    Select Case FormID
+                        Case FormArchive
+                            Select Case ButtonValue
+                                Case FormButtonViewNewsLetter
+                                    '
+                                    ' Archive form pressing the view button
+                                    '
+                                    FormID = FormCover
+                            End Select
+                    End Select
+                    '
+                    ' Dispay the form
+                    '
+                    '
+                    If TemplateCopy = "" Then
                         '
-                        ' There is a template, encoding it captures the newsletterBodyClass
+                        ' create default string 
                         '
-
-                        GetContent = cp.Utils.EncodeContentForWeb(GetContent, "Newsletter Templates", TemplateID)
-                    Else
-                        '
-                        ' No valid template, call just the body so get Archive Lists
-                        '
-                        Body = New newsletterBodyClass
-                        GetContent = Body.GetContent(cp, NewsletterName, WorkingQueryStringPlus)
                     End If
+                    '
+                    Call layout.Load(TemplateCopy)
+                    '
+                    nav = New newsletterNavClass
+                    newsNav = layout.GetInner(".newsNav")
+                    '
+                    Body = New newsletterBodyClass
+                    Select Case FormID
+                        Case FormArchive
+                            newsArchiveList = layout.GetInner(".newsArchiveList")
+                            newsArchiveList = Body.GetArchiveList(CP, ButtonValue, IssueID, WorkingQueryStringPlus, newsArchiveList)
+                            Call layout.SetInner(".newsArchiveList", newsArchiveList)
+                            Call layout.SetOuter(".newsBody", "")
+                            Call layout.SetOuter(".newsCoverList", "")
+                            newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav)
+                        Case FormDetails
+                            newsBody = layout.GetInner(".newsBody")
+                            newsBody = Body.GetNewsletterBodyDetails(CP, cn, storyID, IssueID, WorkingQueryStringPlus, newsBody)
+                            Call layout.SetInner(".newsBody", newsBody)
+                            Call layout.SetOuter(".newsArchiveList", "")
+                            Call layout.SetOuter(".newsCoverList", "")
+                            newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav)
+                        Case Else
+                            FormID = FormCover
+                            newsCoverStoryItem = layout.GetOuter(".newsCoverItem")
+                            newsCoverCategoryItem = layout.GetOuter(".newsCoverCategory")
+                            newsCoverItemList = Body.GetNewsletterCover(CP, IssueID, storyID, WorkingQueryStringPlus, FormID, newsCoverStoryItem, newsCoverCategoryItem)
+                            Call layout.SetInner(".newsCoverList", newsCoverItemList)
+                            Call layout.SetOuter(".newsArchiveList", "")
+                            Call layout.SetOuter(".newsBody", "")
+                            newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav)
+                    End Select
+                    Call layout.SetInner(".newsNav", newsNav)
+                    returnHtml = layout.GetHtml()
                 End If
                 '
                 ' List Unpublished issues for admins
                 '
-                If cp.User.IsAuthoring(ContentNameNewsletters) Then
+                If CP.User.IsAuthoring(ContentNameNewsletters) Then
                     '
                     ' Controls
                     '
                     Controls = ""
-                    QS = cp.Doc.RefreshQueryString
+                    QS = CP.Doc.RefreshQueryString
                     If QS <> "" Then
                         QS = QS & "&"
                     Else
@@ -251,9 +262,9 @@ Namespace newsletter2
                         ' For this issue
                         '
                         Controls = Controls & "<h3>For this Issue</h3><ul>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterStories) & "&af=4&aa=2&ad=1&wc=" & cp.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
-                        If (InStr(1, cp.Request.PathPage, "/admin", vbTextCompare) <> 0) Or (LCase(cp.Site.GetText("adminUrl")) = LCase(cp.Request.PathPage)) Then
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterStories) & "&af=4&aa=2&ad=1&wc=" & CP.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
+                        If (InStr(1, CP.Request.PathPage, "/admin", vbTextCompare) <> 0) Or (LCase(CP.Site.GetText("adminUrl")) = LCase(CP.Request.PathPage)) Then
                             Controls = Controls & "<li><div class=""AdminLink"">Create&nbsp;email&nbsp;version (not available from admin site)</div></li>"
                         Else
                             Controls = Controls & "<li><div class=""AdminLink""><a href=""?" & QS & RequestNameFormID & "=" & FormEmail & "&" & RequestNameIssueID & "=" & IssueID & """>Create&nbsp;email&nbsp;version</a></div></li>"
@@ -265,13 +276,13 @@ Namespace newsletter2
                         ' For this newsletter
                         '
                         Controls = Controls & "<h3>For this Newsletter</h3><ul>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit this newsletter</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit this newsletter</a></div></li>"
                         Controls = Controls & "</ul>"
                         '
                         ' Search for unpublished versions
                         '
-                        UnpublishedIssueList = cn.GetUnpublishedIssueList(cp, NewsletterID, cn)
+                        UnpublishedIssueList = cn.GetUnpublishedIssueList(CP, NewsletterID, cn)
                         If UnpublishedIssueList <> "" Then
                             Controls = Controls & "<h3>Unpublished issues for this Newsletter</h3>"
                             Controls = Controls & UnpublishedIssueList
@@ -281,8 +292,8 @@ Namespace newsletter2
                     ' General Controls
                     '
                     Controls = Controls & "<h3>General Controls</h3><ul>"
-                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
-                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & cp.Site.DomainPrimary & cp.Site.GetText("adminUrl") & "?cid=" & cp.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
+                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
+                    Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
                     Controls = Controls & "</ul>"
                     '
                     ' instructions
@@ -296,179 +307,146 @@ Namespace newsletter2
                          & "<P>To create a new newsletter, click the 'Add a new Newsletter' link. To make your new newsletter appear here, turn on Advanced Edit and click the Options icon at the top of add-on (wrench icon). Select the newsletter you want to display and hit update.</P>" _
                          & ""
                     If Controls <> "" Then
-                        GetContent = GetContent & cn.GetAdminHintWrapper(cp, Controls)
+                        returnHtml = returnHtml & cn.GetAdminHintWrapper(CP, Controls)
                     End If
                 End If
                 '
                 ' Add any user errors
                 '
-                If Not cp.UserError.OK Then
-                    GetContent = "<div style=""padding:10px"">" & cp.UserError.GetList() & "</div>" & GetContent
+                If Not CP.UserError.OK Then
+                    returnHtml = "<div style=""padding:10px"">" & CP.UserError.GetList() & "</div>" & returnHtml
                 End If
-                '
-                ' Add newsletter edit wrapper
-                '
-                'If cp.User.IsEditing("Newsletters") Then
-                '    GetContent = cn.GetEditWrapper(cp, "Newsletter [" & NewsletterName & "] " & cp.Content.GetEditLink("Newsletters", NewsletterID, False, NewsletterName, True), GetContent)
-                'End If
+                'returnHtml = GetContent(CP, WorkingQueryStringPlus)
             Catch ex As Exception
-                'Call HandleError(cp, ex, "GetContent")
+                handleError(CP, ex, "execute")
             End Try
-            '
-            'Exit Function
+            Return returnHtml
         End Function
         '
         '
+        '=====================================================================================
+        ' common report for this class
+        '=====================================================================================
         '
-        Private Function CreateEmailGetID(cp As CPBaseClass, IssueID As Integer, NewsletterName As String, NewsletterID As Integer, workingQueryStringPlus As String) As Integer
-
-            'On Error GoTo ErrorTrap
-
-            Dim EmailAddress As String
-            Dim MemberName As String
-            Dim CSPointer As CPCSBaseClass = cp.CSNew()
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim TemplatePointer As Integer
-            Dim GroupPointer As Integer
-            Dim SQL As String
-            Dim LocalGroupID As Integer
-            Dim Caption As String
-            Dim GroupName As String
-            Dim EmailID As Integer
-            Dim TemplateCopy As String
-            Dim Copy As String
-            Dim Stream As String
-            Dim cn As New newsletterCommonClass
-            Dim Body As newsletterBodyClass
-            Dim TemplateID As Integer
-            Dim Pos As Integer
-            Dim posStart As Integer
-            Dim posEnd As Integer
-            Dim NavObj As newsletterNavClass
-            Dim BodyObj As newsletterBodyClass
-            Dim Styles As String
-
-            If IssueID > 0 Then
-                Call cs.OpenRecord("Newsletters", NewsletterID)
-                If cs.OK() Then
-                    TemplateID = cs.GetInteger("TemplateID")
-                    Styles = cp.File.ReadVirtual(cs.GetText("StylesFileName"))
-                End If
-                Call cs.Close()
-
-                If TemplateID = 0 Then
-                    TemplateID = cp.Content.GetRecordID("Newsletter Templates", "Default")
-                End If
-
-                Call cs.OpenRecord("Newsletter Templates", TemplateID)
-                If cs.OK() Then
-                    Copy = cs.GetText("Template")
-                End If
-                Call cs.Close()
-            End If
-
-            If Copy <> "" Then
+        Private Sub HandleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+            Try
+                cp.Site.ErrorReport(ex, "Unexpected error in newsletterPageClass." & method)
+            Catch exLost As Exception
                 '
-                ' replace-in the navigation
-                ' if I call EncodeContent, it will also encode all the personalization
+                ' stop anything thrown from cp errorReport
                 '
-                Pos = InStr(1, Copy, "Newsletter-nav only", vbTextCompare)
-                If Pos <> 0 Then
-                    posStart = InStrRev(Copy, "<AC ", Pos, vbTextCompare)
-                    If posStart <> 0 Then
-                        posEnd = InStr(posStart, Copy, ">")
-                        If posEnd > 0 Then
-                            NavObj = New newsletterNavClass
-                            Copy = Mid(Copy, 1, posStart - 1) & NavObj.GetContent(cp, "newsletter=" & NewsletterName) & Mid(Copy, posEnd + 1)
-                            NavObj = Nothing
-                        End If
+            End Try
+        End Sub
+        '
+        '
+        '
+        Private Function CreateEmailGetID(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal NewsletterName As String, ByVal NewsletterID As Integer, ByVal workingQueryStringPlus As String) As Integer
+            Dim returnId As Integer = 0
+            Try
+                Dim EmailAddress As String
+                Dim MemberName As String
+                Dim CSPointer As CPCSBaseClass = cp.CSNew()
+                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim SQL As String
+                Dim EmailID As Integer
+                Dim templateCopy As String = ""
+                Dim cn As New newsletterCommonClass
+                Dim Body As newsletterBodyClass
+                Dim TemplateID As Integer
+                Dim Pos As Integer
+                Dim posStart As Integer
+                Dim posEnd As Integer
+                Dim Nav As newsletterNavClass
+                'Dim BodyObj As newsletterBodyClass
+                Dim Styles As String
+                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                Dim newsBody As String = ""
+                Dim newsNav As String = ""
+                Dim emailBody As String = ""
+                Dim LoopPtr As Integer
+                Dim StartPos As Integer
+                Dim EndPos As Integer
+                Dim newsCoverStoryItem As String = ""
+                Dim newsCoverCategoryItem As String = ""
+                '
+                If IssueID > 0 Then
+                    Call cs.OpenRecord("Newsletters", NewsletterID)
+                    If cs.OK() Then
+                        TemplateID = cs.GetInteger("TemplateID")
+                        Styles = cp.File.ReadVirtual(cs.GetText("StylesFileName"))
                     End If
-                End If
-                '
-                Pos = InStr(1, Copy, "Newsletter-body only", vbTextCompare)
-                If Pos <> 0 Then
-                    posStart = InStrRev(Copy, "<AC ", Pos, vbTextCompare)
-                    If posStart <> 0 Then
-                        posEnd = InStr(posStart, Copy, ">")
-                        If posEnd > 0 Then
-                            BodyObj = New newsletterBodyClass
-                            Copy = Mid(Copy, 1, posStart - 1) & BodyObj.GetContent(cp, NewsletterName, workingQueryStringPlus) & Mid(Copy, posEnd + 1)
-                            BodyObj = Nothing
-                        End If
-                    End If
-                End If
+                    Call cs.Close()
 
+                    If TemplateID = 0 Then
+                        TemplateID = cp.Content.GetRecordID("Newsletter Templates", "Default")
+                    End If
+
+                    Call cs.OpenRecord("Newsletter Templates", TemplateID)
+                    If cs.OK() Then
+                        templateCopy = cs.GetText("Template")
+                    End If
+                    Call cs.Close()
+                End If
+                If templateCopy = "" Then
+                    '
+                    ' fix somehow
+                    '
+                End If
                 '
-                '   JF 6/23/09 - this will catch any add-ons droppped anywhere, but more importnatly in the template itself
+                ' There is a template, encoding it captures the newsletterBodyClass
                 '
-                Copy = cp.Utils.EncodeContentForWeb(Copy)
-            Else
+                Call layout.Load(templateCopy)
                 '
-                ' No valid template, call just the body so get Archive Lists
-                '
+                newsBody = layout.GetInner(".newsBody")
+                newsCoverStoryItem = layout.GetOuter(".newsCoverStoryList")
+                newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
                 Body = New newsletterBodyClass
-                Copy = Body.GetContent(cp, NewsletterName, workingQueryStringPlus)
-            End If
-
-            If Styles <> "" Then
-                Copy = "<style>" & Styles & "</style>" & Copy
-            End If
-            '
-            ' Remove comments - dont know why, but emails fail with comments embedded
-            '
-            Dim LoopPtr As Integer
-            Dim StartPos As Integer
-            Dim EndPos As Integer
-            LoopPtr = 0
-            Do While InStr(1, Copy, "<!--") <> 0 And LoopPtr < 100
-                StartPos = InStr(1, Copy, "<!--")
-                EndPos = InStr(StartPos, Copy, "-->")
-                If EndPos <> 0 Then
-                    Copy = Left(Copy, StartPos - 1) & Mid(Copy, EndPos + 3)
+                newsBody = Body.GetNewsletterCover(cp, IssueID, 0, workingQueryStringPlus, FormCover, newsCoverStoryItem, newsCoverCategoryItem)
+                '
+                newsNav = layout.GetInner(".newsNav")
+                Nav = New newsletterNavClass
+                newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav)
+                '
+                Call layout.SetInner(".newsBody", newsBody)
+                Call layout.SetInner(".newsNav", newsNav)
+                emailBody = layout.GetHtml()
+                '
+                ' Remove comments - dont know why, but emails fail with comments embedded
+                '
+                LoopPtr = 0
+                Do While InStr(1, templateCopy, "<!--") <> 0 And LoopPtr < 100
+                    StartPos = InStr(1, templateCopy, "<!--")
+                    EndPos = InStr(StartPos, templateCopy, "-->")
+                    If EndPos <> 0 Then
+                        templateCopy = Left(templateCopy, StartPos - 1) & Mid(templateCopy, EndPos + 3)
+                    End If
+                    LoopPtr = LoopPtr + 1
+                Loop
+                '
+                Call cs.Insert(ContentNameGroupEmail)
+                If cs.OK Then
+                    CreateEmailGetID = cs.GetInteger("ID")
+                    If NewsletterName = "" Then
+                        NewsletterName = cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID)
+                    End If
+                    EmailID = cs.GetInteger("ID")
+                    EmailAddress = Trim(cp.User.Email)
+                    MemberName = cp.User.Name
+                    If (EmailAddress <> "") And (MemberName <> "") Then
+                        EmailAddress = """" & MemberName & """ <" & EmailAddress & ">"
+                    End If
+                    Call cs.SetField("Name", "Newsletter " & NewsletterName)
+                    Call cs.SetField("Subject", NewsletterName)
+                    Call cs.SetField("FromAddress", EmailAddress)
+                    Call cs.SetField("TestMemberID", cp.User.Id)
+                    Call cs.SetField("CopyFileName", templateCopy)
+                    Call cs.Save()
                 End If
-                LoopPtr = LoopPtr + 1
-            Loop
-            '
-            ' ----- add inline styles because gmail removes style tags
-            '
-            Copy = Replace(Copy, "class=""Headline""", "class=""Headline"" style=""font-weight:bold;margin-top:20px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""Overview""", "class=""Overview"" style=""margin-top:10px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""PrintIcon""", "class=""PrintIcon"" style=""float:right;text-align: right; margin-top:5px;margin-bottom:10px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""EmailIcon""", "class=""EmailIcon"" style=""float:right;text-align: right; margin-top:5px;margin-bottom:10px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""ReadMore""", "class=""ReadMore"" style=""margin-top:5px;margin-bottom:10px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""NewsletterTopic""", "class=""NewsletterTopic"" style=""font-weight:bold;padding-top:15px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""NewsletterTopicStory""", "class=""NewsletterTopicStory"" style=""padding-left:20px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""GoToPageLine""", "class=""GoToPageLine"" style=""text-align:left;margin-top:10px;padding-top:10px;border-top:1px solid black;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""LinkLine""", "class=""LinkLine"" style=""padding:10px 0 0 0;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""caption""", "class=""caption"" style=""font-weight:bold;margin-top: 10px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""PageList""", "class=""PageList"" style=""margin-top: 10px;margin-left:10px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""NewsletterNavTopic""", "class=""NewsletterNavTopic"" style=""margin-top:15px;"" ", , , vbTextCompare)
-            Copy = Replace(Copy, "class=""NewsletterNavTopic""", "class=""NewsletterNavTopic"" style=""margin-top:15px;"" ", , , vbTextCompare)
-            '
-            Call cs.Insert(ContentNameGroupEmail)
-            If cs.OK Then
-                CreateEmailGetID = cs.GetInteger("ID")
-                If NewsletterName = "" Then
-                    NewsletterName = cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID)
-                End If
-                EmailID = cs.GetInteger("ID")
-                EmailAddress = Trim(cp.User.Email)
-                MemberName = cp.User.Name
-                If (EmailAddress <> "") And (MemberName <> "") Then
-                    EmailAddress = """" & MemberName & """ <" & EmailAddress & ">"
-                End If
-                Call cs.SetField("Name", "Newsletter " & NewsletterName)
-                Call cs.SetField("Subject", NewsletterName)
-                Call cs.SetField("FromAddress", EmailAddress)
-                Call cs.SetField("TestMemberID", cp.User.Id)
-                Call cs.SetField("CopyFileName", Copy)
-                Call cs.Save()
-            End If
-            Call cs.Close()
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "CreateEmailGetID")
+                Call cs.Close()
+            Catch ex As Exception
+                Call HandleError(cp, ex, "CreateEmailGetID")
+            End Try
+            Return returnId
         End Function
 
     End Class

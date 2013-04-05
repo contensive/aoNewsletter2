@@ -271,49 +271,6 @@ Namespace newsletter2
             End If
         End Sub
         '
-        Friend Function HasArticleAccess(cp As CPBaseClass, ArticleID As Integer, Optional GivenGroupID As Integer = 0) As Boolean
-            '
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim ThisTest As String
-            '
-            If GivenGroupID <> 0 Then
-                Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , "GroupID")
-                If Not cs.OK Then
-                    HasArticleAccess = True
-                Else
-                    Do While cs.OK
-                        If cs.GetInteger("GroupID") = GivenGroupID Then
-                            HasArticleAccess = True
-                        End If
-                        Call cs.GoNext()
-                    Loop
-                End If
-                Call cs.Close()
-            Else
-                If Not cp.User.IsContentManager("Newsletters") Then
-                    Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , "GroupID")
-                    If Not cs.OK Then
-                        HasArticleAccess = True
-                    Else
-                        Do While cs.OK
-                            ThisTest = cs.GetText("GroupID")
-                            'ThisTest = cs.getText( "GroupID")
-                            '
-                            If ThisTest <> "" Then
-                                If cp.User.IsInGroup(ThisTest) Then
-                                    HasArticleAccess = True
-                                End If
-                            End If
-                            Call cs.GoNext()
-                        Loop
-                    End If
-                    Call cs.Close()
-                Else
-                    HasArticleAccess = True
-                End If
-            End If
-        End Function
-        '
         Friend Function GetCategoryAccessString(cp As CPBaseClass, CategoryID As Integer) As String
             'On Error GoTo ErrorTrap
             '
@@ -490,10 +447,21 @@ Namespace newsletter2
             GetDefaultTemplateID = TemplateID
         End Function
         '
-        Friend Function GetDefaultTemplateCopy(cp As CPBaseClass) As String
-            GetDefaultTemplateCopy = DefaultTemplate
-            GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID0}}", GetRandomInteger())
-            GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID1}}", GetRandomInteger())
+        Friend Function GetDefaultTemplateCopy(ByVal cp As CPBaseClass) As String
+            Dim returnHtml As String = ""
+            Try
+                Dim cs As CPCSBaseClass = cp.CSNew()
+                If cs.Open("layouts", "ccguid=" & guidLayoutDefaultTemplate) Then
+                    returnHtml = cs.GetText("layout")
+                End If
+                Call cs.Close()
+            Catch ex As Exception
+                handleError(cp, ex, "getDefaultTemplateCopy")
+            End Try
+            'GetDefaultTemplateCopy = DefaultTemplate
+            'GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID0}}", GetRandomInteger())
+            'GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID1}}", GetRandomInteger())
+            Return returnHtml
         End Function
         '
         '===================================================================================================

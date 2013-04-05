@@ -95,7 +95,7 @@ Namespace newsletter2
                     ExtensionType = LCase(Trim(cp.Doc.GetText("ExtensionType", OptionString)))
                     Call cp.Site.TestPoint("GetIssueID call 1, NewsletterID=" & NewsletterID)
                     IssueID = cn.GetIssueID(cp, NewsletterID)
-                    PageID = cp.Doc.GetInteger(RequestNameIssuePageID)
+                    PageID = cp.Doc.GetInteger(RequestNameStoryId)
                     IsQuickEditing = cp.User.IsQuickEditing("Page Content")
                     IsWorkflowRendering = cp.User.IsWorkflowRendering
                     '
