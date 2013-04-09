@@ -18,7 +18,7 @@ Namespace newsletter2
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
-                Dim WorkingQueryStringPlus As String = ""
+                Dim refreshQueryString As String = ""
                 '
                 Dim layout As CPBlockBaseClass = CP.BlockNew()
                 Dim newsBody As String = ""
@@ -53,12 +53,9 @@ Namespace newsletter2
                 ' deal with this later
                 Dim archiveIssueID As Integer = 0
                 '
-                WorkingQueryStringPlus = CP.Doc.RefreshQueryString
-                If WorkingQueryStringPlus <> "" Then
-                    WorkingQueryStringPlus = "?" & WorkingQueryStringPlus
-                End If
+                refreshQueryString = CP.Doc.RefreshQueryString
                 '
-                currentLink = CP.Request.Protocol & CP.Site.DomainPrimary & CP.Request.PathPage & "?" & CP.Doc.RefreshQueryString
+                currentLink = CP.Request.Protocol & CP.Site.DomainPrimary & CP.Request.PathPage & "?" & refreshQueryString
                 ReferLink = RequestNameRefer & "=" & CP.Utils.EncodeRequestVariable(CP.Utils.ModifyQueryString(currentLink, RequestNameRefer, ""))
                 isManager = CP.User.IsContentManager("Newsletters")
                 '
@@ -122,7 +119,7 @@ Namespace newsletter2
                         ' ????? 
                         '
                         'Main.ServerPagePrintVersion = True
-                        EmailID = CreateEmailGetID(CP, IssueID, NewsletterName, NewsletterID, WorkingQueryStringPlus)
+                        EmailID = CreateEmailGetID(CP, IssueID, NewsletterName, NewsletterID, refreshQueryString)
                         CP.Response.Redirect(CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameGroupEmail) & "&id=" & EmailID & "&af=4")
                         Return ""
                         Exit Function
@@ -218,23 +215,23 @@ Namespace newsletter2
                     Select Case FormID
                         Case FormArchive
                             newsArchiveList = layout.GetInner(".newsArchiveList")
-                            newsArchiveList = Body.GetArchiveList(CP, ButtonValue, IssueID, WorkingQueryStringPlus, newsArchiveList)
+                            newsArchiveList = Body.GetArchiveList(CP, ButtonValue, IssueID, refreshQueryString, newsArchiveList)
                             Call layout.SetInner(".newsArchiveList", newsArchiveList)
                             Call layout.SetOuter(".newsBody", "")
                             Call layout.SetOuter(".newsCoverList", "")
                             newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav)
                         Case FormDetails
                             newsBody = layout.GetInner(".newsBody")
-                            newsBody = Body.GetNewsletterBodyDetails(CP, cn, storyID, IssueID, WorkingQueryStringPlus, newsBody)
+                            newsBody = Body.GetNewsletterBodyDetails(CP, cn, storyID, IssueID, refreshQueryString, newsBody)
                             Call layout.SetInner(".newsBody", newsBody)
                             Call layout.SetOuter(".newsArchiveList", "")
                             Call layout.SetOuter(".newsCoverList", "")
                             newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav)
                         Case Else
                             FormID = FormCover
-                            newsCoverStoryItem = layout.GetOuter(".newsCoverItem")
-                            newsCoverCategoryItem = layout.GetOuter(".newsCoverCategory")
-                            newsCoverItemList = Body.GetNewsletterCover(CP, IssueID, storyID, WorkingQueryStringPlus, FormID, newsCoverStoryItem, newsCoverCategoryItem)
+                            newsCoverStoryItem = layout.GetOuter(".newsCoverStoryItem")
+                            newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
+                            newsCoverItemList = Body.GetNewsletterCover(CP, IssueID, storyID, refreshQueryString, FormID, newsCoverStoryItem, newsCoverCategoryItem)
                             Call layout.SetInner(".newsCoverList", newsCoverItemList)
                             Call layout.SetOuter(".newsArchiveList", "")
                             Call layout.SetOuter(".newsBody", "")
@@ -251,7 +248,7 @@ Namespace newsletter2
                     ' Controls
                     '
                     Controls = ""
-                    QS = CP.Doc.RefreshQueryString
+                    QS = refreshQueryString
                     If QS <> "" Then
                         QS = QS & "&"
                     Else
@@ -316,7 +313,7 @@ Namespace newsletter2
                 If Not CP.UserError.OK Then
                     returnHtml = "<div style=""padding:10px"">" & CP.UserError.GetList() & "</div>" & returnHtml
                 End If
-                'returnHtml = GetContent(CP, WorkingQueryStringPlus)
+                'returnHtml = GetContent(CP, refreshQueryString)
             Catch ex As Exception
                 handleError(CP, ex, "execute")
             End Try
@@ -340,7 +337,7 @@ Namespace newsletter2
         '
         '
         '
-        Private Function CreateEmailGetID(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal NewsletterName As String, ByVal NewsletterID As Integer, ByVal workingQueryStringPlus As String) As Integer
+        Private Function CreateEmailGetID(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal NewsletterName As String, ByVal NewsletterID As Integer, ByVal refreshQueryString As String) As Integer
             Dim returnId As Integer = 0
             Try
                 Dim EmailAddress As String
@@ -401,7 +398,7 @@ Namespace newsletter2
                 newsCoverStoryItem = layout.GetOuter(".newsCoverStoryList")
                 newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
                 Body = New newsletterBodyClass
-                newsBody = Body.GetNewsletterCover(cp, IssueID, 0, workingQueryStringPlus, FormCover, newsCoverStoryItem, newsCoverCategoryItem)
+                newsBody = Body.GetNewsletterCover(cp, IssueID, 0, refreshQueryString, FormCover, newsCoverStoryItem, newsCoverCategoryItem)
                 '
                 newsNav = layout.GetInner(".newsNav")
                 Nav = New newsletterNavClass

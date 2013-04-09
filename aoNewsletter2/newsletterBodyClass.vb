@@ -23,7 +23,7 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Friend Function GetArchiveList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal WorkingQueryStringPlus As String, ByVal newsArchiveList As String) As String
+        Friend Function GetArchiveList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveList As String) As String
             '
             Dim recordTop As Integer
             Dim RecordsPerPage As Integer
@@ -34,10 +34,11 @@ Namespace newsletter2
             Dim yearSelected As Integer
             Dim SearchKeywords As String
             '
-            Dim Stream As String
-            Dim Colors As String
+            Dim link As String = ""
+            Dim Stream As String = ""
+            Dim Colors As String = ""
             Dim ThisSQL As String
-            Dim ThisSQL2 As String
+            Dim ThisSQL2 As String = ""
             Dim MonthString As String
             Dim YearString As String
             Dim MonthCounter As Integer
@@ -53,7 +54,8 @@ Namespace newsletter2
             Dim BlockSearchForm As Boolean
             Dim qs As String
             Dim PageNumber As Integer
-            '
+            Dim issueDate As Date
+            Dim issueDateFormatted As String = ""
             '
             archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
@@ -122,7 +124,13 @@ Namespace newsletter2
                     If cs.OK Then
                         Stream &= cp.Content.GetCopy(PageNameArchives, "<h2>Archive Issues</h2>")
                         Do While cs.OK
-                            Stream &= cs.GetEditLink() & "<a href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameIssueID & "=" & cs.GetInteger("ID") & """>" & GetIssuePublishDate(cp, cs.GetInteger("ID")) & " " & cs.GetText("Name") & "</a>"
+                            issueDate = cs.GetDate("PublishDate")
+                            If IsDate(issueDate) Then
+                                issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
+                            End If
+                            link = refreshQueryString
+                            link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID"))
+                            Stream &= cs.GetEditLink() & "<a href=""?" & link & """>" & issueDateFormatted & " " & cs.GetText("Name") & "</a>"
                             Stream &= "<br>"
                             Stream &= cp.Utils.EncodeContentForWeb(cs.GetText("Overview"))
                             Call cs.GoNext()
@@ -192,7 +200,7 @@ Namespace newsletter2
                         'stream &=  "<br><br>"
                         'stream &=  "</tr></td>"
                         If (cs.GetBoolean("AllowReadMore")) And (cs.GetText("Body") <> "") Then
-                            qs = cp.Doc.RefreshQueryString
+                            qs = refreshQueryString
                             qs = cp.Utils.ModifyQueryString(qs, "formid", "400")
                             qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID"))
                             Stream &= "<a href=""?" & qs & """>"
@@ -209,10 +217,11 @@ Namespace newsletter2
                     'stream &=  "<tr><td align=center>"
                     Stream &= "<div  class=""NewsletterBody""><div class=""GoToPageLine"">Go to Page&nbsp;&nbsp;"
                     Do While PageCount <= NumberofPages
-                        'stream &=  "<a href=""" & Main.ServerPage & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """> Page " & (PageCount) & "</a>"
-                        ' 1/1/09 - JK - alays linked to root path
-                        Stream &= "<a href=""" & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """>" & (PageCount) & "</a>"
-                        'stream &=  "<a href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & WorkingQueryStringPlus & RequestNameButtonValue & "=" & FormButtonViewArchives & "&" & RequestNamePageNumber & "=" & PageCount & "&" & RequestNameSearchKeywords & "=" & SearchKeywords & """>" & (PageCount) & "</a>"
+                        qs = refreshQueryString
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
+                        Stream &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
                         PageCount = PageCount + 1
                         Stream &= "&nbsp;&nbsp;&nbsp;"
                     Loop
@@ -364,28 +373,28 @@ Namespace newsletter2
         '    'Call HandleError(cp, ex, "GetArticleAccess")
         'End Function
         '
-        Private Function GetIssuePublishDate(ByVal cp As CPBaseClass, ByVal IssueID As Integer) As String
-            'On Error GoTo ErrorTrap
-            '
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim IssueDate As String
-            Dim Stream As String = ""
-            '
-            cs.Open(ContentNameNewsletterIssues, "ID=" & IssueID, , , "PublishDate")
-            If cs.OK Then
-                IssueDate = cs.GetDate("PublishDate")
-                If IsDate(IssueDate) Then
-                    Stream = MonthName(Month(IssueDate), True) & " " & Day(IssueDate) & ", " & Year(IssueDate)
-                End If
-            End If
-            Call cs.Close()
-            '
-            '
-            GetIssuePublishDate = Stream
-            '
-        End Function
-        '
-        Friend Function GetNewsletterCover(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal IssuePageID As Integer, ByVal WorkingQueryStringPlus As String, ByVal formid As Integer, ByVal newsCoverStoryItem As String, ByVal newsCoverCategoryItem As String) As String
+        'Private Function GetIssuePublishDate(ByVal cp As CPBaseClass, ByVal IssueID As Integer) As String
+        '    'On Error GoTo ErrorTrap
+        '    '
+        '    Dim cs As CPCSBaseClass = cp.CSNew()
+        '    Dim IssueDate As String
+        '    Dim Stream As String = ""
+        '    '
+        '    cs.Open(ContentNameNewsletterIssues, "ID=" & IssueID, , , "PublishDate")
+        '    If cs.OK Then
+        '        IssueDate = cs.GetDate("PublishDate")
+        '        If IsDate(IssueDate) Then
+        '            Stream = MonthName(Month(IssueDate), True) & " " & Day(IssueDate) & ", " & Year(IssueDate)
+        '        End If
+        '    End If
+        '    Call cs.Close()
+        '    '
+        '    '
+        '    GetIssuePublishDate = Stream
+        '    '
+        'End Function
+        ''
+        Friend Function GetNewsletterCover(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal storyId As Integer, ByVal refreshQueryString As String, ByVal formid As Integer, ByVal newsCoverStoryItem As String, ByVal newsCoverCategoryItem As String) As String
             Dim returnHtmlItemList As String = ""
             Try
                 '
@@ -403,6 +412,7 @@ Namespace newsletter2
                 Dim FetchFlag As Boolean
                 Dim CategoryID As Integer
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
+                Dim qs As String
                 '
                 TableList = "NewsletterIssuePages "
                 '
@@ -412,13 +422,13 @@ Namespace newsletter2
                 End If
                 Call cs.Close()
                 '
-                If IssuePageID <> 0 Then
+                If storyId <> 0 Then
                     Criteria = ""
                     MainSQL = "" _
                         & " select p.categoryId,c.name as CategoryName" _
                         & " from NewsletterIssuePages p" _
                         & " left join NewsletterIssueCategories c on c.id=p.categoryId" _
-                        & " where (p.ID=" & cp.Db.EncodeSQLNumber(IssuePageID) & ")" _
+                        & " where (p.ID=" & cp.Db.EncodeSQLNumber(storyId) & ")" _
                         & ""
                     'call cs.open(ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded")
                 Else
@@ -453,14 +463,17 @@ Namespace newsletter2
                             CategoryName = cs.GetText("CategoryName")
                             If RecordCount <> 0 Then
                                 If cp.User.IsAuthoring(ContentNameNewsletterStories) Then
-                                    CategoryName &= cn.GetAdminHintWrapper(cp, "<a href=""" & WorkingQueryStringPlus & RequestNameIssueID & "=" & IssueID & "&" & RequestNameSortUp & "=" & CategoryID & """>[Move Up]</a> ")
+                                    qs = refreshQueryString
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID.ToString())
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameSortUp, CategoryID.ToString())
+                                    CategoryName &= cn.GetAdminHintWrapper(cp, "<a href=""?" & qs & """>[Move Up]</a> ")
                                 End If
                             End If
                             Call layout.SetInner(".newsCoverCategoryItem", CategoryName)
                             returnHtmlItemList &= layout.GetHtml()
                             '
                             Do While CS2.OK
-                                returnHtmlItemList &= GetStoryOverview(cp, CS2, formid, IssuePageID, WorkingQueryStringPlus, newsCoverStoryItem)
+                                returnHtmlItemList &= GetStoryOverview(cp, CS2, formid, refreshQueryString, newsCoverStoryItem)
                                 Call CS2.GoNext()
                             Loop
                             returnHtmlItemList &= layout.GetHtml()
@@ -473,7 +486,19 @@ Namespace newsletter2
                 '
                 Call cs.Close()
                 '
-                returnHtmlItemList &= GetUnrelatedStories(cp, IssuePageID, IssueID, formid, WorkingQueryStringPlus, newsCoverStoryItem)
+                Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")"
+                Call cs.Open(ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded")
+                If cs.OK() Then
+                    'Caption = cp.Site.GetText("Newsletter Caption Other Stories", "")
+                    'If Caption <> "" Then
+                    '    Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
+                    'End If
+                    Do While cs.OK()
+                        returnHtmlItemList &= GetStoryOverview(cp, cs, formid, refreshQueryString, newsCoverStoryItem)
+                        Call cs.GoNext()
+                    Loop
+                End If
+                Call cs.Close()
                 '
                 IssueSQL = " Select max(id) as MaxIssueID from newsletterissues"
                 Call cs.OpenSQL(IssueSQL)
@@ -490,40 +515,40 @@ Namespace newsletter2
             End Try
             Return returnHtmlItemList
         End Function
-        '
+        ''
 
-        Private Function GetUnrelatedStories(ByVal cp As CPBaseClass, ByVal IssuePageID As Integer, ByVal IssueID As Integer, ByVal formId As Integer, ByVal WorkingQueryStringPlus As String, ByVal newsCoverStoryItem As String) As String
-            Dim returnHtml As String = ""
-            Try
+        'Private Function GetUnrelatedStories(ByVal cp As CPBaseClass, ByVal IssuePageID As Integer, ByVal IssueID As Integer, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String) As String
+        '    Dim returnHtml As String = ""
+        '    Try
 
-                'On Error GoTo ErrorTrap
-                '
-                Dim Criteria As String
-                Dim cs As CPCSBaseClass = cp.CSNew()
-                Dim Caption As String
-                '
-                If IssuePageID = 0 Then
-                    Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")"
-                    Call cs.Open(ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded")
-                    If cs.OK() Then
-                        'Caption = cp.Site.GetText("Newsletter Caption Other Stories", "")
-                        'If Caption <> "" Then
-                        '    Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
-                        'End If
-                        Do While cs.OK()
-                            returnHtml &= GetStoryOverview(cp, cs, formId, IssuePageID, WorkingQueryStringPlus, newsCoverStoryItem)
-                            Call cs.GoNext()
-                        Loop
-                    End If
-                    Call cs.Close()
-                End If
-            Catch ex As Exception
-                Call handleError(cp, ex, "GetUnrelatedStories")
-            End Try
-            Return returnHtml
-        End Function
+        '        'On Error GoTo ErrorTrap
+        '        '
+        '        Dim Criteria As String
+        '        Dim cs As CPCSBaseClass = cp.CSNew()
+        '        Dim Caption As String
+        '        '
+        '        If IssuePageID = 0 Then
+        '            Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & IssueID & ")"
+        '            Call cs.Open(ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded")
+        '            If cs.OK() Then
+        '                'Caption = cp.Site.GetText("Newsletter Caption Other Stories", "")
+        '                'If Caption <> "" Then
+        '                '    Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
+        '                'End If
+        '                Do While cs.OK()
+        '                    returnHtml &= GetStoryOverview(cp, cs, formId, IssuePageID, refreshQueryString, newsCoverStoryItem)
+        '                    Call cs.GoNext()
+        '                Loop
+        '            End If
+        '            Call cs.Close()
+        '        End If
+        '    Catch ex As Exception
+        '        Call handleError(cp, ex, "GetUnrelatedStories")
+        '    End Try
+        '    Return returnHtml
+        'End Function
         '
-        Private Function GetStoryOverview(ByVal cp As CPBaseClass, ByVal CS As CPCSBaseClass, ByVal formId As Integer, ByVal IssuePageID As Integer, ByVal WorkingQueryStringPlus As String, ByVal newsCoverStoryItem As String) As String
+        Private Function GetStoryOverview(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String) As String
             Dim returnhtml As String = ""
             Try
                 '
@@ -537,7 +562,7 @@ Namespace newsletter2
                 Dim readMore As String = ""
                 '
                 Call layout.Load(newsCoverStoryItem)
-                StoryID = CS.GetInteger("ID")
+                StoryID = CSStories.GetInteger("ID")
                 storyBookmark = "story" & StoryID
                 StoryAccessString = cn.GetArticleAccessString(cp, StoryID)
                 '
@@ -547,17 +572,19 @@ Namespace newsletter2
 
                 '
                 If formId <> FormEmail Then
-                    caption &= CS.GetEditLink()
+                    caption &= CSStories.GetEditLink()
                 End If
-                caption = "<span id=""" & storyBookmark & """>" & CS.GetText("Name") & "</span>"
+                caption = "<span id=""" & storyBookmark & """>" & CSStories.GetText("Name") & "</span>"
                 Call layout.SetInner(".newsCoverListCaption", caption)
-                Call layout.SetInner(".newsCoverListOverview", cp.Utils.EncodeContentForWeb(CS.GetText("Overview")))
-                If Not CS.GetBoolean("AllowReadMore") Then
+                Call layout.SetInner(".newsCoverListOverview", cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview")))
+                If Not CSStories.GetBoolean("AllowReadMore") Then
                     Call layout.SetOuter(".newsCoverListReadMore", "")
                 Else
-                    readMoreLink = WorkingQueryStringPlus & RequestNameStoryId & "=" & CS.GetInteger("ID") & "&" & RequestNameFormID & "=" & FormDetails
+                    readMoreLink = refreshQueryString
+                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID)
+                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormDetails)
                     readMore = layout.GetInner(".newsCoverListReadMore")
-                    readMore = readMore.Replace("?", readMoreLink)
+                    readMore = readMore.Replace("?", "?" & readMoreLink)
                     Call layout.SetInner(".newsCoverListReadMore", readMore)
                 End If
                 If StoryAccessString <> "" Then
@@ -571,7 +598,7 @@ Namespace newsletter2
             Return returnhtml
         End Function
         '
-        Friend Function GetNewsletterBodyDetails(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal IssuePageID As Integer, ByVal IssueID As String, ByVal WorkingQueryStringPlus As String, ByVal newsBody As String) As String
+        Friend Function GetNewsletterBodyDetails(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal IssuePageID As Integer, ByVal IssueID As String, ByVal refreshQueryString As String, ByVal newsBody As String) As String
             'On Error GoTo ErrorTrap
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
@@ -588,6 +615,7 @@ Namespace newsletter2
             Dim EmailIcon As String
             Dim storyName As String
             Dim storyOverview As String
+            Dim qs As String = ""
             '
             PrinterIcon = "<img border=0 src=/ccLib/images/IconPrint.gif>"
             EmailIcon = "<img border=0 src=/ccLib/images/IconEmail.gif>"
@@ -603,12 +631,12 @@ Namespace newsletter2
                     '
                     Stream &= cs.GetEditLink()
                     If cs.GetBoolean("AllowPrinterPage") Then
-                        Link = WorkingQueryStringPlus & RequestNameStoryId & "=" & IssuePageID & "&" & RequestNameFormID & "=" & FormDetails & "&ccIPage=l6d09a10sP"
-                        Stream &= "<div class=""PrintIcon""><a target=_blank href=""" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
+                        Link = refreshQueryString & "&" & RequestNameStoryId & "=" & IssuePageID & "&" & RequestNameFormID & "=" & FormDetails & "&ccIPage=l6d09a10sP"
+                        Stream &= "<div class=""PrintIcon""><a target=_blank href=""?" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
                     End If
                     If cs.GetBoolean("AllowEmailPage") Then
-                        Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(WorkingQueryStringPlus, "&", "%26") & RequestNameStoryId & "=" & IssuePageID & "%26" & RequestNameFormID & "=" & FormDetails
-                        Stream &= "<div class=""EmailIcon""><a target=_blank href=""" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
+                        Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & IssuePageID & "%26" & RequestNameFormID & "=" & FormDetails
+                        Stream &= "<div class=""EmailIcon""><a target=_blank href=""?" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
                     End If
                     Stream &= "<div class=""NewsletterBody"">"
                     Stream &= "<div class=""Headline"">" & cs.GetText("Name") & "</div>"
@@ -650,12 +678,12 @@ Namespace newsletter2
                             If Pos > 0 Then
                                 Link = Left(Link, Pos - 1)
                             End If
-                            Copy = cp.Doc.RefreshQueryString()
-                            Copy = cp.Utils.ModifyQueryString(Copy, RequestNameStoryId, CStr(IssuePageID))
-                            Copy = cp.Utils.ModifyQueryString(Copy, RequestNameFormID, FormDetails)
-                            Copy = cp.Utils.ModifyQueryString(Copy, "method", "")
+                            qs = refreshQueryString
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(IssuePageID))
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails)
+                            qs = cp.Utils.ModifyQueryString(qs, "method", "")
                             rssChange = True
-                            Call cs.SetField("RSSLink", Link & "?" & Copy)
+                            Call cs.SetField("RSSLink", Link & "?" & qs)
                         End If
                     End If
                     If rssChange Then

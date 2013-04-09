@@ -1,13 +1,52 @@
-<div style="width:810px;margin:0 auto;">
-	<table style="BORDER-TOP: medium none; BORDER-RIGHT: medium none; BORDER-COLLAPSE: collapse; BORDER-BOTTOM: medium none; TEXT-ALIGN: left; MARGIN: 0px; BORDER-LEFT: medium none; WIDTH: 838px" cellpadding="0">
+
+<style>
+	/* define to match inline styles (for email) and over-ride site stylesheets (for pages) */
+	#newsTemplate div
+	,#newsTemplate p
+	,#newsTemplate li
+	,#newsTemplate td {
+		font-family:georgia,serif;
+		font-size:14px;
+		font-weight:normal
+	}
+	#newsTemplate h1
+	,#newsTemplate h2
+	,#newsTemplate h3
+	,#newsTemplate h4
+	,#newsTemplate .newsCoverListCaption
+	,#newsTemplate .newsNavCaption
+	,#newsTemplate .newsBodyCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:16px;
+		font-weight:bold
+	}
+	#newsTemplate .newsCoverCategoryItem
+	{
+		color:#fff;
+		backgorund-color:#4f4;
+		font-family:helvetica,san-serif;
+		font-size:16px;
+		font-weight:bold
+	}
+	#newsTemplate .newsCoverListReadMoreCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:12px;
+		font-weight:normal;
+	}
+	
+</style>
+<div id="newsTemplate" style="width:810px;margin:0 auto;font-family:georgia,serif;font-size:14px;">
+	<table style="border:none;BORDER-COLLAPSE:collapse;TEXT-ALIGN: left; MARGIN: 0px; WIDTH: 838px" cellpadding="0">
 		<tbody>
 			<tr align="left">
-				<td style="BORDER-TOP: medium none; BORDER-RIGHT: medium none; BORDER-BOTTOM: medium none; TEXT-ALIGN: left; BORDER-LEFT: medium none" colspan="2">
+				<td style="border:none; TEXT-ALIGN: left" colspan="2">
 					<img border="0" alt="" src="/images/FpiEBHeaderFPI.jpg">
 				</td>
 			</tr>
 			<tr>
-				<td style="BORDER-TOP: medium none; BORDER-RIGHT: medium none; VERTICAL-ALIGN: middle; BORDER-BOTTOM: medium none; WORD-SPACING: 0px; TEXT-ALIGN: left; BORDER-LEFT: medium none; LETTER-SPACING: 0px" colspan="2">
+				<td style="border: none; VERTICAL-ALIGN: middle; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px" colspan="2">
 					<div class="newsNav" style="margin: 20px 0 0 0;border: 1px solid red;">
 						<div class="newsNavCaption"  style="font-weight:bold;margin-top: 10px;">In This Issue</div>
 						<div class="newsNavList">
@@ -16,12 +55,12 @@
 					</div>
 					<div class="newsCover" style="margin: 20px 0 0 0;border: 1px solid green;">
 						<div class="newsCoverList">
-							<div class="newsCoverCategoryItem">
+							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;backgorund-color:#4f4;">
 								Industry news
 							</div>
 							<div class="newsCoverStoryItem">
-								<div class="newsCoverListCaption">newsListCaption-The FPI Update:  What's New and News in Your Association...</div>
-								<div class="newsCoverListOverview">
+								<div class="newsCoverListCaption" style="font-weight:bold;margin-top: 10px;">newsListCaption-The FPI Update:  What's New and News in Your Association...</div>
+								<div class="newsCoverListOverview" style="font-family:georgia,serif;font-size:14px;">
 									<p>newsListOverview- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
 								<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
@@ -29,8 +68,8 @@
 						</div>
 					</div>
 					<div class="newsBody" style="margin: 20px 0 0 0;border: 1px solid blue;">
-						<div class="newsBodyCaption">newsBodyCaption-The FPI Update:  What's New and News in Your Association...</div>
-						<div class="newsBodyStory">
+						<div class="newsBodyCaption" style="font-weight:bold;margin-top: 10px;">newsBodyCaption-The FPI Update:  What's New and News in Your Association...</div>
+						<div class="newsBodyStory" style="font-family:georgia,serif;font-size:14px;">
 							<p>newsBodyStory-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
@@ -41,7 +80,7 @@
 						<div class="newsArchiveList">
 							<div class="newsArchiveItem">
 								<div class="newsArchiveListCaption" id="story1">newsListCaption-The FPI Update:  What's New and News in Your Association...</div>
-								<div class="newsArchiveListOverview">
+								<div class="newsArchiveListOverview" style="font-family:georgia,serif;font-size:14px;">
 									<p>newsListOverview- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
 								<div class="newsArchiveListReadMore"><a class="newsArchiveListReadMoreAnchor" href="?bid=67&amp;issuepage=1&amp;formid=400"><span class="newsArchiveListReadMoreCaption">Read More</span></a></div>
@@ -51,7 +90,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td style="BORDER-TOP: medium none; BORDER-RIGHT: medium none; BORDER-BOTTOM: medium none; WORD-SPACING: 0px; TEXT-ALIGN: center; BORDER-LEFT: medium none; LETTER-SPACING: 0px" colspan="2">	
+				<td style="border: none; WORD-SPACING: 0px; TEXT-ALIGN: center; LETTER-SPACING: 0px" colspan="2">	
 					<div style="TEXT-ALIGN: left">
 						<img border="0" alt="" src="/images/FpiEBfooterFPI.jpg"><a style="LETTER-SPACING: 0px" name="contribute">
 						<br></a>
