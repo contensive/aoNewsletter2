@@ -30,15 +30,15 @@ Namespace newsletter2
                 Dim repeatItem As CPBlockBaseClass = cp.BlockNew()
                 '
                 Dim currentIssueId As Integer = 0
-                Dim CS As CPCSBaseClass = cp.CSNew()
+                Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
                 Dim CSPointer As CPCSBaseClass = cp.CSNew()
                 Dim ThisSQL As String
                 Dim Controls As String
-                Dim WorkingIssuePageID As Integer
+                Dim WorkingStoryId As Integer
                 Dim NavSQL As String
                 Dim CategoryName As String
-                Dim PreviousCategoryName As String
+                Dim PreviousCategoryName As String = ""
                 Dim cn As New newsletterCommonClass
                 Dim AccessString As String
                 Dim CategoryID As Integer
@@ -67,17 +67,17 @@ Namespace newsletter2
                 NavSQL = NavSQL & " AND (NIR.NewsletterIssueID=" & issueid & ")"
                 NavSQL = NavSQL & " AND (NIC.Active<>0)"
                 NavSQL = NavSQL & " AND (NIR.Active<>0)"
-                NavSQL = NavSQL & " ORDER BY NIR.SortOrder"
+                NavSQL = NavSQL & " ORDER BY NIR.SortOrder,NIC.name"
                 '
-                Call CS.OpenSQL(NavSQL)
-                If CS.OK() Then
-                    Do While CS.OK()
-                        CategoryID = CS.GetInteger("CategoryID")
-                        Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & issueid & ")", "SortOrder")
+                Call cs.OpenSQL(NavSQL)
+                If cs.OK() Then
+                    Do While cs.OK()
+                        CategoryID = cs.GetInteger("CategoryID")
+                        Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & issueid & ")", "SortOrder,id")
                         If CS2.OK Then
-                            CategoryName = CS.GetText("CategoryName")
+                            CategoryName = cs.GetText("CategoryName")
                             If (CategoryName <> PreviousCategoryName) Then
-                                AccessString = cn.GetCategoryAccessString(cp, CS.GetInteger("CategoryID"))
+                                AccessString = cn.GetCategoryAccessString(cp, cs.GetInteger("CategoryID"))
                                 If AccessString <> "" Then
                                     repeatList &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                                 End If
@@ -91,15 +91,15 @@ Namespace newsletter2
                             Do While CS2.OK
                                 '
                                 Call repeatItem.Load(newsNavItem)
-                                WorkingIssuePageID = CS2.GetInteger("ID")
-                                AccessString = cn.GetArticleAccessString(cp, WorkingIssuePageID)
-                                storyCaption = CS2.GetEditLink() & CS.GetText("Name")
+                                WorkingStoryId = CS2.GetInteger("ID")
+                                AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                                storyCaption = CS2.GetEditLink() & CS2.GetText("Name")
                                 Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
                                 If AccessString <> "" Then
                                     repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
                                 End If
                                 QS = cp.Doc.RefreshQueryString
-                                QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingIssuePageID), True)
+                                QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingStoryId), True)
                                 QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
                                 If AccessString <> "" Then
                                     repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
@@ -112,13 +112,13 @@ Namespace newsletter2
                         End If
                         Call CS2.Close()
                         '
-                        Call CS.GoNext()
+                        Call cs.GoNext()
                     Loop
                 End If
-                Call CS.Close()
+                Call cs.Close()
                 '
-                Call CS.Open(ContentNameNewsletterStories, "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & issueid & ")", "SortOrder,DateAdded")
-                If CS.OK() Then
+                Call cs.Open(ContentNameNewsletterStories, "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" & issueid & ")", "SortOrder,DateAdded")
+                If cs.OK() Then
                     If ArticleCount > 0 Then
                         '
                         ' This is a list of uncategorized articles following the categories -- give it a heading
@@ -126,21 +126,22 @@ Namespace newsletter2
                         CategoryName = cp.Site.GetText("Newsletter Nav Caption Other Articles", "Other Articles")
                         repeatList &= vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
                     End If
-                    Do While CS.OK()
+                    Do While cs.OK()
                         Call repeatItem.Load(newsNavItem)
-                        WorkingIssuePageID = CS.GetInteger("ID")
-                        AccessString = cn.GetArticleAccessString(cp, WorkingIssuePageID)
-                        storyCaption = CS.GetEditLink() & CS.GetText("Name")
+                        WorkingStoryId = cs.GetInteger("ID")
+                        AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                        storyCaption = cs.GetText("Name")
+                        'storyCaption = CS.GetEditLink() & CS.GetText("Name")
                         If AccessString <> "" Then
                             repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
                         End If
                         Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
-                        If CS.GetBoolean("AllowReadMore") Then
+                        If cs.GetBoolean("AllowReadMore") Then
                             '
                             ' link to the story page
                             '
                             QS = cp.Doc.RefreshQueryString
-                            QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingIssuePageID), True)
+                            QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingStoryId), True)
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
                         Else
                             '
@@ -149,16 +150,16 @@ Namespace newsletter2
                             QS = "?" & cp.Doc.RefreshQueryString
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, "", False)
                             QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover, True)
-                            QS = QS & "#story" & WorkingIssuePageID
+                            QS = QS & "#story" & WorkingStoryId
                         End If
                         If AccessString <> "" Then
                             repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
                         End If
                         repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
-                        Call CS.GoNext()
+                        Call cs.GoNext()
                     Loop
                 End If
-                Call CS.Close()
+                Call cs.Close()
                 '
                 ' Link to Current Issues
                 '
@@ -173,13 +174,13 @@ Namespace newsletter2
                 ' can not just lookup issues that are not the issueid because if you are editing a future issue, the current issue shows up as an archive
                 '
                 ThisSQL = "SELECT TOP 2 ID From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
-                Call CS.OpenSQL(ThisSQL)
-                If CS.OK Then
+                Call cs.OpenSQL(ThisSQL)
+                If cs.OK Then
                     '
                     ' First one is the current issue
                     '
-                    Call CS.GoNext()
-                    If CS.OK Then
+                    Call cs.GoNext()
+                    If cs.OK Then
                         '
                         ' If there are more then one published issues, the others are archive issues
                         '
@@ -188,7 +189,7 @@ Namespace newsletter2
                         repeatList &= repeatItem.GetHtml().Replace("?", "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive)
                     End If
                 End If
-                Call CS.Close()
+                Call cs.Close()
                 '
                 Call layout.SetInner(".newsNavList", repeatList)
                 '

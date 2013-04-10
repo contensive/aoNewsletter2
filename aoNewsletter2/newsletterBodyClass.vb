@@ -598,106 +598,111 @@ Namespace newsletter2
             Return returnhtml
         End Function
         '
-        Friend Function GetNewsletterBodyDetails(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal IssuePageID As Integer, ByVal IssueID As String, ByVal refreshQueryString As String, ByVal newsBody As String) As String
-            'On Error GoTo ErrorTrap
-            '
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim CSIssue As CPCSBaseClass = cp.CSNew()
-            Dim rssChange As Boolean
-            Dim expirationDate As Date
-            Dim PublishDate As Date
-            Dim Pos As Integer
-            Dim recordDate As Date
-            Dim Copy As String
-            Dim Stream As String
-            Dim Link As String
-            Dim PrinterIcon As String
-            Dim EmailIcon As String
-            Dim storyName As String
-            Dim storyOverview As String
-            Dim qs As String = ""
-            '
-            PrinterIcon = "<img border=0 src=/ccLib/images/IconPrint.gif>"
-            EmailIcon = "<img border=0 src=/ccLib/images/IconEmail.gif>"
-            '
-            If IssuePageID = 0 Then
-                Stream = "<span class=""ccError"">The requested story is currently unavailable.</span>"
-            Else
-                Call cs.Open(ContentNameNewsletterStories, "ID=" & IssuePageID)
-                If cs.OK() Then
-                    storyName = cs.GetText("name")
-                    storyOverview = cs.GetText("Overview")
-                    IssueID = cs.GetInteger("newsletterId")
-                    '
-                    Stream &= cs.GetEditLink()
-                    If cs.GetBoolean("AllowPrinterPage") Then
-                        Link = refreshQueryString & "&" & RequestNameStoryId & "=" & IssuePageID & "&" & RequestNameFormID & "=" & FormDetails & "&ccIPage=l6d09a10sP"
-                        Stream &= "<div class=""PrintIcon""><a target=_blank href=""?" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
-                    End If
-                    If cs.GetBoolean("AllowEmailPage") Then
-                        Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & IssuePageID & "%26" & RequestNameFormID & "=" & FormDetails
-                        Stream &= "<div class=""EmailIcon""><a target=_blank href=""?" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
-                    End If
-                    Stream &= "<div class=""NewsletterBody"">"
-                    Stream &= "<div class=""Headline"">" & cs.GetText("Name") & "</div>"
-                    Stream &= "<div class=""Copy"">" & cs.GetText("Body") & "</div>"
-                    Stream &= "</div>"
-                    '
-                    ' update RSS fields if empty
-                    '
-                    rssChange = False
-                    If (IssueID <> 0) Then
-                        If (cn.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
-                            CSIssue.Open(ContentNameNewsletterIssues, "id=" & cp.Db.EncodeSQLNumber(IssueID))
-                            If CSIssue.OK() Then
-                                PublishDate = CSIssue.GetDate("publishDate")
-                            End If
-                            Call CSIssue.Close()
-                            If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
-                                rssChange = True
-                                Call cs.SetField("RSSDatePublish", PublishDate)
+        Friend Function GetNewsletterBodyDetails(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal storyId As Integer, ByVal IssueID As String, ByVal refreshQueryString As String, ByVal newsBody As String) As String
+            Dim returnHtml As String = ""
+            Try
+                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim CSIssue As CPCSBaseClass = cp.CSNew()
+                Dim rssChange As Boolean
+                Dim expirationDate As Date
+                Dim PublishDate As Date
+                Dim Pos As Integer
+                Dim recordDate As Date
+                Dim Copy As String
+                Dim Link As String
+                Dim PrinterIcon As String
+                Dim EmailIcon As String
+                Dim storyName As String
+                Dim storyOverview As String
+                Dim storyBody As String
+                Dim qs As String = ""
+                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                '
+                Call layout.Load(newsBody)
+                '
+                PrinterIcon = "<img border=0 src=/ccLib/images/IconPrint.gif>"
+                EmailIcon = "<img border=0 src=/ccLib/images/IconEmail.gif>"
+                '
+                If storyId = 0 Then
+                    Call layout.SetInner(".newsBodyStory", "<span class=""ccError"">The requested story is currently unavailable.</span>")
+                Else
+                    Call cs.Open(ContentNameNewsletterStories, "ID=" & storyId)
+                    If cs.OK() Then
+                        storyName = cs.GetText("name")
+                        storyBody = cs.GetText("body")
+                        storyOverview = cs.GetText("Overview")
+                        If storyBody = "" Then
+                            storyBody = storyOverview
+                        End If
+                        IssueID = cs.GetInteger("newsletterId")
+                        '
+                        returnHtml &= cs.GetEditLink()
+                        If cs.GetBoolean("AllowPrinterPage") Then
+                            Link = refreshQueryString & "&" & RequestNameStoryId & "=" & storyId & "&" & RequestNameFormID & "=" & FormDetails & "&ccIPage=l6d09a10sP"
+                            returnHtml &= "<div class=""PrintIcon""><a target=_blank href=""?" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
+                        End If
+                        If cs.GetBoolean("AllowEmailPage") Then
+                            Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormDetails
+                            returnHtml &= "<div class=""EmailIcon""><a target=_blank href=""?" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
+                        End If
+                        Call layout.SetInner(".newsBodyCaption", storyName)
+                        Call layout.SetInner(".newsBodyStory", storyBody)
+                        '
+                        ' update RSS fields if empty
+                        '
+                        rssChange = False
+                        If (IssueID <> 0) Then
+                            If (cn.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
+                                CSIssue.Open(ContentNameNewsletterIssues, "id=" & cp.Db.EncodeSQLNumber(IssueID))
+                                If CSIssue.OK() Then
+                                    PublishDate = CSIssue.GetDate("publishDate")
+                                End If
+                                Call CSIssue.Close()
+                                If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
+                                    rssChange = True
+                                    Call cs.SetField("RSSDatePublish", PublishDate)
+                                End If
                             End If
                         End If
-                    End If
-                    '
-                    If (storyName <> "") And (cs.GetText("RSSTitle") = "") Then
-                        rssChange = True
-                        Call cs.SetField("RSSTitle", storyName)
-                    End If
-                    '
-                    If (storyOverview <> "") And (cs.GetText("RSSDescription") = "") Then
-                        rssChange = True
-                        Copy = cp.Utils.ConvertHTML2Text(storyOverview)
-                        Call cs.SetField("RSSDescription", Copy)
-                    End If
-                    '
-                    If (cs.GetText("RSSLink") = "") Then
-                        Link = cp.Request.Link
-                        If InStr(1, Link, cp.Site.GetText("adminUrl"), vbTextCompare) = 0 Then
-                            Pos = InStr(1, Link, "?")
-                            If Pos > 0 Then
-                                Link = Left(Link, Pos - 1)
-                            End If
-                            qs = refreshQueryString
-                            qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(IssuePageID))
-                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails)
-                            qs = cp.Utils.ModifyQueryString(qs, "method", "")
+                        '
+                        If (storyName <> "") And (cs.GetText("RSSTitle") = "") Then
                             rssChange = True
-                            Call cs.SetField("RSSLink", Link & "?" & qs)
+                            Call cs.SetField("RSSTitle", storyName)
+                        End If
+                        '
+                        If (storyOverview <> "") And (cs.GetText("RSSDescription") = "") Then
+                            rssChange = True
+                            Copy = cp.Utils.ConvertHTML2Text(storyOverview)
+                            Call cs.SetField("RSSDescription", Copy)
+                        End If
+                        '
+                        If (cs.GetText("RSSLink") = "") Then
+                            Link = cp.Request.Link
+                            If InStr(1, Link, cp.Site.GetText("adminUrl"), vbTextCompare) = 0 Then
+                                Pos = InStr(1, Link, "?")
+                                If Pos > 0 Then
+                                    Link = Left(Link, Pos - 1)
+                                End If
+                                qs = refreshQueryString
+                                qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(storyId))
+                                qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails)
+                                qs = cp.Utils.ModifyQueryString(qs, "method", "")
+                                rssChange = True
+                                Call cs.SetField("RSSLink", Link & "?" & qs)
+                            End If
+                        End If
+                        If rssChange Then
+                            Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
                         End If
                     End If
-                    If rssChange Then
-                        Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
-                    End If
+                    Call cs.Close()
                 End If
-                Call cs.Close()
-            End If
-            '
-            GetNewsletterBodyDetails = Stream
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetNewsletterBodyDetails")
+                '
+                returnHtml = layout.GetHtml()
+            Catch ex As Exception
+                Call handleError(cp, ex, "getNewsletterBodyDetails")
+            End Try
+            Return returnHtml
         End Function
         '
         Private Function template(x As Integer) As String

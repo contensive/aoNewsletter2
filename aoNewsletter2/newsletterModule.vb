@@ -6,7 +6,7 @@
         '
         Public Const RequestNameFormID = "formid"
         Public Const RequestNameIssueID = "issue"
-        Public Const RequestNameStoryId = "issuepage"
+        Public Const RequestNameStoryId = "storyId"
         Public Const RequestNameChildPageID = "bid"
         '
         Public Const RequestNameEmailGroups = "Groups"

@@ -395,7 +395,7 @@ Namespace newsletter2
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Stream As String
             '
-            Call cs.Open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , , , "SortOrder")
+            Call cs.Open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , "SortOrder")
             If cs.OK() Then
                 Stream = cs.GetText("SortOrder")
             End If

@@ -79,13 +79,13 @@ Namespace newsletter2
                     '
                     ' PageID given, get Issue from PageID (and check against Newsletter)
                     '
-                    Call cs.Open(ContentNameNewsletterStories, "(id=" & storyID & ")", , , , , "NewsletterID")
+                    Call cs.Open(ContentNameNewsletterStories, "(id=" & storyID & ")", , , "NewsletterID")
                     If cs.OK() Then
                         IssueID = cs.GetInteger("NewsletterID")
                     End If
                     Call cs.Close()
                     '
-                    Call cs.Open(ContentNameNewsletterIssues, "(id=" & IssueID & ")and(Newsletterid=" & NewsletterID & ")", , , , , "ID")
+                    Call cs.Open(ContentNameNewsletterIssues, "(id=" & IssueID & ")and(Newsletterid=" & NewsletterID & ")", , , "ID")
                     If Not cs.OK() Then
                         '
                         ' Bad Issue, reset to current issue of current newsletter
