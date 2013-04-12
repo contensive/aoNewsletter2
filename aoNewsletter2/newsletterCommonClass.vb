@@ -30,7 +30,7 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Friend Function GetIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
+        Friend Function GetIssueID(ByVal cp As CPBaseClass, ByVal NewsletterID As Integer, ByVal currentIssueId As Integer) As Integer
             'On Error GoTo ErrorTrap
             '
             Dim IssueID As Integer
@@ -41,7 +41,7 @@ Namespace newsletter2
             Call cp.Site.TestPoint("GetIssueID - NewsletterID: " & NewsletterID)
             '
             If IssueID = 0 Then
-                IssueID = GetCurrentIssueID(cp, NewsletterID)
+                IssueID = currentIssueId
             End If
             '
             Call cp.Site.TestPoint("GetIssueID - IssueID: " & IssueID)
@@ -70,8 +70,9 @@ Namespace newsletter2
         End Function
         '
         Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As newsletterCommonClass) As String
-            'On Error GoTo ErrorTrap
+            GetUnpublishedIssueList = ""
             '
+            Dim qs As String = ""
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim ID As Integer
             Dim Name As String
@@ -101,7 +102,9 @@ Namespace newsletter2
                     Copy = Copy & ", publish " & Int(PublishDate)
                 End If
                 If cp.User.IsContentManager("Newsletters") Then
-                    Copy = "<a href=""?" & cp.Doc.RefreshQueryString & "&" & RequestNameIssueID & "=" & ID & """>" & Copy & "</a>"
+                    qs = cp.Doc.RefreshQueryString
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, ID)
+                    Copy = "<a href=""?" & qs & """>" & Copy & "</a>"
                 End If
                 GetUnpublishedIssueList = GetUnpublishedIssueList & "<li>" & Copy & "</li>"
                 Call cs.GoNext()
@@ -126,7 +129,7 @@ Namespace newsletter2
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim CSIssue As CPCSBaseClass = cp.CSNew()
             Dim AOPointer As CPCSBaseClass = cp.CSNew()
-            Dim StyleString As String
+            Dim StyleString As String = ""
             '
             Call cs.Open(ContentNameNewsletters, "Name=" & cp.Db.EncodeSQLText(NewsletterName))
             If cs.OK() Then
@@ -183,18 +186,15 @@ Namespace newsletter2
             Dim Pointer As CPCSBaseClass = cp.CSNew()
             Dim CategoryID As Integer
             Dim Sort As Integer
-            Dim SortUp As Integer
-            Dim SortDown As Integer
             Dim SQL As String
             Dim MainSQL As String
-            Dim PreviousID As Integer
-            Dim PreviousCategoryID As Integer
             Dim SortArray As Object
             Dim SortArrayPointer As Integer
             Dim SortArrayCount As Integer
             Dim SortOrder As String
             Dim RuleCategoryID As Integer
             Dim RuleIssueID As Integer
+            Dim ptr As Integer = 0
             '
             CategoryID = cp.Doc.GetInteger(RequestNameSortUp)
             '
@@ -240,43 +240,35 @@ Namespace newsletter2
                 If cs.OpenSQL(MainSQL) Then
                     SortArrayCount = cs.GetRowCount
                     ReDim SortArray(2, SortArrayCount)
-                    Dim ptr As Integer = 0
                     Do While cs.OK()
                         SortArray(0, ptr) = cs.GetText("categoryId")
                         SortArray(1, ptr) = cs.GetText("sortOrder")
                         Call cs.GoNext()
                     Loop
+                    SortArrayCount = UBound(SortArray, 2)
+                    For SortArrayPointer = 0 To SortArrayCount
+                        If (CategoryID = SortArray(0, SortArrayPointer)) And (SortArrayPointer <> 0) Then
+                            SortArray(1, SortArrayPointer - 1) = PadValue(cp, Sort, 4)
+                            SortArray(1, SortArrayPointer) = PadValue(cp, Sort - 10, 4)
+                        Else
+                            SortArray(1, SortArrayPointer) = PadValue(cp, Sort, 4)
+                        End If
+                        Sort = Sort + 10
+                    Next
+                    SortArrayPointer = 0
+                    For SortArrayPointer = 0 To SortArrayCount
+                        SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & cp.Db.EncodeSQLNumber(SortArray(0, SortArrayPointer)) & ") AND (NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
+                        Call cp.Db.ExecuteSQL(SQL)
+                    Next
                 End If
-                'SortArray = cs.Main.GetCSRows(cs)
-                '
-                SortArrayCount = UBound(SortArray, 2)
-                For SortArrayPointer = 0 To SortArrayCount
-                    If (CategoryID = SortArray(0, SortArrayPointer)) And (SortArrayPointer <> 0) Then
-                        SortArray(1, SortArrayPointer - 1) = PadValue(cp, Sort, 4)
-                        SortArray(1, SortArrayPointer) = PadValue(cp, Sort - 10, 4)
-                    Else
-                        SortArray(1, SortArrayPointer) = PadValue(cp, Sort, 4)
-                    End If
-                    Sort = Sort + 10
-                Next
-                '
-                SortArrayPointer = 0
-                '
-                For SortArrayPointer = 0 To SortArrayCount
-                    SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & cp.Db.EncodeSQLNumber(SortArray(0, SortArrayPointer)) & ") AND (NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
-                    'Call Main.WriteStream("SQL " & SortArrayPointer & ": " & SQL)
-                    Call cp.Db.ExecuteSQL(SQL)
-                Next
                 '
             End If
         End Sub
         '
         Friend Function GetCategoryAccessString(cp As CPBaseClass, CategoryID As Integer) As String
-            'On Error GoTo ErrorTrap
-            '
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim SQL As String
-            Dim Stream As String
+            Dim Stream As String = ""
             '
             SQL = "SELECT ID "
             SQL = SQL & "From NewsletterIssuePages "
@@ -319,7 +311,7 @@ Namespace newsletter2
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim SQL As String
-            Dim Stream As String
+            Dim Stream As String = ""
             '
             SQL = "SELECT GR.GroupID "
             SQL = SQL & "FROM NewsletterPageGroupRules GR "
@@ -347,7 +339,6 @@ Namespace newsletter2
             Dim ListArray() As String
             Dim ListArrayCount As Integer
             Dim ListArrayPointer As Integer
-            Dim AccessFlag As Boolean
             '
             If cp.User.IsContentManager("Newsletters") Then
                 HasAccess = True
@@ -377,7 +368,6 @@ Namespace newsletter2
             Dim Counter As Integer
             Dim ValueLenghth As Integer
             Dim InnerValue As String
-            Dim Stream As String
             '
             InnerValue = CStr(Value)
             ValueLenghth = Len(InnerValue)
@@ -393,7 +383,7 @@ Namespace newsletter2
         '
         Private Function GetSortOrder(cp As CPBaseClass, CategoryID As Integer, IssueID As Integer) As String
             Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim Stream As String
+            Dim Stream As String = ""
             '
             Call cs.Open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , "SortOrder")
             If cs.OK() Then
@@ -545,20 +535,22 @@ Namespace newsletter2
         '
         '
         Private Function GetLegacySiteStyles()
+            Dim returnStyles As String = ""
             If Not Private_LegacySiteSites_Loaded Then
                 Private_LegacySiteSites_Loaded = True
                 '
                 ' compatibility with old sites - if they do not get the default style sheet, put it in here
                 '
-                    GetLegacySiteStyles = "" _
-                    & cr & "<!-- compatibility with legacy framework --><style type=text/css>" _
-                    & cr & " .ccEditWrapper {border:1px dashed #808080;}" _
-                    & cr & " .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}" _
-                    & cr & " .ccEditWrapperContent{padding:4px;}" _
-                    & cr & " .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}" _
-                    & cr & " .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}" _
-                    & "</style>"
+                returnStyles = "" _
+                & cr & "<!-- compatibility with legacy framework --><style type=text/css>" _
+                & cr & " .ccEditWrapper {border:1px dashed #808080;}" _
+                & cr & " .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}" _
+                & cr & " .ccEditWrapperContent{padding:4px;}" _
+                & cr & " .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}" _
+                & cr & " .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}" _
+                & "</style>"
             End If
+            Return returnStyles
         End Function
     End Class
 End Namespace

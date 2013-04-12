@@ -27,7 +27,7 @@
         '
         Public Const RequestNamePageNumber = "PageNumber"
         Public Const RequestNameRecordTop = "RecordTop"
-        Public Const RequestNameNewsletterID = "nlid"
+        'Public Const RequestNameNewsletterID = "nlid"
         Public Const RequestNameSortUp = "srtup"
         '
         Public Const FormButtonSend = " Send Email "
@@ -60,6 +60,7 @@
         Public Const FormArchive = 200
         Public Const FormEmail = 300
         Public Const FormDetails = 400
+        Public Const FormSearch = 500
         '
         Public Const PageNameArchives = "Newsletter Archives"
         Public Const SitePropertyNoNewsletterArchives = "NoNewsletterArchives"

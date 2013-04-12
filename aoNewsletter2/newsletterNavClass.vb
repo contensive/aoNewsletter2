@@ -23,18 +23,16 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Friend Function GetNav(ByVal cp As CPBaseClass, ByVal issueid As Integer, ByVal NewsletterID As Integer, ByVal isContentManager As Boolean, ByVal FormID As Integer, ByVal newsNav As String) As String
+        Friend Function GetNav(ByVal cp As CPBaseClass, ByVal issueid As Integer, ByVal NewsletterID As Integer, ByVal isContentManager As Boolean, ByVal FormID As Integer, ByVal newsNav As String, ByVal currentIssueId As Integer) As String
             Dim returnHtml As String = ""
             Try
                 Dim layout As CPBlockBaseClass = cp.BlockNew()
                 Dim repeatItem As CPBlockBaseClass = cp.BlockNew()
                 '
-                Dim currentIssueId As Integer = 0
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
                 Dim CSPointer As CPCSBaseClass = cp.CSNew()
                 Dim ThisSQL As String
-                Dim Controls As String
                 Dim WorkingStoryId As Integer
                 Dim NavSQL As String
                 Dim CategoryName As String
@@ -44,8 +42,6 @@ Namespace newsletter2
                 Dim CategoryID As Integer
                 Dim QS As String
                 Dim ArticleCount As Integer
-                Dim newsNavCaption As String
-                Dim newsNavList As String
                 Dim newsNavItem As String
                 Dim storyCaption As String
                 Dim repeatList As String = ""
@@ -163,11 +159,12 @@ Namespace newsletter2
                 '
                 ' Link to Current Issues
                 '
-                currentIssueId = cn.GetCurrentIssueID(cp, NewsletterID)
                 If (issueid <> currentIssueId) And (currentIssueId <> 0) Then
+                    QS = cp.Doc.RefreshQueryString
+                    QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover)
                     Call repeatItem.Load(newsNavItem)
                     Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue"))
-                    repeatList &= repeatItem.GetHtml().Replace("?", "?" & cp.Doc.RefreshQueryString & RequestNameFormID & "=" & FormCover)
+                    repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
                 End If
                 '
                 ' Display Archive Link if there are archive issues
@@ -186,7 +183,10 @@ Namespace newsletter2
                         '
                         Call repeatItem.Load(newsNavItem)
                         Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyIssueArchive, "Archives"))
-                        repeatList &= repeatItem.GetHtml().Replace("?", "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive)
+                        QS = cp.Doc.RefreshQueryString
+                        'QS = cp.Utils.ModifyQueryString(QS, RequestNameNewsletterID, NewsletterID)
+                        QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormArchive)
+                        repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
                     End If
                 End If
                 Call cs.Close()
@@ -201,35 +201,24 @@ Namespace newsletter2
         End Function
         '
         Private Function GetArchiveLink(ByVal cp As CPBaseClass, ByVal newsletterId As Integer) As String
-            'On Error GoTo ErrorTrap
+            Dim Stream As String = ""
+            Dim qs As String = ""
             '
-            Dim Stream As String
-            '
-            ' 1/1/09 - JK - fixed link - always pointed to the current page in the site's root directory (/index.asp), should point to the current page
-            Stream &= "<a class=""caption"" href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & newsletterId & "&" & RequestNameFormID & "=" & FormArchive & """>" & cp.Site.GetText(SitePropertyIssueArchive, "Archives") & "</a>"
-            'stream &=  "<a class=""caption"" href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & "?" & cp.Doc.RefreshQueryString & RequestNameNewsletterID & "=" & NewsletterID & "&" & RequestNameFormID & "=" & FormArchive & """>" & cp.site.getText(SitePropertyIssueArchive, "Archives", True) & "</a>"
-            '
+            QS = cp.Doc.RefreshQueryString
+            'qs = cp.Utils.ModifyQueryString(qs, RequestNameNewsletterID, newsletterId)
+            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormArchive)
+            Stream &= "<a class=""caption"" href=""?" & qs & """>" & cp.Site.GetText(SitePropertyIssueArchive, "Archives") & "</a>"
             GetArchiveLink = Stream
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("NavigationClass", "GetArchiveLink")
         End Function
         '
         Private Function GetCurrentIssueLink(ByVal cp As CPBaseClass) As String
-            'On Error GoTo ErrorTrap
+            Dim Stream As String = ""
+            Dim qs As String = ""
             '
-            Dim Stream As String
-            '
-            ' 1/1/09 - JK - fixed link - always pointed to the current page in the site's root directory (/index.asp), should point to the current page
-            Stream &= "<a class=""caption"" href=""" & "?" & cp.Doc.RefreshQueryString & RequestNameFormID & "=" & FormCover & """>" & cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue") & "</a>"
-            'stream &=  "<a class=""caption"" href=""http://" & cp.Site.DomainPrimary & Main.ServerAppRootPath & Main.ServerPage & "?" & cp.Doc.RefreshQueryString & RequestNameFormID & "=" & FormIssue & """>" & cp.site.getText(SitePropertyCurrentIssue, "Current Issue", True) & "</a>"
-            '
+            QS = cp.Doc.RefreshQueryString
+            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormCover)
+            Stream &= "<a class=""caption"" href=""?" & qs & """>" & cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue") & "</a>"
             GetCurrentIssueLink = Stream
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("NavigationClass", "GetCurrentIssueLink")
         End Function
     End Class
 End Namespace

@@ -23,13 +23,13 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Friend Function GetArchiveList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveList As String) As String
+        Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
             '
+            Dim layout As CPBlockBaseClass = cp.BlockNew()
             Dim recordTop As Integer
             Dim RecordsPerPage As Integer
             Dim archiveIssuesToDisplay As Integer
             Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim NewsletterID As Integer
             Dim monthSelected As Integer
             Dim yearSelected As Integer
             Dim SearchKeywords As String
@@ -43,12 +43,12 @@ Namespace newsletter2
             Dim YearString As String
             Dim MonthCounter As Integer
             Dim YearCounter As Integer
-            Dim SearchResult As String
+            Dim storyName As String
             Dim NumberofPages As Integer
             Dim PageCount As Integer
             Dim sql2 As String
             Dim FileCount As Integer
-            Dim BriefCopyFileName As String
+            Dim storyOverview As String
             Dim RowCount As Integer
             Dim YearsWanted As Integer
             Dim BlockSearchForm As Boolean
@@ -56,6 +56,7 @@ Namespace newsletter2
             Dim PageNumber As Integer
             Dim issueDate As Date
             Dim issueDateFormatted As String = ""
+            Dim GoToPage As String = ""
             '
             archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
@@ -81,9 +82,9 @@ Namespace newsletter2
             ' Get Total Archive count
             '
             PageCount = 1
-            sql2 = " select count(nlp.id) as count"
-            sql2 = sql2 & " from newsletterissues nl, newsletterissuepages nlp"
-            sql2 = sql2 & " Where (NL.ID = nlp.newsletterid)"
+            sql2 = " select count(story.id) as count"
+            sql2 = sql2 & " from newsletterissues nl, newsletterissuepages story"
+            sql2 = sql2 & " Where (NL.ID = story.newsletterid)"
             sql2 = sql2 & " AND (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
             If monthSelected <> 0 Then
                 ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
@@ -92,7 +93,246 @@ Namespace newsletter2
                 ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & yearSelected
             End If
             If SearchKeywords <> "" Then
-                sql2 = sql2 & " and ((nlp.Body like '%" & SearchKeywords & "%' )or (nlp.name  like '%" & SearchKeywords & "%') or (nlp.Overview  like '%" & SearchKeywords & "%'))"
+                sql2 = sql2 & " and ((story.Body like '%" & SearchKeywords & "%' )or (story.name  like '%" & SearchKeywords & "%') or (story.Overview  like '%" & SearchKeywords & "%'))"
+            End If
+            If cs.OpenSQL(sql2) Then
+                FileCount = cs.GetInteger("count")
+                NumberofPages = FileCount / RecordsPerPage
+                If NumberofPages <> Int(NumberofPages) Then
+                    NumberofPages = NumberofPages + 1
+                    NumberofPages = Int(NumberofPages)
+                End If
+                If NumberofPages = 0 Then
+                    NumberofPages = 1
+                End If
+            End If
+            Call cs.Close()
+            '
+            'Colors = "#ffffff"
+            '
+            '
+            If (ButtonValue <> FormButtonViewNewsLetter) And (ButtonValue <> FormButtonViewArchives) Then
+                '
+                ' List a page of archive issues
+                '
+                If (monthSelected = 0) And (yearSelected = 0) Then
+                    'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
+                    '
+                    'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & currentIssueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    '
+                    Call cs.OpenSQL(ThisSQL)
+                    If cs.OK Then
+                        Do While cs.OK
+                            Call layout.Load(newsArchiveListItemLayout)
+                            issueDate = cs.GetDate("PublishDate")
+                            If IsDate(issueDate) Then
+                                issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
+                            End If
+                            link = refreshQueryString
+                            link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID"))
+                            Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
+                            Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
+                            Stream &= Replace(layout.GetHtml(), "?", "?" & link)
+                            Call cs.GoNext()
+                        Loop
+                    Else
+                        BlockSearchForm = True
+                        Call layout.Load(newsArchiveListItemLayout)
+                        Call layout.SetInner(".newsArchiveListCaption", "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>")
+                        Call layout.SetInner(".newsArchiveListOverview", "")
+                        Stream &= layout.GetHtml()
+                    End If
+                    Call cs.Close()
+                End If
+            End If
+            If ButtonValue = FormButtonViewArchives Then
+                '
+                ' List search results of archive issues
+                '
+                'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
+                ThisSQL2 = " select NL.id, nl.name, nl.publishdate, story.AllowReadMore, story.Overview, story.Body, story.id as ThisID ,story.newsletterid, story.name as storyName"
+                ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages story"
+                ThisSQL2 = ThisSQL2 & " Where (NL.ID = story.newsletterid)"
+                If monthSelected <> 0 Then
+                    ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
+                End If
+                If yearSelected <> 0 Then
+                    ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & yearSelected
+                End If
+                If SearchKeywords <> "" Then
+                    ThisSQL2 = ThisSQL2 & " and ((story.Body like '%" & SearchKeywords & "%' )or (story.name  like '%" & SearchKeywords & "%') or (story.Overview  like '%" & SearchKeywords & "%'))"
+                End If
+                ThisSQL2 = ThisSQL2 & "  ORDER BY PublishDate DESC"
+                '
+                Call cs.OpenSQL(ThisSQL2, RecordsPerPage, PageNumber)
+                If Not cs.OK Then
+                    Call layout.Load(newsArchiveListItemLayout)
+                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
+                    Call layout.SetInner(".newsArchiveListOverview", "")
+                    Stream &= layout.GetHtml()
+                    'Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
+                Else
+                    Call layout.Load(newsArchiveListItemLayout)
+                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
+                    Call layout.SetInner(".newsArchiveListOverview", "")
+                    Stream &= layout.GetHtml()
+                    Do While cs.OK And RowCount < RecordsPerPage
+                        storyName = cs.GetText("storyName")
+                        storyOverview = cs.GetText("Overview")
+                        If storyOverview = "" Then
+                            If cs.GetBoolean("AllowReadMore") Then
+                                storyOverview = cs.GetText("Body")
+                            Else
+                                storyOverview = cp.Content.GetCopy("Newsletter Article Access Denied", "You do not have access to this article")
+                            End If
+                        End If
+                        qs = refreshQueryString
+                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID"))
+                        Call layout.Load(newsArchiveListItemLayout)
+                        Call layout.SetInner(".newsArchiveListCaption", storyName)
+                        Call layout.SetInner(".newsArchiveListOverview", storyOverview)
+                        Stream &= Replace(layout.GetHtml(), "?", "?" & qs)
+                        Call cs.GoNext()
+                        RowCount = RowCount + 1
+                    Loop
+                End If
+                '
+                If FileCount <> 0 Then
+                    GoToPage = ""
+                    Do While PageCount <= NumberofPages
+                        qs = refreshQueryString
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
+                        GoToPage &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
+                        PageCount = PageCount + 1
+                        GoToPage &= "&nbsp;&nbsp;&nbsp;"
+                    Loop
+                    Call layout.Load(newsArchiveListItemLayout)
+                    Call layout.SetInner(".newsArchiveListCaption", GoToPage)
+                    Call layout.SetInner(".newsArchiveListOverview", "")
+                    Stream &= layout.GetHtml()
+                End If
+            End If
+            '
+            BlockSearchForm = True
+            If Not BlockSearchForm Then
+                '
+                ' Display search form
+                '
+                Dim searchForm As String = ""
+                searchForm &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
+                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
+                searchForm &= "<div>&nbsp;</div>"
+                searchForm &= "<div>keyword search<br>"
+                searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , 50) & "</div>"
+                MonthString = ""
+                MonthString &= "Month <select size=""1"" name=""" & RequestNameMonthSelectd & """>"
+                MonthString &= "<option selected>Month</option>"
+                For MonthCounter = 1 To 12
+                    MonthString &= "<option "
+                    MonthString &= "value=""" & MonthCounter & """>" & MonthName(MonthCounter) & "</option>"
+                Next
+                MonthString &= "</select> "
+                '
+                YearString = ""
+                YearString &= "Year <select size=""1"" name=""" & RequestNameYearSelected & """>"
+                YearString &= "<option selected>Year</option>"
+                For YearCounter = (Year(Now) - YearsWanted) To (Year(Now))
+                    YearString &= "<option "
+                    YearString &= "value=""" & YearCounter & """>" & YearCounter & "</option>"
+                Next
+                YearString &= "</select>"
+                searchForm &= "<div>&nbsp;</div>"
+                searchForm &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
+                searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive)
+                searchForm &= cp.Html.Form(searchForm)
+                '
+                Call layout.Load(newsArchiveListItemLayout)
+                Call layout.SetInner(".newsArchiveListCaption", "")
+                Call layout.SetInner(".newsArchiveListOverview", searchForm)
+                Stream &= layout.GetHtml()
+            End If
+            '
+            '
+            GetArchiveItemList = Stream
+        End Function
+        '
+        '
+        Friend Function GetSearchItemList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String) As String
+            '
+            Dim layout As CPBlockBaseClass = cp.BlockNew()
+            Dim recordTop As Integer
+            Dim RecordsPerPage As Integer
+            Dim archiveIssuesToDisplay As Integer
+            Dim cs As CPCSBaseClass = cp.CSNew()
+            Dim NewsletterID As Integer
+            Dim monthSelected As Integer
+            Dim yearSelected As Integer
+            Dim SearchKeywords As String
+            '
+            Dim link As String = ""
+            Dim Stream As String = ""
+            Dim Colors As String = ""
+            Dim ThisSQL As String
+            Dim ThisSQL2 As String = ""
+            Dim MonthString As String
+            Dim YearString As String
+            Dim MonthCounter As Integer
+            Dim YearCounter As Integer
+            Dim storyName As String
+            Dim NumberofPages As Integer
+            Dim PageCount As Integer
+            Dim sql2 As String
+            Dim FileCount As Integer
+            Dim storyOverview As String
+            Dim RowCount As Integer
+            Dim YearsWanted As Integer
+            Dim BlockSearchForm As Boolean
+            Dim qs As String
+            Dim PageNumber As Integer
+            Dim issueDate As Date
+            Dim issueDateFormatted As String = ""
+            Dim GoToPage As String = ""
+            '
+            archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
+            monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
+            yearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
+            SearchKeywords = cp.Doc.GetText(RequestNameSearchKeywords)
+            RecordsPerPage = cp.Site.GetInteger("Newsletter Search Results Records Per Page", "3")
+            recordTop = cp.Doc.GetInteger(RequestNameRecordTop)
+            '
+            PageNumber = cp.Doc.GetInteger(RequestNamePageNumber)
+            If PageNumber = 0 Then
+                PageNumber = 1
+            End If
+            '
+            YearsWanted = cp.Utils.EncodeInteger(cp.Site.GetText("Newsletter years wanted", 1))
+            If YearsWanted < 1 Then
+                YearsWanted = 1
+            End If
+            '
+            If archiveIssuesToDisplay = 0 Then
+                archiveIssuesToDisplay = 6
+            End If
+            '
+            ' Get Total Archive count
+            '
+            PageCount = 1
+            sql2 = " select count(story.id) as count"
+            sql2 = sql2 & " from newsletterissues nl, newsletterissuepages story"
+            sql2 = sql2 & " Where (NL.ID = story.newsletterid)"
+            sql2 = sql2 & " AND (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
+            If monthSelected <> 0 Then
+                ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
+            End If
+            If yearSelected <> 0 Then
+                ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & yearSelected
+            End If
+            If SearchKeywords <> "" Then
+                sql2 = sql2 & " and ((story.Body like '%" & SearchKeywords & "%' )or (story.name  like '%" & SearchKeywords & "%') or (story.Overview  like '%" & SearchKeywords & "%'))"
             End If
             If cs.OpenSQL(sql2) Then
                 FileCount = cs.GetInteger("count")
@@ -122,33 +362,27 @@ Namespace newsletter2
                     '
                     Call cs.OpenSQL(ThisSQL)
                     If cs.OK Then
-                        Stream &= cp.Content.GetCopy(PageNameArchives, "<h2>Archive Issues</h2>")
                         Do While cs.OK
+                            Call layout.Load(newsArchiveListItemLayout)
                             issueDate = cs.GetDate("PublishDate")
                             If IsDate(issueDate) Then
                                 issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
                             End If
                             link = refreshQueryString
                             link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID"))
-                            Stream &= cs.GetEditLink() & "<a href=""?" & link & """>" & issueDateFormatted & " " & cs.GetText("Name") & "</a>"
-                            Stream &= "<br>"
-                            Stream &= cp.Utils.EncodeContentForWeb(cs.GetText("Overview"))
+                            Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
+                            Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
+                            Stream &= Replace(layout.GetHtml(), "?", "?" & link)
                             Call cs.GoNext()
-                            If Colors = "#ffffff" Then
-                                Colors = "#E0E0E0"
-                            Else
-                                Colors = "#ffffff"
-                            End If
                         Loop
                     Else
                         BlockSearchForm = True
-                        'stream &=  "<TR>"
-                        Stream &= "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>"
-                        'stream &=  "<TD><span class=""ccError"">" & cp.site.getText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.", True) & "</span></TD>"
-                        'stream &=  "</TR>"
+                        Call layout.Load(newsArchiveListItemLayout)
+                        Call layout.SetInner(".newsArchiveListCaption", "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>")
+                        Call layout.SetInner(".newsArchiveListOverview", "")
+                        Stream &= layout.GetHtml()
                     End If
                     Call cs.Close()
-                    'stream &=  "</TABLE>"
                 End If
             End If
             If ButtonValue = FormButtonViewArchives Then
@@ -156,9 +390,9 @@ Namespace newsletter2
                 ' List search results of archive issues
                 '
                 'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
-                ThisSQL2 = " select NL.id, nl.name, nl.publishdate, nlp.AllowReadMore, nlp.Overview, nlp.Body, nlp.id as ThisID ,nlp.newsletterid, nlp.name as nlpname"
-                ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages nlp"
-                ThisSQL2 = ThisSQL2 & " Where (NL.ID = nlp.newsletterid)"
+                ThisSQL2 = " select NL.id, nl.name, nl.publishdate, story.AllowReadMore, story.Overview, story.Body, story.id as ThisID ,story.newsletterid, story.name as storyName"
+                ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages story"
+                ThisSQL2 = ThisSQL2 & " Where (NL.ID = story.newsletterid)"
                 If monthSelected <> 0 Then
                     ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
                 End If
@@ -166,99 +400,72 @@ Namespace newsletter2
                     ThisSQL2 = ThisSQL2 & " and year(nl.publishdate) = " & yearSelected
                 End If
                 If SearchKeywords <> "" Then
-                    ThisSQL2 = ThisSQL2 & " and ((nlp.Body like '%" & SearchKeywords & "%' )or (nlp.name  like '%" & SearchKeywords & "%') or (nlp.Overview  like '%" & SearchKeywords & "%'))"
+                    ThisSQL2 = ThisSQL2 & " and ((story.Body like '%" & SearchKeywords & "%' )or (story.name  like '%" & SearchKeywords & "%') or (story.Overview  like '%" & SearchKeywords & "%'))"
                 End If
                 ThisSQL2 = ThisSQL2 & "  ORDER BY PublishDate DESC"
                 '
                 Call cs.OpenSQL(ThisSQL2, RecordsPerPage, PageNumber)
                 If Not cs.OK Then
-                    Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
+                    Call layout.Load(newsArchiveListItemLayout)
+                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
+                    Call layout.SetInner(".newsArchiveListOverview", "")
+                    Stream &= layout.GetHtml()
+                    'Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
                 Else
-                    Stream &= cp.Content.GetCopy("Newsletter Search Results Found", "Search results")
+                    Call layout.Load(newsArchiveListItemLayout)
+                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
+                    Call layout.SetInner(".newsArchiveListOverview", "")
+                    Stream &= layout.GetHtml()
                     Do While cs.OK And RowCount < RecordsPerPage
-                        SearchResult = cs.GetText("nlpname")
-                        Dim thisid As Integer
-                        thisid = cs.GetInteger("ID")
-                        If Colors = "#E0E0E0" Then
-                            Colors = "#ffffff"
-                        Else
-                            Colors = "#E0E0E0"
-                        End If
-                        'stream &=  "<tr><td  BGCOLOR= """ & Colors & """ style=""border-top:1px solid #c0c0c0;padding:20px;"">"
-                        Stream &= "<div  class=""NewsletterBody"">"
-                        Stream &= "<div  class=""Headline"">" & SearchResult & "</div>"
-                        BriefCopyFileName = cs.GetText("Overview")
-                        If BriefCopyFileName = "" Then
+                        storyName = cs.GetText("storyName")
+                        storyOverview = cs.GetText("Overview")
+                        If storyOverview = "" Then
                             If cs.GetBoolean("AllowReadMore") Then
-                                BriefCopyFileName = cs.GetText("Body")
+                                storyOverview = cs.GetText("Body")
                             Else
-                                BriefCopyFileName = cp.Content.GetCopy("Newsletter Article Access Denied", "You do not have access to this article")
+                                storyOverview = cp.Content.GetCopy("Newsletter Article Access Denied", "You do not have access to this article")
                             End If
                         End If
-                        Stream &= "<div  class=""Overview"">" & cs.GetText("Overview") & "</div>"
-                        'stream &=  cs.gettext( "Overview")
-                        'stream &=  "<br><br>"
-                        'stream &=  "</tr></td>"
-                        If (cs.GetBoolean("AllowReadMore")) And (cs.GetText("Body") <> "") Then
-                            qs = refreshQueryString
-                            qs = cp.Utils.ModifyQueryString(qs, "formid", "400")
-                            qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID"))
-                            Stream &= "<a href=""?" & qs & """>"
-                            Stream &= "Read More"
-                            Stream &= "</a>"
-                        End If
-                        Stream &= "</div>"
+                        qs = refreshQueryString
+                        qs = cp.Utils.ModifyQueryString(qs, "formid", "400")
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID"))
+                        Call layout.Load(newsArchiveListItemLayout)
+                        Call layout.SetInner(".newsArchiveListCaption", storyName)
+                        Call layout.SetInner(".newsArchiveListOverview", storyOverview)
+                        Stream &= Replace(layout.GetHtml(), "?", "?" & qs)
                         Call cs.GoNext()
                         RowCount = RowCount + 1
                     Loop
                 End If
                 '
                 If FileCount <> 0 Then
-                    'stream &=  "<tr><td align=center>"
-                    Stream &= "<div  class=""NewsletterBody""><div class=""GoToPageLine"">Go to Page&nbsp;&nbsp;"
+                    GoToPage = ""
                     Do While PageCount <= NumberofPages
                         qs = refreshQueryString
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
                         qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount)
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
-                        Stream &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
+                        GoToPage &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
                         PageCount = PageCount + 1
-                        Stream &= "&nbsp;&nbsp;&nbsp;"
+                        GoToPage &= "&nbsp;&nbsp;&nbsp;"
                     Loop
-                    Stream &= "</div></div>"
+                    Call layout.Load(newsArchiveListItemLayout)
+                    Call layout.SetInner(".newsArchiveListCaption", GoToPage)
+                    Call layout.SetInner(".newsArchiveListOverview", "")
+                    Stream &= layout.GetHtml()
                 End If
-                'stream &=  "</TABLE>"
             End If
             '
             If Not BlockSearchForm Then
                 '
                 ' Display search form
                 '
-                'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
-                'stream &=  "<tr>"
-                'stream &=  "<td>"
-                Stream &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
-                'stream &=  "</td>"
-                'stream &=  "</tr>"
-                '
-                'stream &=  "<tr>"
-                'stream &=  "<td>"
-                ' 1 ** drop down select list 2007 Issues (all issues in 2007)
-                Stream &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
-                ' ** need a button to view the newsletter
-                'stream &=  "</td>"
-                'stream &=  "</tr>"
-                '
-                Stream &= "<div>&nbsp;</div>"
-                'stream &=  "<tr>"
-                'stream &=  "<td>"
-                Stream &= "<div>keyword search<br>"
-                Stream &= cp.Html.InputText(RequestNameSearchKeywords, , , 50) & "</div>"
-                'stream &=  "</td>"
-                'stream &=  "</tr>"
-                '
-                'stream &=  "<tr>"
-                'stream &=  "<td>"
+                Dim searchForm As String = ""
+                searchForm &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
+                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
+                searchForm &= "<div>&nbsp;</div>"
+                searchForm &= "<div>keyword search<br>"
+                searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , 50) & "</div>"
                 MonthString = ""
                 MonthString &= "Month <select size=""1"" name=""" & RequestNameMonthSelectd & """>"
                 MonthString &= "<option selected>Month</option>"
@@ -271,43 +478,33 @@ Namespace newsletter2
                 YearString = ""
                 YearString &= "Year <select size=""1"" name=""" & RequestNameYearSelected & """>"
                 YearString &= "<option selected>Year</option>"
-                'For YearCounter = (Year(Now) - 5) To (Year(Now))
                 For YearCounter = (Year(Now) - YearsWanted) To (Year(Now))
                     YearString &= "<option "
                     YearString &= "value=""" & YearCounter & """>" & YearCounter & "</option>"
                 Next
                 YearString &= "</select>"
-                Stream &= "<div>&nbsp;</div>"
-                Stream &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
-                'stream &=  "</td>"
-                'stream &=  "</tr>"
-                'stream &=  "</TABLE>"
+                searchForm &= "<div>&nbsp;</div>"
+                searchForm &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
+                searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive)
+                searchForm &= cp.Html.Form(searchForm)
+                '
+                Call layout.Load(newsArchiveListItemLayout)
+                Call layout.SetInner(".newsArchiveListCaption", "")
+                Call layout.SetInner(".newsArchiveListOverview", searchForm)
+                Stream &= layout.GetHtml()
             End If
             '
-            Stream &= cp.Html.Hidden(RequestNameFormID, FormArchive)
-            Stream &= cp.Html.Form(Stream)
             '
-            GetArchiveList = Stream
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetArchiveList")
+            GetSearchItemList = Stream
         End Function
         '
         Private Function GetFormRow(ByVal Innards As String) As String
-            'On Error GoTo ErrorTrap
+            Dim Stream As String = ""
             '
-            Dim Stream As String
-            '
-            stream &= "<TR>"
-            stream &= "<TD colspan=2 width=""60%"">" & Innards & "</TD>"
-            stream &= "</TR>"
-            '
+            Stream &= "<TR>"
+            Stream &= "<TD colspan=2 width=""60%"">" & Innards & "</TD>"
+            Stream &= "</TR>"
             GetFormRow = Stream
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("DonationClass", "GetFormRow2")
         End Function
         '
         Private Function GetSpacer(Optional ByVal Height As Integer = 1, Optional ByVal Width As Integer = 1) As String
@@ -394,7 +591,7 @@ Namespace newsletter2
         '    '
         'End Function
         ''
-        Friend Function GetNewsletterCover(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal storyId As Integer, ByVal refreshQueryString As String, ByVal formid As Integer, ByVal newsCoverStoryItem As String, ByVal newsCoverCategoryItem As String) As String
+        Friend Function GetCover(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal storyId As Integer, ByVal refreshQueryString As String, ByVal formid As Integer, ByVal newsCoverStoryItem As String, ByVal newsCoverCategoryItem As String, ByVal isEditing As Boolean) As String
             Dim returnHtmlItemList As String = ""
             Try
                 '
@@ -416,11 +613,13 @@ Namespace newsletter2
                 '
                 TableList = "NewsletterIssuePages "
                 '
-                Call cs.OpenRecord("Newsletter Issues", IssueID)
-                If cs.OK() Then
-                    returnHtmlItemList &= cs.GetEditLink() & cs.GetText("Cover")
+                If isEditing Then
+                    Call cs.OpenRecord("Newsletter Issues", IssueID)
+                    If cs.OK() Then
+                        returnHtmlItemList &= cs.GetEditLink() & cs.GetText("Cover")
+                    End If
+                    Call cs.Close()
                 End If
-                Call cs.Close()
                 '
                 If storyId <> 0 Then
                     Criteria = ""
@@ -508,7 +707,13 @@ Namespace newsletter2
                 NewIssueId = MaxIssueID + 1
                 Call cs.Close()
                 '
-                returnHtmlItemList &= cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything)
+                If isEditing Then
+                    Call layout.Load(newsCoverStoryItem)
+                    Call layout.SetInner(".newsCoverListCaption", cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything) & "Add a story to this issue")
+                    Call layout.SetInner(".newsCoverListOverview", "")
+                    Call layout.SetInner(".newsCoverListReadMore", "")
+                    returnHtmlItemList &= layout.GetHtml()
+                End If
                 '
             Catch ex As Exception
                 Call handleError(cp, ex, "GetNewsletterBodyOverview")
@@ -598,16 +803,14 @@ Namespace newsletter2
             Return returnhtml
         End Function
         '
-        Friend Function GetNewsletterBodyDetails(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal storyId As Integer, ByVal IssueID As String, ByVal refreshQueryString As String, ByVal newsBody As String) As String
+        Friend Function GetStory(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal storyId As Integer, ByVal IssueID As String, ByVal refreshQueryString As String, ByVal newsBody As String) As String
             Dim returnHtml As String = ""
             Try
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim CSIssue As CPCSBaseClass = cp.CSNew()
                 Dim rssChange As Boolean
-                Dim expirationDate As Date
                 Dim PublishDate As Date
                 Dim Pos As Integer
-                Dim recordDate As Date
                 Dim Copy As String
                 Dim Link As String
                 Dim PrinterIcon As String
@@ -638,8 +841,11 @@ Namespace newsletter2
                         '
                         returnHtml &= cs.GetEditLink()
                         If cs.GetBoolean("AllowPrinterPage") Then
-                            Link = refreshQueryString & "&" & RequestNameStoryId & "=" & storyId & "&" & RequestNameFormID & "=" & FormDetails & "&ccIPage=l6d09a10sP"
-                            returnHtml &= "<div class=""PrintIcon""><a target=_blank href=""?" & Link & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Printer Version</nobr></a></div>"
+                            qs = cp.Doc.RefreshQueryString
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, storyId)
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails)
+                            qs = cp.Utils.ModifyQueryString(qs, "ccIPage", "l6d09a10sP")
+                            returnHtml &= "<div class=""PrintIcon""><a target=_blank href=""?" & qs & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & qs & """><nobr>Printer Version</nobr></a></div>"
                         End If
                         If cs.GetBoolean("AllowEmailPage") Then
                             Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormDetails

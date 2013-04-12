@@ -52,14 +52,11 @@ Namespace newsletter2
         '       Page - The copy is new for each page
         '===========================================================================================================
         '
-        Public Function GetContent(cp As CPBaseClass, OptionString As String) As String
-            'On Error GoTo ErrorTrap
+        Public Function GetContent(ByVal cp As CPBaseClass, ByVal OptionString As String) As String
+            Dim returnHtml As String = ""
             '
-
-            Dim Stream As String
             Dim ExtensionName As String
             Dim ExtensionType As String
-            Dim Copy As String
             Dim PageID As Integer
             Dim IssueID As Integer
             Dim IsWorkflowRendering As Boolean
@@ -68,6 +65,7 @@ Namespace newsletter2
             Dim NewsletterProperty As String
             Dim Parts() As String
             Dim NewsletterID As Integer
+            Dim currentIssueId As Integer
             '
             If True Then
                 '
@@ -86,15 +84,16 @@ Namespace newsletter2
                 If ExtensionName = "" Then
                     ExtensionName = "Default"
                     'If Main.IsAdmin() Then
-                    '    GetContent = cn.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                    '    returnHtml = cn.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     'End If
                 Else
                     '
                     ' Handle PageID Request Variable
                     '
+                    currentIssueId = cn.GetCurrentIssueID(cp, NewsletterID)
                     ExtensionType = LCase(Trim(cp.Doc.GetText("ExtensionType", OptionString)))
                     Call cp.Site.TestPoint("GetIssueID call 1, NewsletterID=" & NewsletterID)
-                    IssueID = cn.GetIssueID(cp, NewsletterID)
+                    IssueID = cn.GetIssueID(cp, NewsletterID, currentIssueId)
                     PageID = cp.Doc.GetInteger(RequestNameStoryId)
                     IsQuickEditing = cp.User.IsQuickEditing("Page Content")
                     IsWorkflowRendering = cp.User.IsWorkflowRendering
@@ -102,21 +101,18 @@ Namespace newsletter2
                     Select Case ExtensionType
                         Case "issue"
                             If IssueID <> 0 Then
-                                GetContent = cp.Content.GetCopy("Newsletter-Extension-Issue-" & IssueID & "-" & ExtensionName)
+                                returnHtml = cp.Content.GetCopy("Newsletter-Extension-Issue-" & IssueID & "-" & ExtensionName)
                             End If
                         Case "page"
                             If PageID <> 0 Then
-                                GetContent = cp.Content.GetCopy("Newsletter-Extension-Issue-Page-" & IssueID & "-" & PageID & "-" & ExtensionName)
+                                returnHtml = cp.Content.GetCopy("Newsletter-Extension-Issue-Page-" & IssueID & "-" & PageID & "-" & ExtensionName)
                             End If
                         Case Else
-                            GetContent = cn.getAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                            returnHtml = cn.GetAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     End Select
                 End If
             End If
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError("ExtensionClass", "GetContent")
+            Return returnHtml
         End Function
 
     End Class
