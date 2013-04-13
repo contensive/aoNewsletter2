@@ -3,7 +3,7 @@
         Public Const DefaultEmailLinkSubject = "A link to NCA Currents newsletter"
         '
         Public Const guidLayoutDefaultTemplate = "{24AB7755-C205-4C12-AE51-A58F885F1596}"
-        Public Const guidLayoutDefaultEmailTemplate = "{6F2E8DB3-2F4E-4894-9F45-C33FC76AC844}"
+        Public Const guidLayoutDefaultEmailTemplate = "{02FCBD4C-C610-493B-AA44-453DD3D8865A}"
         Public Const guidLayoutDefaultIssueCover = "{5CBE8DAB-4CC0-4114-BADB-248D7929C486}"
         Public Const guidLayoutDefaultStoryOverview = "{C10A769F-CB9B-4E69-AFCC-858852E90782}"
         Public Const guidLayoutDefaultStoryBody = "{4A1A2A6B-E422-464E-B76F-5C254E31E1EF}"
