@@ -3,6 +3,11 @@
         Public Const DefaultEmailLinkSubject = "A link to NCA Currents newsletter"
         '
         Public Const guidLayoutDefaultTemplate = "{24AB7755-C205-4C12-AE51-A58F885F1596}"
+        Public Const guidLayoutDefaultEmailTemplate = "{6F2E8DB3-2F4E-4894-9F45-C33FC76AC844}"
+        Public Const guidLayoutDefaultIssueCover = "{5CBE8DAB-4CC0-4114-BADB-248D7929C486}"
+        Public Const guidLayoutDefaultStoryOverview = "{C10A769F-CB9B-4E69-AFCC-858852E90782}"
+        Public Const guidLayoutDefaultStoryBody = "{4A1A2A6B-E422-464E-B76F-5C254E31E1EF}"
+        'guidLayoutDefaultStoryBody
         '
         Public Const RequestNameFormID = "formid"
         Public Const RequestNameIssueID = "issue"
@@ -77,7 +82,7 @@
         Public Const ModeHorizontal = "Horizontal"
         Public Const ModeVertical = "Vertical"
         '
-        Public Const DefaultTemplate = "<TABLE style=""BORDER: black 1px solid; WIDTH: 100%; BORDER-COLLAPSE: collapse"" cellPadding=5><TBODY><TR><TD colspan=2 style=""BORDER: black 1px solid;"">Newsletter Banner<BR>(Edit this template to design your newsletter)</TD></TR><TR><TD style=""BORDER: black 1px solid; VERTICAL-ALIGN: top; WIDTH: 150px;""><AC type=""AGGREGATEFUNCTION"" name=""Newsletter-nav only"" querystring="""" acinstanceid=""{{ACID0}}""><br><img src=""/cclib/images/spacer.gif"" width=""150"" height=""1""></TD><TD width=""99%"" style=""BORDER: black 1px solid; VERTICAL-ALIGN: top; TEXT-ALIGN: left""><AC type=""AGGREGATEFUNCTION"" name=""Newsletter-body only"" querystring="""" acinstanceid=""{{ACID1}}""></TD></TR></TBODY></TABLE>"
+        'Public Const DefaultTemplate = "<TABLE style=""BORDER: black 1px solid; WIDTH: 100%; BORDER-COLLAPSE: collapse"" cellPadding=5><TBODY><TR><TD colspan=2 style=""BORDER: black 1px solid;"">Newsletter Banner<BR>(Edit this template to design your newsletter)</TD></TR><TR><TD style=""BORDER: black 1px solid; VERTICAL-ALIGN: top; WIDTH: 150px;""><AC type=""AGGREGATEFUNCTION"" name=""Newsletter-nav only"" querystring="""" acinstanceid=""{{ACID0}}""><br><img src=""/cclib/images/spacer.gif"" width=""150"" height=""1""></TD><TD width=""99%"" style=""BORDER: black 1px solid; VERTICAL-ALIGN: top; TEXT-ALIGN: left""><AC type=""AGGREGATEFUNCTION"" name=""Newsletter-body only"" querystring="""" acinstanceid=""{{ACID1}}""></TD></TR></TBODY></TABLE>"
         '
         Public Const NewsletterAddonGuid = "{B9EB288C-C2BD-4DDF-8C70-E44828C45BA0}"
         '

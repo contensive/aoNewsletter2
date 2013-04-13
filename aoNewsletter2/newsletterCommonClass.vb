@@ -1,4 +1,7 @@
 ﻿
+Option Explicit On
+Option Strict Off
+
 Imports System
 Imports System.Collections.Generic
 Imports System.Text
@@ -54,19 +57,26 @@ Namespace newsletter2
         End Function
         '
         Friend Function GetCurrentIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
-            'On Error GoTo ErrorTrap
-            '
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            '
-            Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
-            If cs.OK() Then
-                GetCurrentIssueID = cs.GetInteger("ID")
-            End If
-            Call cs.Close()
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetCurrentIssueID")
+            Dim returnId As Integer = 0
+            Try
+                Dim cs As CPCSBaseClass = cp.CSNew()
+                '
+                Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
+                If cs.OK() Then
+                    returnId = cs.GetInteger("ID")
+                End If
+                Call cs.Close()
+                '
+                If returnId = 0 Then
+                    '
+                    ' there are no issues of this newsletter -- create a default issue
+                    '
+                    returnId = createDefaultIssueGetId(cp, NewsletterID)
+                End If
+            Catch ex As Exception
+                Call handleError(cp, ex, "getCurrentIssueId")
+            End Try
+            Return returnId
         End Function
         '
         Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As newsletterCommonClass) As String
@@ -96,14 +106,14 @@ Namespace newsletter2
                     Copy = Copy & ",inactive"
                 End If
                 If cn.encodeMinDate(DateAdded) <> Date.MinValue Then
-                    Copy = Copy & ", created " & Int(DateAdded)
+                    Copy = Copy & ", created " & DateAdded.ToShortDateString
                 End If
                 If PublishDate <> Date.MinValue Then
-                    Copy = Copy & ", publish " & Int(PublishDate)
+                    Copy = Copy & ", publish " & PublishDate.ToShortDateString
                 End If
                 If cp.User.IsContentManager("Newsletters") Then
                     qs = cp.Doc.RefreshQueryString
-                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, ID)
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, ID.ToString())
                     Copy = "<a href=""?" & qs & """>" & Copy & "</a>"
                 End If
                 GetUnpublishedIssueList = GetUnpublishedIssueList & "<li>" & Copy & "</li>"
@@ -120,65 +130,74 @@ Namespace newsletter2
             'Call HandleError("aoNewsletter.newsletterCommonClass", "GetUnpublishedIssueList")
         End Function
         '
-        Friend Function GetNewsletterID(cp As CPBaseClass, NewsletterName As String) As String
-            'On Error GoTo ErrorTrap
-            '
-            Dim NewsletterID As Integer
-            Dim TemplateCopy As String
-            Dim TemplateID As Integer
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim CSIssue As CPCSBaseClass = cp.CSNew()
-            Dim AOPointer As CPCSBaseClass = cp.CSNew()
-            Dim StyleString As String = ""
-            '
-            Call cs.Open(ContentNameNewsletters, "Name=" & cp.Db.EncodeSQLText(NewsletterName))
-            If cs.OK() Then
-                NewsletterID = cs.GetInteger("ID")
-            Else
-                Call cs.Close()
+        Friend Function GetNewsletterID(cp As CPBaseClass, NewsletterName As String) As Integer
+            Dim returnId As Integer = 0
+            Try
+                Dim templateID As Integer
+                Dim emailTemplateID As Integer
+                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim CSIssue As CPCSBaseClass = cp.CSNew()
+                Dim AOPointer As CPCSBaseClass = cp.CSNew()
+                Dim StyleString As String = ""
                 '
-                ' moved the entire build newsletter process here - eliminating the optional build step, makes it easier for cm
-                ' Build Default Template
-                '
-                TemplateID = GetDefaultTemplateID(cp)
-                Call cs.Open("Newsletter Templates", "id=" & TemplateID)
+                Call cs.Open(ContentNameNewsletters, "Name=" & cp.Db.EncodeSQLText(NewsletterName))
                 If cs.OK() Then
-                    TemplateCopy = Trim(cs.GetText("Template"))
-                    If TemplateCopy = "" Then
-                        TemplateCopy = GetDefaultTemplateCopy(cp)
-                        Call cs.SetField("Template", TemplateCopy)
+                    returnId = cs.GetInteger("ID")
+                Else
+                    Call cs.Close()
+                    '
+                    templateID = verifyDefaultTemplateGetId(cp)
+                    emailTemplateID = verifyDefaultEmailTemplateGetId(cp)
+                    '
+                    Call cs.Insert(ContentNameNewsletters)
+                    If cs.OK() Then
+                        returnId = cs.GetInteger("ID")
+                        Call cs.SetField("Name", NewsletterName)
+                        Call cs.SetField("TemplateID", templateID.ToString())
+                        Call cs.SetField("emailTemplateID", emailTemplateID.ToString())
                     End If
+                    Call createDefaultIssueGetId(cp, returnId)
                 End If
                 Call cs.Close()
-                '
-                ' Build Newsletter
-                '
-                Call cs.Insert(ContentNameNewsletters)
-                If cs.OK() Then
-                    NewsletterID = cs.GetInteger("ID")
-                    Call cs.SetField("Name", NewsletterName)
-                    Call cs.SetField("TemplateID", TemplateID)
-                    Call AOPointer.Open("Add-Ons", "ccGUID=" & cp.Db.EncodeSQLText(NewsletterAddonGuid), , , , , "StylesFileName")
-                    If AOPointer.OK Then
-                        StyleString = AOPointer.GetText("StylesFilename")
-                    End If
-                    Call AOPointer.Close()
-                    Call cs.SetField("StylesFileName", StyleString)
-                End If
+            Catch ex As Exception
+                handleError(cp, ex, "getnewsletterId")
+            End Try
+            Return returnId
+        End Function
+        '
+        Friend Function createDefaultIssueGetId(cp As CPBaseClass, newsletterId As Integer) As Integer
+            Dim returnId As Integer = 0
+            Try
+                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim StyleString As String = ""
+                Dim newsletterName As String = cp.Content.GetRecordName(ContentNameNewsletters, newsletterId)
                 '
                 ' Build the first issue in the newsletter
                 '
-                Call CSIssue.Insert("Newsletter Issues")
-                If CSIssue.OK() Then
-                    Call CSIssue.SetField("name", NewsletterName & " - Issue 1")
-                    Call CSIssue.SetField("NewsletterID", NewsletterID)
-                    Call CSIssue.SetField("PublishDate", Now())
+                Call cs.Insert("Newsletter Issues")
+                If cs.OK() Then
+                    returnId = cs.GetInteger("id")
+                    Call cs.SetField("name", newsletterName & " Newsletter, Issue 1")
+                    Call cs.SetField("NewsletterID", newsletterId.ToString())
+                    Call cs.SetField("PublishDate", Now().ToShortDateString)
+                    Call cs.SetField("cover", GetLayout(cp, guidLayoutDefaultIssueCover))
                 End If
-                Call CSIssue.Close()
-            End If
-            Call cs.Close()
-            '
-            GetNewsletterID = NewsletterID
+                Call cs.Close()
+                '
+                ' Build the first story
+                '
+                Call cs.Insert("Newsletter Stories")
+                If cs.OK() Then
+                    Call cs.SetField("name", "The First Story")
+                    Call cs.SetField("newsletterid", returnId.ToString())
+                    Call cs.SetField("Overview", GetLayout(cp, guidLayoutDefaultStoryOverview))
+                    Call cs.SetField("body", GetLayout(cp, guidLayoutDefaultStoryBody))
+                End If
+                Call cs.Close()
+            Catch ex As Exception
+                Call handleError(cp, ex, "createDefaultIssueGetId")
+            End Try
+            Return returnId
         End Function
         '
         Friend Sub SortCategoriesByIssue(cp As CPBaseClass, IssueID As Integer)
@@ -215,9 +234,9 @@ Namespace newsletter2
                     RuleCategoryID = cs.GetInteger("CatID")
                     RuleIssueID = cs.GetInteger("IssueID")
                     SortOrder = GetSortOrder(cp, RuleCategoryID, RuleIssueID)
-                    Call Pointer.SetField("NewsletterIssueID", RuleIssueID)
-                    Call Pointer.SetField("Active", 1)
-                    Call Pointer.SetField("CategoryID", RuleCategoryID)
+                    Call Pointer.SetField("NewsletterIssueID", RuleIssueID.ToString())
+                    Call Pointer.SetField("Active", "1")
+                    Call Pointer.SetField("CategoryID", RuleCategoryID.ToString())
                     Call Pointer.SetField("SortOrder", SortOrder)
                 End If
                 Call Pointer.GoNext()
@@ -348,7 +367,7 @@ Namespace newsletter2
                         ListArray = Split(GroupString, ",", , vbTextCompare)
                         ListArrayCount = UBound(ListArray)
                         For ListArrayPointer = 0 To ListArrayCount
-                            If cp.User.IsInGroup(cp.Content.GetRecordName("Groups", ListArray(ListArrayPointer))) Then
+                            If cp.User.IsInGroup(cp.Content.GetRecordName("Groups", CInt(ListArray(ListArrayPointer)))) Then
                                 HasAccess = True
                                 Exit Function
                             End If
@@ -398,14 +417,21 @@ Namespace newsletter2
             GetSortOrder = Stream
         End Function
         '
-        Friend Function GetDefaultTemplateID(cp As CPBaseClass) As Integer
+        Friend Function verifyDefaultTemplateGetId(cp As CPBaseClass) As Integer
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim TemplateID As Integer
             Dim TemplateCopy As String
             '
             ' try default template
             '
-            Call cs.Open("Newsletter Templates", "name=" & cp.Db.EncodeSQLText("Default"))
+            Call cs.Open("Newsletter Templates", "name='Default'")
+            If Not cs.OK() Then
+                Call cs.Close()
+                Call cs.Insert("Newsletter Templates")
+                If cs.OK() Then
+                    Call cs.SetField("name", "Default")
+                End If
+            End If
             If cs.OK() Then
                 '
                 ' Use the default template in their Db already
@@ -413,44 +439,55 @@ Namespace newsletter2
                 TemplateID = cs.GetInteger("ID")
                 TemplateCopy = Trim(cs.GetText("Template"))
                 If TemplateCopy = "" Then
-                    TemplateCopy = DefaultTemplate
-                    TemplateCopy = Replace(TemplateCopy, "{{ACID0}}", GetRandomInteger())
-                    TemplateCopy = Replace(TemplateCopy, "{{ACID1}}", GetRandomInteger())
+                    TemplateCopy = GetLayout(cp, guidLayoutDefaultTemplate)
                     Call cs.SetField("Template", TemplateCopy)
                 End If
             End If
             Call cs.Close()
-            If TemplateID = 0 Then
-                '
-                ' build default template
-                '
-                TemplateCopy = GetDefaultTemplateCopy(cp)
-                Call cs.Insert("Newsletter Templates")
-                If cs.OK() Then
-                    Call cs.SetField("name", "Default")
-                    Call cs.SetField("Template", TemplateCopy)
-                    TemplateID = cs.GetInteger("ID")
-                End If
-                Call cs.Close()
-            End If
-            '
-            GetDefaultTemplateID = TemplateID
+            verifyDefaultTemplateGetId = TemplateID
         End Function
         '
-        Friend Function GetDefaultTemplateCopy(ByVal cp As CPBaseClass) As String
+        Friend Function verifyDefaultEmailTemplateGetId(cp As CPBaseClass) As Integer
+            Dim cs As CPCSBaseClass = cp.CSNew()
+            Dim TemplateID As Integer
+            Dim TemplateCopy As String
+            '
+            ' try default template
+            '
+            Call cs.Open("Newsletter Templates", "name='Default Email'")
+            If Not cs.OK() Then
+                Call cs.Close()
+                Call cs.Insert("Newsletter Templates")
+                If cs.OK() Then
+                    Call cs.SetField("name", "Default Email")
+                End If
+            End If
+            If cs.OK() Then
+                '
+                ' Use the default template in their Db already
+                '
+                TemplateID = cs.GetInteger("ID")
+                TemplateCopy = Trim(cs.GetText("Template"))
+                If TemplateCopy = "" Then
+                    TemplateCopy = GetLayout(cp, guidLayoutDefaultEmailTemplate)
+                    Call cs.SetField("Template", TemplateCopy)
+                End If
+            End If
+            Call cs.Close()
+            verifyDefaultEmailTemplateGetId = TemplateID
+        End Function
+        '
+        Friend Function GetLayout(ByVal cp As CPBaseClass, guid As String) As String
             Dim returnHtml As String = ""
             Try
                 Dim cs As CPCSBaseClass = cp.CSNew()
-                If cs.Open("layouts", "ccguid=" & guidLayoutDefaultTemplate) Then
+                If cs.Open("layouts", "ccguid='" & guid & "'") Then
                     returnHtml = cs.GetText("layout")
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                handleError(cp, ex, "getDefaultTemplateCopy")
+                handleError(cp, ex, "GetLayout(" & guid & ")")
             End Try
-            'GetDefaultTemplateCopy = DefaultTemplate
-            'GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID0}}", GetRandomInteger())
-            'GetDefaultTemplateCopy = Replace(GetDefaultTemplateCopy, "{{ACID1}}", GetRandomInteger())
             Return returnHtml
         End Function
         '
@@ -525,16 +562,16 @@ Namespace newsletter2
         '   Get a Random Long Value
         '=================================================================================
         '
-        Public Function GetRandomInteger() As Long
-            Dim RandomLimit As Long
+        Public Function GetRandomInteger() As Integer
+            Dim RandomLimit As Integer
             RandomLimit = 32767
             Randomize()
-            GetRandomInteger = (Rnd() * RandomLimit)
+            GetRandomInteger = CInt(Rnd() * RandomLimit)
         End Function
         '
         '
         '
-        Private Function GetLegacySiteStyles()
+        Private Function GetLegacySiteStyles() As String
             Dim returnStyles As String = ""
             If Not Private_LegacySiteSites_Loaded Then
                 Private_LegacySiteSites_Loaded = True

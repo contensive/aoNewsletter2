@@ -1,4 +1,6 @@
-﻿
+﻿Option Explicit On
+Option Strict On
+
 Imports System
 Imports System.Collections.Generic
 Imports System.Text
@@ -160,11 +162,11 @@ Namespace newsletter2
                             End If
                             '
                             If TemplateID = 0 Then
-                                TemplateID = cn.GetDefaultTemplateID(CP)
+                                TemplateID = cn.verifyDefaultEmailTemplateGetId(CP)
                                 If TemplateID <> 0 Then
                                     Call cs.OpenRecord("Newsletter Issues", IssueID)
                                     If cs.OK() Then
-                                        Call cs.SetField("TemplateID", TemplateID)
+                                        Call cs.SetField("TemplateID", TemplateID.ToString())
                                     End If
                                     Call cs.Close()
                                 End If
@@ -231,7 +233,7 @@ Namespace newsletter2
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormDetails
                                 newsBody = layout.GetInner(".newsBody")
-                                newsBody = Body.GetStory(CP, cn, storyID, IssueID, refreshQueryString, newsBody)
+                                newsBody = Body.GetStory(CP, cn, storyID, IssueID, refreshQueryString, newsBody, isEditing)
                                 Call layout.SetInner(".newsBody", newsBody)
                                 Call layout.SetOuter(".newsArchive", "")
                                 Call layout.SetOuter(".newsCover", "")
@@ -278,8 +280,8 @@ Namespace newsletter2
                                 Controls = Controls & "<li><div class=""AdminLink"">Create&nbsp;email&nbsp;version (not available from admin site)</div></li>"
                             Else
                                 qs = CP.Doc.RefreshQueryString
-                                qs = CP.Utils.ModifyQueryString(qs, RequestNameFormID, FormEmail)
-                                qs = CP.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID)
+                                qs = CP.Utils.ModifyQueryString(qs, RequestNameFormID, FormEmail.ToString())
+                                qs = CP.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID.ToString())
                                 Controls = Controls & "<li><div class=""AdminLink""><a href=""?" & qs & """>Create&nbsp;email&nbsp;version</a></div></li>"
                             End If
                             Controls = Controls & "</ul>"
@@ -389,7 +391,7 @@ Namespace newsletter2
                     Call cs.Close()
                     If emailTemplateID = 0 Then
                         If webTemplateID = 0 Then
-                            webTemplateID = cn.GetDefaultTemplateID(cp)
+                            webTemplateID = cn.verifyDefaultEmailTemplateGetId(cp)
                             Call cp.Db.ExecuteSQL("update newsletters set templateid=" & webTemplateID & " where id=" & NewsletterID)
                         End If
                         emailTemplateID = webTemplateID
@@ -425,6 +427,7 @@ Namespace newsletter2
                 Call layout.SetOuter(".newsBody", "")
                 Call layout.SetOuter(".newsArchive", "")
                 Call layout.SetOuter(".newsSearch", "")
+                Call layout.SetInner(".newsIssueCaption", cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
                 '
                 emailBody = layout.GetHtml()
                 '
@@ -454,7 +457,7 @@ Namespace newsletter2
                     Call cs.SetField("Name", "Newsletter " & NewsletterName)
                     Call cs.SetField("Subject", NewsletterName)
                     Call cs.SetField("FromAddress", EmailAddress)
-                    Call cs.SetField("TestMemberID", cp.User.Id)
+                    Call cs.SetField("TestMemberID", cp.User.Id.ToString())
                     Call cs.SetField("CopyFileName", emailBody)
                     Call cs.Save()
                 End If

@@ -1,4 +1,7 @@
-﻿Imports System
+﻿Option Explicit On
+Option Strict On
+
+Imports System
 Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
@@ -70,7 +73,7 @@ Namespace newsletter2
                 PageNumber = 1
             End If
             '
-            YearsWanted = cp.Utils.EncodeInteger(cp.Site.GetText("Newsletter years wanted", 1))
+            YearsWanted = cp.Utils.EncodeInteger(cp.Site.GetText("Newsletter years wanted", "1"))
             If YearsWanted < 1 Then
                 YearsWanted = 1
             End If
@@ -97,7 +100,7 @@ Namespace newsletter2
             End If
             If cs.OpenSQL(sql2) Then
                 FileCount = cs.GetInteger("count")
-                NumberofPages = FileCount / RecordsPerPage
+                NumberofPages = CInt(FileCount / RecordsPerPage)
                 If NumberofPages <> Int(NumberofPages) Then
                     NumberofPages = NumberofPages + 1
                     NumberofPages = Int(NumberofPages)
@@ -130,7 +133,7 @@ Namespace newsletter2
                                 issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
                             End If
                             link = refreshQueryString
-                            link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID"))
+                            link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID").ToString())
                             Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
                             Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
                             Stream &= Replace(layout.GetHtml(), "?", "?" & link)
@@ -165,7 +168,7 @@ Namespace newsletter2
                 End If
                 ThisSQL2 = ThisSQL2 & "  ORDER BY PublishDate DESC"
                 '
-                Call cs.OpenSQL(ThisSQL2, RecordsPerPage, PageNumber)
+                Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
                 If Not cs.OK Then
                     Call layout.Load(newsArchiveListItemLayout)
                     Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
@@ -188,8 +191,8 @@ Namespace newsletter2
                             End If
                         End If
                         qs = refreshQueryString
-                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover)
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID"))
+                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover.ToString())
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
                         Call layout.Load(newsArchiveListItemLayout)
                         Call layout.SetInner(".newsArchiveListCaption", storyName)
                         Call layout.SetInner(".newsArchiveListOverview", storyOverview)
@@ -204,7 +207,7 @@ Namespace newsletter2
                     Do While PageCount <= NumberofPages
                         qs = refreshQueryString
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
                         GoToPage &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
                         PageCount = PageCount + 1
@@ -227,7 +230,7 @@ Namespace newsletter2
                 searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>keyword search<br>"
-                searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , 50) & "</div>"
+                searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , "50") & "</div>"
                 MonthString = ""
                 MonthString &= "Month <select size=""1"" name=""" & RequestNameMonthSelectd & """>"
                 MonthString &= "<option selected>Month</option>"
@@ -247,7 +250,7 @@ Namespace newsletter2
                 YearString &= "</select>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
-                searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive)
+                searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive.ToString())
                 searchForm &= cp.Html.Form(searchForm)
                 '
                 Call layout.Load(newsArchiveListItemLayout)
@@ -309,7 +312,7 @@ Namespace newsletter2
                 PageNumber = 1
             End If
             '
-            YearsWanted = cp.Utils.EncodeInteger(cp.Site.GetText("Newsletter years wanted", 1))
+            YearsWanted = cp.Utils.EncodeInteger(cp.Site.GetText("Newsletter years wanted", "1"))
             If YearsWanted < 1 Then
                 YearsWanted = 1
             End If
@@ -336,7 +339,7 @@ Namespace newsletter2
             End If
             If cs.OpenSQL(sql2) Then
                 FileCount = cs.GetInteger("count")
-                NumberofPages = FileCount / RecordsPerPage
+                NumberofPages = CInt(FileCount / RecordsPerPage)
                 If NumberofPages <> Int(NumberofPages) Then
                     NumberofPages = NumberofPages + 1
                     NumberofPages = Int(NumberofPages)
@@ -369,7 +372,7 @@ Namespace newsletter2
                                 issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
                             End If
                             link = refreshQueryString
-                            link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID"))
+                            link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID").ToString())
                             Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
                             Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
                             Stream &= Replace(layout.GetHtml(), "?", "?" & link)
@@ -404,7 +407,7 @@ Namespace newsletter2
                 End If
                 ThisSQL2 = ThisSQL2 & "  ORDER BY PublishDate DESC"
                 '
-                Call cs.OpenSQL(ThisSQL2, RecordsPerPage, PageNumber)
+                Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
                 If Not cs.OK Then
                     Call layout.Load(newsArchiveListItemLayout)
                     Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
@@ -428,7 +431,7 @@ Namespace newsletter2
                         End If
                         qs = refreshQueryString
                         qs = cp.Utils.ModifyQueryString(qs, "formid", "400")
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID"))
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
                         Call layout.Load(newsArchiveListItemLayout)
                         Call layout.SetInner(".newsArchiveListCaption", storyName)
                         Call layout.SetInner(".newsArchiveListOverview", storyOverview)
@@ -443,7 +446,7 @@ Namespace newsletter2
                     Do While PageCount <= NumberofPages
                         qs = refreshQueryString
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount)
+                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
                         GoToPage &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
                         PageCount = PageCount + 1
@@ -465,7 +468,7 @@ Namespace newsletter2
                 searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>keyword search<br>"
-                searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , 50) & "</div>"
+                searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , "50") & "</div>"
                 MonthString = ""
                 MonthString &= "Month <select size=""1"" name=""" & RequestNameMonthSelectd & """>"
                 MonthString &= "<option selected>Month</option>"
@@ -485,7 +488,7 @@ Namespace newsletter2
                 YearString &= "</select>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
-                searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive)
+                searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive.ToString())
                 searchForm &= cp.Html.Form(searchForm)
                 '
                 Call layout.Load(newsArchiveListItemLayout)
@@ -596,9 +599,6 @@ Namespace newsletter2
             Try
                 '
                 Dim layout As CPBlockBaseClass = cp.BlockNew()
-                Dim IssueSQL As String
-                Dim NewIssueId As Integer
-                Dim MaxIssueID As Integer
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim Criteria As String
                 Dim TableList As String
@@ -613,13 +613,14 @@ Namespace newsletter2
                 '
                 TableList = "NewsletterIssuePages "
                 '
-                If isEditing Then
-                    Call cs.OpenRecord("Newsletter Issues", IssueID)
-                    If cs.OK() Then
-                        returnHtmlItemList &= cs.GetEditLink() & cs.GetText("Cover")
+                Call cs.OpenRecord("Newsletter Issues", IssueID)
+                If cs.OK() Then
+                    If isEditing Then
+                        returnHtmlItemList &= cs.GetEditLink()
                     End If
-                    Call cs.Close()
+                    returnHtmlItemList &= cs.GetText("Cover")
                 End If
+                Call cs.Close()
                 '
                 If storyId <> 0 Then
                     Criteria = ""
@@ -672,7 +673,7 @@ Namespace newsletter2
                             returnHtmlItemList &= layout.GetHtml()
                             '
                             Do While CS2.OK
-                                returnHtmlItemList &= GetStoryOverview(cp, CS2, formid, refreshQueryString, newsCoverStoryItem)
+                                returnHtmlItemList &= GetStoryOverview(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
                                 Call CS2.GoNext()
                             Loop
                             returnHtmlItemList &= layout.GetHtml()
@@ -693,18 +694,10 @@ Namespace newsletter2
                     '    Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
                     'End If
                     Do While cs.OK()
-                        returnHtmlItemList &= GetStoryOverview(cp, cs, formid, refreshQueryString, newsCoverStoryItem)
+                        returnHtmlItemList &= GetStoryOverview(cp, cs, formid, refreshQueryString, newsCoverStoryItem, isEditing)
                         Call cs.GoNext()
                     Loop
                 End If
-                Call cs.Close()
-                '
-                IssueSQL = " Select max(id) as MaxIssueID from newsletterissues"
-                Call cs.OpenSQL(IssueSQL)
-                If cs.OK Then
-                    MaxIssueID = cs.GetInteger("maxissueid")
-                End If
-                NewIssueId = MaxIssueID + 1
                 Call cs.Close()
                 '
                 If isEditing Then
@@ -753,7 +746,7 @@ Namespace newsletter2
         '    Return returnHtml
         'End Function
         '
-        Private Function GetStoryOverview(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String) As String
+        Private Function GetStoryOverview(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String, isEditing As Boolean) As String
             Dim returnhtml As String = ""
             Try
                 '
@@ -765,6 +758,7 @@ Namespace newsletter2
                 Dim caption As String = ""
                 Dim readMoreLink As String = ""
                 Dim readMore As String = ""
+                Dim overview As String = ""
                 '
                 Call layout.Load(newsCoverStoryItem)
                 StoryID = CSStories.GetInteger("ID")
@@ -780,14 +774,18 @@ Namespace newsletter2
                     caption &= CSStories.GetEditLink()
                 End If
                 caption = "<span id=""" & storyBookmark & """>" & CSStories.GetText("Name") & "</span>"
+                If isEditing Then
+                    caption = CSStories.GetEditLink() & caption
+                End If
+                overview = cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview"))
                 Call layout.SetInner(".newsCoverListCaption", caption)
-                Call layout.SetInner(".newsCoverListOverview", cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview")))
+                Call layout.SetInner(".newsCoverListOverview", overview)
                 If Not CSStories.GetBoolean("AllowReadMore") Then
                     Call layout.SetOuter(".newsCoverListReadMore", "")
                 Else
                     readMoreLink = refreshQueryString
-                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID)
-                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormDetails)
+                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID.ToString())
+                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormDetails.ToString())
                     readMore = layout.GetInner(".newsCoverListReadMore")
                     readMore = readMore.Replace("?", "?" & readMoreLink)
                     Call layout.SetInner(".newsCoverListReadMore", readMore)
@@ -803,7 +801,7 @@ Namespace newsletter2
             Return returnhtml
         End Function
         '
-        Friend Function GetStory(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal storyId As Integer, ByVal IssueID As String, ByVal refreshQueryString As String, ByVal newsBody As String) As String
+        Friend Function GetStory(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal storyId As Integer, ByVal IssueID As Integer, ByVal refreshQueryString As String, ByVal newsBody As String, isEditing As Boolean) As String
             Dim returnHtml As String = ""
             Try
                 Dim cs As CPCSBaseClass = cp.CSNew()
@@ -832,6 +830,9 @@ Namespace newsletter2
                     Call cs.Open(ContentNameNewsletterStories, "ID=" & storyId)
                     If cs.OK() Then
                         storyName = cs.GetText("name")
+                        If isEditing Then
+                            storyName = cs.GetEditLink() & storyName
+                        End If
                         storyBody = cs.GetText("body")
                         storyOverview = cs.GetText("Overview")
                         If storyBody = "" Then
@@ -842,8 +843,8 @@ Namespace newsletter2
                         returnHtml &= cs.GetEditLink()
                         If cs.GetBoolean("AllowPrinterPage") Then
                             qs = cp.Doc.RefreshQueryString
-                            qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, storyId)
-                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails)
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, storyId.ToString())
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails.ToString())
                             qs = cp.Utils.ModifyQueryString(qs, "ccIPage", "l6d09a10sP")
                             returnHtml &= "<div class=""PrintIcon""><a target=_blank href=""?" & qs & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & qs & """><nobr>Printer Version</nobr></a></div>"
                         End If
@@ -866,7 +867,7 @@ Namespace newsletter2
                                 Call CSIssue.Close()
                                 If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
                                     rssChange = True
-                                    Call cs.SetField("RSSDatePublish", PublishDate)
+                                    Call cs.SetField("RSSDatePublish", PublishDate.ToString())
                                 End If
                             End If
                         End If
@@ -891,7 +892,7 @@ Namespace newsletter2
                                 End If
                                 qs = refreshQueryString
                                 qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(storyId))
-                                qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails)
+                                qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails.ToString())
                                 qs = cp.Utils.ModifyQueryString(qs, "method", "")
                                 rssChange = True
                                 Call cs.SetField("RSSLink", Link & "?" & qs)
