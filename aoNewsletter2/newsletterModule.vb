@@ -19,7 +19,7 @@
         Public Const ContentNameNewsletters = "Newsletters"
         Public Const ContentNameNewsletterIssues = "Newsletter Issues"
         Public Const ContentNameNewsletterStories = "Newsletter Stories"
-        Public Const ContentNameNewsLetterGroupRules = "Newsletter Group Rules"
+        'Public Const ContentNameNewsLetterGroupRules = "Newsletter Group Rules"
         Public Const ContentNameMemberRules = "Member Rules"
         Public Const ContentNameGroupEmail = "Group Email"
         Public Const ContentNameGroups = "Groups"
@@ -28,7 +28,7 @@
         Public Const ContentNameTopicRules = "Topic Rules"
         Public Const ContentNameTopics = "Topics"
         Public Const ContentNameIssueRules = "Newsletter Issue Category Rules"
-        Public Const ContentNameIssueCategories = "Newsletter Issue Categories"
+        Public Const ContentNameIssueCategories = "Newsletter Categories"
         '
         Public Const RequestNamePageNumber = "PageNumber"
         Public Const RequestNameRecordTop = "RecordTop"

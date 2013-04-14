@@ -40,7 +40,6 @@ Namespace newsletter2
                 Dim FormID As Integer
                 Dim EmailID As Integer
                 Dim TemplateCopy As String = ""
-                Dim NewsletterName As String
                 Dim qs As String
                 Dim ButtonValue As String
                 Dim NewsletterID As Integer
@@ -64,12 +63,7 @@ Namespace newsletter2
                 ReferLink = RequestNameRefer & "=" & CP.Utils.EncodeRequestVariable(CP.Utils.ModifyLinkQueryString(currentLink, RequestNameRefer, ""))
                 isManager = CP.User.IsContentManager("Newsletters")
                 '
-                NewsletterName = CP.Doc.GetText("Newsletter")
-                If NewsletterName = "" Then
-                    NewsletterName = DefaultRecord
-                End If
-                NewsletterID = cn.GetNewsletterID(CP, NewsletterName)
-                Call CP.Site.TestPoint("PC NewsletterID After Option: " & NewsletterID)
+                NewsletterID = cn.getNewsletterId(CP)
                 currentIssueID = cn.GetCurrentIssueID(CP, NewsletterID)
                 '
                 BuildDefault = CP.Doc.GetBoolean("BuildDefault")
@@ -115,7 +109,7 @@ Namespace newsletter2
                     ' ????? 
                     '
                     'Main.ServerPagePrintVersion = True
-                    EmailID = CreateEmailGetID(CP, IssueID, NewsletterName, NewsletterID, refreshQueryString, currentIssueID)
+                    EmailID = CreateEmailGetID(CP, IssueID, NewsletterID, refreshQueryString, currentIssueID)
                     CP.Response.Redirect(CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameGroupEmail) & "&id=" & EmailID & "&af=4")
                     returnHtml = ""
                 ElseIf (FormID = FormEmail) Then
@@ -356,9 +350,10 @@ Namespace newsletter2
         '
         '
         '
-        Private Function CreateEmailGetID(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal NewsletterName As String, ByVal NewsletterID As Integer, ByVal refreshQueryString As String, ByVal currentIssueId As Integer) As Integer
+        Private Function CreateEmailGetID(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal NewsletterID As Integer, ByVal refreshQueryString As String, ByVal currentIssueId As Integer) As Integer
             Dim returnId As Integer = 0
             Try
+                Dim NewsletterName As String
                 Dim EmailAddress As String
                 Dim MemberName As String
                 Dim CSPointer As CPCSBaseClass = cp.CSNew()
@@ -420,7 +415,7 @@ Namespace newsletter2
                 '
                 newsNav = layout.GetInner(".newsNav")
                 Nav = New newsletterNavClass
-                newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav, currentIssueID)
+                newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav, currentIssueId)
                 '
                 Call layout.SetInner(".newsNav", newsNav)
                 Call layout.SetInner(".newsCover", newsCover)
@@ -446,9 +441,7 @@ Namespace newsletter2
                 Call cs.Insert(ContentNameGroupEmail)
                 If cs.OK Then
                     returnId = cs.GetInteger("ID")
-                    If NewsletterName = "" Then
-                        NewsletterName = cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID)
-                    End If
+                    NewsletterName = cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID)
                     EmailAddress = Trim(cp.User.Email)
                     MemberName = cp.User.Name
                     If (EmailAddress <> "") And (MemberName <> "") Then

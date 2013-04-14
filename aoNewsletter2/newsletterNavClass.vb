@@ -42,15 +42,17 @@ Namespace newsletter2
                 Dim CategoryID As Integer
                 Dim QS As String
                 Dim ArticleCount As Integer
-                Dim newsNavItem As String
+                Dim newsNavStoryItem As String
+                Dim newsNavCategoryItem As String
                 Dim storyCaption As String
                 Dim repeatList As String = ""
 
                 '
                 Call layout.Load(newsNav)
-                newsNavItem = layout.GetOuter(".newsNavItem")
+                newsNavStoryItem = layout.GetOuter(".newsNavStoryItem")
+                newsNavCategoryItem = layout.GetOuter(".newsNavCategoryItem")
                 '
-                Call repeatItem.Load(newsNavItem)
+                Call repeatItem.Load(newsNavStoryItem)
                 QS = cp.Doc.RefreshQueryString
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameIssueID, CStr(issueid), True)
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover, True)
@@ -77,7 +79,11 @@ Namespace newsletter2
                                 If AccessString <> "" Then
                                     repeatList &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                                 End If
-                                repeatList &= vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
+                                '
+                                Call repeatItem.Load(newsNavCategoryItem)
+                                Call repeatItem.SetInner(".newsNavItemCaption", CategoryName)
+                                repeatList &= repeatItem.GetHtml()
+                                '
                                 If AccessString <> "" Then
                                     repeatList &= "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
                                 End If
@@ -86,10 +92,10 @@ Namespace newsletter2
                             '
                             Do While CS2.OK
                                 '
-                                Call repeatItem.Load(newsNavItem)
+                                Call repeatItem.Load(newsNavStoryItem)
                                 WorkingStoryId = CS2.GetInteger("ID")
                                 AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
-                                storyCaption = CS2.GetEditLink() & CS2.GetText("Name")
+                                storyCaption = CS2.GetText("Name")
                                 Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
                                 If AccessString <> "" Then
                                     repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
@@ -120,10 +126,12 @@ Namespace newsletter2
                         ' This is a list of uncategorized articles following the categories -- give it a heading
                         '
                         CategoryName = cp.Site.GetText("Newsletter Nav Caption Other Articles", "Other Articles")
-                        repeatList &= vbCrLf & "<div class=""NewsletterNavTopic"">" & CategoryName & "</div>"
+                        Call repeatItem.Load(newsNavCategoryItem)
+                        Call repeatItem.SetInner(".newsNavItemCaption", CategoryName)
+                        repeatList &= repeatItem.GetHtml()
                     End If
                     Do While cs.OK()
-                        Call repeatItem.Load(newsNavItem)
+                        Call repeatItem.Load(newsNavStoryItem)
                         WorkingStoryId = cs.GetInteger("ID")
                         AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
                         storyCaption = cs.GetText("Name")
@@ -162,7 +170,7 @@ Namespace newsletter2
                 If (issueid <> currentIssueId) And (currentIssueId <> 0) Then
                     QS = cp.Doc.RefreshQueryString
                     QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover)
-                    Call repeatItem.Load(newsNavItem)
+                    Call repeatItem.Load(newsNavStoryItem)
                     Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue"))
                     repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
                 End If
@@ -181,7 +189,7 @@ Namespace newsletter2
                         '
                         ' If there are more then one published issues, the others are archive issues
                         '
-                        Call repeatItem.Load(newsNavItem)
+                        Call repeatItem.Load(newsNavStoryItem)
                         Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyIssueArchive, "Archives"))
                         QS = cp.Doc.RefreshQueryString
                         'QS = cp.Utils.ModifyQueryString(QS, RequestNameNewsletterID, NewsletterID)

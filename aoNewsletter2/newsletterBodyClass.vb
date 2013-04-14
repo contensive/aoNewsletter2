@@ -654,20 +654,18 @@ Namespace newsletter2
                     Do While cs.OK()
                         CategoryID = cs.GetInteger("CategoryID")
                         '
-                        Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder")
+                        Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder,id")
                         If CS2.OK Then
                             '
                             ' there are stories under this topic, wrap in div to allow a story indent
                             '
                             Call layout.Load(newsCoverCategoryItem)
                             CategoryName = cs.GetText("CategoryName")
-                            If RecordCount <> 0 Then
-                                If cp.User.IsAuthoring(ContentNameNewsletterStories) Then
-                                    qs = refreshQueryString
-                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID.ToString())
-                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameSortUp, CategoryID.ToString())
-                                    CategoryName &= cn.GetAdminHintWrapper(cp, "<a href=""?" & qs & """>[Move Up]</a> ")
-                                End If
+                            If isEditing And (RecordCount <> 0) Then
+                                qs = refreshQueryString
+                                qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID.ToString())
+                                qs = cp.Utils.ModifyQueryString(qs, RequestNameSortUp, CategoryID.ToString())
+                                CategoryName &= "&nbsp;<a href=""?" & qs & """><span style=""font-family:helvetica,arial,san-serif;font-weight:Normal;font-size:13px;text-decoration:none;"">[Move Up]</span></a> "
                             End If
                             Call layout.SetInner(".newsCoverCategoryItem", CategoryName)
                             returnHtmlItemList &= layout.GetHtml()
@@ -676,7 +674,7 @@ Namespace newsletter2
                                 returnHtmlItemList &= GetStoryOverview(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
                                 Call CS2.GoNext()
                             Loop
-                            returnHtmlItemList &= layout.GetHtml()
+                            'returnHtmlItemList &= layout.GetHtml()
                         End If
                         Call CS2.Close()
                         Call cs.GoNext()

@@ -1,6 +1,6 @@
 ﻿
 Option Explicit On
-Option Strict Off
+Option Strict On
 
 Imports System
 Imports System.Collections.Generic
@@ -130,29 +130,53 @@ Namespace newsletter2
             'Call HandleError("aoNewsletter.newsletterCommonClass", "GetUnpublishedIssueList")
         End Function
         '
-        Friend Function GetNewsletterID(cp As CPBaseClass, NewsletterName As String) As Integer
+        Friend Function getNewsletterId(cp As CPBaseClass) As Integer
             Dim returnId As Integer = 0
             Try
+                Dim addonArgumentNewsletterId As Integer
+                Dim addonArgInstanceGuid As String
                 Dim templateID As Integer
                 Dim emailTemplateID As Integer
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim CSIssue As CPCSBaseClass = cp.CSNew()
                 Dim AOPointer As CPCSBaseClass = cp.CSNew()
                 Dim StyleString As String = ""
+                Dim criteria As String = ""
                 '
-                Call cs.Open(ContentNameNewsletters, "Name=" & cp.Db.EncodeSQLText(NewsletterName))
+                addonArgumentNewsletterId = cp.Doc.GetInteger("Newsletter")
+                addonArgInstanceGuid = cp.Doc.GetText("instanceid")
+                If addonArgumentNewsletterId > 0 Then
+                    criteria = "(id=" & addonArgumentNewsletterId & ")"
+                ElseIf (addonArgInstanceGuid <> "") Then
+                    criteria = "(ccguid='" & addonArgInstanceGuid & "')"
+                Else
+                    criteria = "(name='Default')"
+                End If
+                Call cs.Open(ContentNameNewsletters, criteria)
                 If cs.OK() Then
                     returnId = cs.GetInteger("ID")
                 Else
                     Call cs.Close()
                     '
-                    templateID = verifyDefaultTemplateGetId(cp)
-                    emailTemplateID = verifyDefaultEmailTemplateGetId(cp)
+                    ' must create new newsletter
                     '
                     Call cs.Insert(ContentNameNewsletters)
                     If cs.OK() Then
                         returnId = cs.GetInteger("ID")
-                        Call cs.SetField("Name", NewsletterName)
+                        templateID = verifyDefaultTemplateGetId(cp)
+                        emailTemplateID = verifyDefaultEmailTemplateGetId(cp)
+                        If (addonArgInstanceGuid <> "") Then
+                            '
+                            ' newsletter called out by guid but not found
+                            '
+                            Call cs.SetField("ccguid", addonArgInstanceGuid)
+                            Call cs.SetField("Name", cp.Content.GetRecordName("page content", cp.Doc.PageId))
+                        Else
+                            '
+                            ' all other cases
+                            '
+                            Call cs.SetField("Name", "'Default'")
+                        End If
                         Call cs.SetField("TemplateID", templateID.ToString())
                         Call cs.SetField("emailTemplateID", emailTemplateID.ToString())
                     End If
@@ -207,13 +231,13 @@ Namespace newsletter2
             Dim Sort As Integer
             Dim SQL As String
             Dim MainSQL As String
-            Dim SortArray As Object
             Dim SortArrayPointer As Integer
             Dim SortArrayCount As Integer
             Dim SortOrder As String
             Dim RuleCategoryID As Integer
             Dim RuleIssueID As Integer
             Dim ptr As Integer = 0
+            Dim SortArray(2, 1) As String
             '
             CategoryID = cp.Doc.GetInteger(RequestNameSortUp)
             '
@@ -258,27 +282,30 @@ Namespace newsletter2
                 '
                 If cs.OpenSQL(MainSQL) Then
                     SortArrayCount = cs.GetRowCount
-                    ReDim SortArray(2, SortArrayCount)
-                    Do While cs.OK()
-                        SortArray(0, ptr) = cs.GetText("categoryId")
-                        SortArray(1, ptr) = cs.GetText("sortOrder")
-                        Call cs.GoNext()
-                    Loop
-                    SortArrayCount = UBound(SortArray, 2)
-                    For SortArrayPointer = 0 To SortArrayCount
-                        If (CategoryID = SortArray(0, SortArrayPointer)) And (SortArrayPointer <> 0) Then
-                            SortArray(1, SortArrayPointer - 1) = PadValue(cp, Sort, 4)
-                            SortArray(1, SortArrayPointer) = PadValue(cp, Sort - 10, 4)
-                        Else
-                            SortArray(1, SortArrayPointer) = PadValue(cp, Sort, 4)
-                        End If
-                        Sort = Sort + 10
-                    Next
-                    SortArrayPointer = 0
-                    For SortArrayPointer = 0 To SortArrayCount
-                        SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & cp.Db.EncodeSQLNumber(SortArray(0, SortArrayPointer)) & ") AND (NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
-                        Call cp.Db.ExecuteSQL(SQL)
-                    Next
+                    If SortArrayCount > 0 Then
+                        ReDim SortArray(2, SortArrayCount - 1)
+                        Do While cs.OK()
+                            SortArray(0, ptr) = cs.GetText("categoryId")
+                            SortArray(1, ptr) = cs.GetText("sortOrder")
+                            ptr += 1
+                            Call cs.GoNext()
+                        Loop
+                        SortArrayCount = ptr
+                        For SortArrayPointer = 0 To SortArrayCount - 1
+                            If (CategoryID = cp.Utils.EncodeInteger(SortArray(0, SortArrayPointer))) And (SortArrayPointer <> 0) Then
+                                SortArray(1, SortArrayPointer - 1) = PadValue(cp, Sort, 4)
+                                SortArray(1, SortArrayPointer) = PadValue(cp, Sort - 10, 4)
+                            Else
+                                SortArray(1, SortArrayPointer) = PadValue(cp, Sort, 4)
+                            End If
+                            Sort = Sort + 10
+                        Next
+                        SortArrayPointer = 0
+                        For SortArrayPointer = 0 To SortArrayCount - 1
+                            SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & SortArray(0, SortArrayPointer) & ") AND (NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
+                            Call cp.Db.ExecuteSQL(SQL)
+                        Next
+                    End If
                 End If
                 '
             End If
