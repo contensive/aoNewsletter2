@@ -156,7 +156,7 @@ Namespace newsletter2
                             End If
                             '
                             If TemplateID = 0 Then
-                                TemplateID = cn.verifyDefaultEmailTemplateGetId(CP)
+                                TemplateID = cn.verifyDefaultTemplateGetId(CP)
                                 If TemplateID <> 0 Then
                                     Call cs.OpenRecord("Newsletter Issues", IssueID)
                                     If cs.OK() Then
@@ -384,18 +384,23 @@ Namespace newsletter2
                         Styles = cp.File.ReadVirtual(cs.GetText("StylesFileName"))
                     End If
                     Call cs.Close()
+                    '
                     If emailTemplateID = 0 Then
                         If webTemplateID = 0 Then
-                            webTemplateID = cn.verifyDefaultEmailTemplateGetId(cp)
+                            webTemplateID = cn.verifyDefaultTemplateGetId(cp)
                             Call cp.Db.ExecuteSQL("update newsletters set templateid=" & webTemplateID & " where id=" & NewsletterID)
                         End If
                         emailTemplateID = webTemplateID
                     End If
+                    '
                     Call cs.OpenRecord("Newsletter Templates", emailTemplateID)
                     If cs.OK() Then
                         templateCopy = cs.GetText("Template")
+                    Else
+                        emailTemplateID = 0
                     End If
                     Call cs.Close()
+
                 End If
                 If templateCopy = "" Then
                     '
