@@ -375,6 +375,7 @@ Namespace newsletter2
                 Dim newsCoverCategoryItem As String = ""
                 Dim emailTemplateID As Integer = 0
                 Dim updateNewsletterTemplateId As Boolean = False
+                Dim templateId As Integer = 0
                 '
                 If IssueID > 0 Then
                     Call cs.OpenRecord("Newsletters", NewsletterID)
@@ -385,19 +386,52 @@ Namespace newsletter2
                     End If
                     Call cs.Close()
                     '
-                    If emailTemplateID = 0 Then
-                        If webTemplateID = 0 Then
-                            webTemplateID = cn.verifyDefaultTemplateGetId(cp)
-                            Call cp.Db.ExecuteSQL("update newsletters set templateid=" & webTemplateID & " where id=" & NewsletterID)
+                    templateId = emailTemplateID
+                    If templateId <> 0 Then
+                        '
+                        ' verify it
+                        '
+                        If Not cs.OpenRecord("newsletter templates", templateId) Then
+                            templateId = 0
+                            Call cp.Db.ExecuteSQL("update newsletters set emailtemplateid=0 where id=" & NewsletterID)
+                        Else
+                            templateCopy = cs.GetText("Template")
                         End If
-                        emailTemplateID = webTemplateID
+                        Call cs.Close()
+                        '
+                    End If
+                    If templateId = 0 Then
+                        '
+                        ' no valid emailtemplate, try webtemplate
+                        '
+                        templateId = webTemplateID
+                        If templateId = 0 Then
+                            templateId = cn.verifyDefaultTemplateGetId(cp)
+                            Call cp.Db.ExecuteSQL("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
+                            If cs.OpenRecord("newsletter templates", templateId) Then
+                                templateCopy = cs.GetText("Template")
+                            End If
+                            Call cs.Close()
+                        End If
+                        If templateId <> 0 Then
+                            '
+                            ' verify it, repair it with default template
+                            '
+                            If Not cs.OpenRecord("newsletter templates", templateId) Then
+                                Call cs.Close()
+                                templateId = cn.verifyDefaultTemplateGetId(cp)
+                                Call cp.Db.ExecuteSQL("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
+                                Call cs.OpenRecord("newsletter templates", templateId)
+                            End If
+                            templateCopy = cs.GetText("Template")
+                            Call cs.Close()
+                            '
+                        End If
                     End If
                     '
-                    Call cs.OpenRecord("Newsletter Templates", emailTemplateID)
+                    Call cs.OpenRecord("Newsletter Templates", templateId)
                     If cs.OK() Then
                         templateCopy = cs.GetText("Template")
-                    Else
-                        emailTemplateID = 0
                     End If
                     Call cs.Close()
 
