@@ -615,9 +615,9 @@ Namespace newsletter2
                 '
                 Call cs.OpenRecord("Newsletter Issues", IssueID)
                 If cs.OK() Then
-                    If isEditing Then
-                        returnHtmlItemList &= cs.GetEditLink()
-                    End If
+                    'If isEditing Then
+                    '    returnHtmlItemList &= cs.GetEditLink()
+                    'End If
                     returnHtmlItemList &= cs.GetText("Cover")
                 End If
                 Call cs.Close()
