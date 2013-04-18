@@ -1,4 +1,5 @@
-﻿Option Explicit On
+﻿
+Option Explicit On
 Option Strict On
 
 Imports System
@@ -209,7 +210,7 @@ Namespace newsletter2
                         Select Case FormID
                             Case FormSearch
                                 itemLayout = layout.GetOuter(".newsSearchListItem")
-                                ItemList = Body.GetSearchItemList(CP, ButtonValue, IssueID, refreshQueryString, itemLayout)
+                                ItemList = Body.GetSearchItemList(CP, cn, ButtonValue, IssueID, refreshQueryString, itemLayout)
                                 Call layout.SetOuter(".newsSearchList", ItemList)
                                 Call layout.SetInner(".newsArchive", "")
                                 Call layout.SetOuter(".newsBody", "")
@@ -218,7 +219,7 @@ Namespace newsletter2
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormArchive
                                 itemLayout = layout.GetOuter(".newsArchiveListItem")
-                                ItemList = Body.GetArchiveItemList(CP, ButtonValue, currentIssueID, refreshQueryString, itemLayout, NewsletterID)
+                                ItemList = Body.GetArchiveItemList(CP, cn, ButtonValue, currentIssueID, refreshQueryString, itemLayout, NewsletterID)
                                 Call layout.SetInner(".newsArchiveList", ItemList)
                                 Call layout.SetOuter(".newsBody", "")
                                 Call layout.SetOuter(".newsCover", "")
@@ -300,9 +301,9 @@ Namespace newsletter2
                         '
                         ' General Controls
                         '
-                        Controls = Controls & "<h3>General Controls</h3><ul>"
+                        Controls = Controls & "<h3>General</h3><ul>"
                         Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
+                        ' Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
                         Controls = Controls & "</ul>"
                         '
                         ' instructions

@@ -26,7 +26,7 @@ Namespace newsletter2
             End Try
         End Sub
         '
-        Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
+        Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
             '
             Dim layout As CPBlockBaseClass = cp.BlockNew()
             Dim recordTop As Integer
@@ -60,6 +60,7 @@ Namespace newsletter2
             Dim issueDate As Date
             Dim issueDateFormatted As String = ""
             Dim GoToPage As String = ""
+            Dim storyBody As String = ""
             '
             archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
@@ -183,9 +184,11 @@ Namespace newsletter2
                     Do While cs.OK And RowCount < RecordsPerPage
                         storyName = cs.GetText("storyName")
                         storyOverview = cs.GetText("Overview")
+                        storyBody = cs.GetText("body")
                         If storyOverview = "" Then
-                            If cs.GetBoolean("AllowReadMore") Then
-                                storyOverview = cs.GetText("Body")
+                            If Not cn.isBlank(cp, storyBody) Then
+                                'if cs.GetBoolean("AllowReadMore") Then
+                                storyOverview = storyBody
                             Else
                                 storyOverview = cp.Content.GetCopy("Newsletter Article Access Denied", "You do not have access to this article")
                             End If
@@ -264,7 +267,7 @@ Namespace newsletter2
         End Function
         '
         '
-        Friend Function GetSearchItemList(ByVal cp As CPBaseClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String) As String
+        Friend Function GetSearchItemList(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String) As String
             '
             Dim layout As CPBlockBaseClass = cp.BlockNew()
             Dim recordTop As Integer
@@ -299,6 +302,7 @@ Namespace newsletter2
             Dim issueDate As Date
             Dim issueDateFormatted As String = ""
             Dim GoToPage As String = ""
+            Dim storyBody As String = ""
             '
             archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
@@ -422,9 +426,11 @@ Namespace newsletter2
                     Do While cs.OK And RowCount < RecordsPerPage
                         storyName = cs.GetText("storyName")
                         storyOverview = cs.GetText("Overview")
+                        storyBody = cs.GetText("body")
                         If storyOverview = "" Then
-                            If cs.GetBoolean("AllowReadMore") Then
-                                storyOverview = cs.GetText("Body")
+                            If Not cn.isBlank(cp, storyBody) Then
+                                ' if cs.GetBoolean("AllowReadMore") Then
+                                storyOverview = storyBody
                             Else
                                 storyOverview = cp.Content.GetCopy("Newsletter Article Access Denied", "You do not have access to this article")
                             End If
@@ -757,6 +763,7 @@ Namespace newsletter2
                 Dim readMoreLink As String = ""
                 Dim readMore As String = ""
                 Dim overview As String = ""
+                Dim storyBody As String = ""
                 '
                 Call layout.Load(newsCoverStoryItem)
                 StoryID = CSStories.GetInteger("ID")
@@ -778,7 +785,9 @@ Namespace newsletter2
                 overview = cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview"))
                 Call layout.SetInner(".newsCoverListCaption", caption)
                 Call layout.SetInner(".newsCoverListOverview", overview)
-                If Not CSStories.GetBoolean("AllowReadMore") Then
+                storyBody = CSStories.GetText("body")
+                If cn.isBlank(cp, StoryBody) Then
+                    'If Not CSStories.GetBoolean("AllowReadMore") Then
                     Call layout.SetOuter(".newsCoverListReadMore", "")
                 Else
                     readMoreLink = refreshQueryString
@@ -855,49 +864,51 @@ Namespace newsletter2
                         '
                         ' update RSS fields if empty
                         '
-                        rssChange = False
-                        If (IssueID <> 0) Then
-                            If (cn.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
-                                CSIssue.Open(ContentNameNewsletterIssues, "id=" & cp.Db.EncodeSQLNumber(IssueID))
-                                If CSIssue.OK() Then
-                                    PublishDate = CSIssue.GetDate("publishDate")
-                                End If
-                                Call CSIssue.Close()
-                                If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
-                                    rssChange = True
-                                    Call cs.SetField("RSSDatePublish", PublishDate.ToString())
+                        If Not isEditing Then
+                            rssChange = False
+                            If (IssueID <> 0) Then
+                                If (cn.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
+                                    CSIssue.Open(ContentNameNewsletterIssues, "id=" & cp.Db.EncodeSQLNumber(IssueID))
+                                    If CSIssue.OK() Then
+                                        PublishDate = CSIssue.GetDate("publishDate")
+                                    End If
+                                    Call CSIssue.Close()
+                                    If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
+                                        rssChange = True
+                                        Call cs.SetField("RSSDatePublish", PublishDate.ToString())
+                                    End If
                                 End If
                             End If
-                        End If
-                        '
-                        If (storyName <> "") And (cs.GetText("RSSTitle") = "") Then
-                            rssChange = True
-                            Call cs.SetField("RSSTitle", storyName)
-                        End If
-                        '
-                        If (storyOverview <> "") And (cs.GetText("RSSDescription") = "") Then
-                            rssChange = True
-                            Copy = cp.Utils.ConvertHTML2Text(storyOverview)
-                            Call cs.SetField("RSSDescription", Copy)
-                        End If
-                        '
-                        If (cs.GetText("RSSLink") = "") Then
-                            Link = cp.Request.Link
-                            If InStr(1, Link, cp.Site.GetText("adminUrl"), vbTextCompare) = 0 Then
-                                Pos = InStr(1, Link, "?")
-                                If Pos > 0 Then
-                                    Link = Left(Link, Pos - 1)
-                                End If
-                                qs = refreshQueryString
-                                qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(storyId))
-                                qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails.ToString())
-                                qs = cp.Utils.ModifyQueryString(qs, "method", "")
+                            '
+                            If (storyName <> "") And (cs.GetText("RSSTitle") = "") Then
                                 rssChange = True
-                                Call cs.SetField("RSSLink", Link & "?" & qs)
+                                Call cs.SetField("RSSTitle", cs.GetText("name"))
                             End If
-                        End If
-                        If rssChange Then
-                            Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
+                            '
+                            If (storyOverview <> "") And (cs.GetText("RSSDescription") = "") Then
+                                rssChange = True
+                                Copy = cp.Utils.ConvertHTML2Text(storyOverview)
+                                Call cs.SetField("RSSDescription", Copy)
+                            End If
+                            '
+                            If (cs.GetText("RSSLink") = "") Then
+                                Link = cp.Request.Link
+                                If InStr(1, Link, cp.Site.GetText("adminUrl"), vbTextCompare) = 0 Then
+                                    Pos = InStr(1, Link, "?")
+                                    If Pos > 0 Then
+                                        Link = Left(Link, Pos - 1)
+                                    End If
+                                    qs = refreshQueryString
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(storyId))
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails.ToString())
+                                    qs = cp.Utils.ModifyQueryString(qs, "method", "")
+                                    rssChange = True
+                                    Call cs.SetField("RSSLink", Link & "?" & qs)
+                                End If
+                            End If
+                            If rssChange Then
+                                Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
+                            End If
                         End If
                     End If
                     Call cs.Close()

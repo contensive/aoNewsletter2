@@ -33,7 +33,7 @@ Namespace newsletter2
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
                 Dim CSPointer As CPCSBaseClass = cp.CSNew()
                 Dim ThisSQL As String
-                Dim WorkingStoryId As Integer
+                'Dim WorkingStoryId As Integer
                 Dim NavSQL As String
                 Dim CategoryName As String
                 Dim PreviousCategoryName As String = ""
@@ -44,9 +44,8 @@ Namespace newsletter2
                 Dim ArticleCount As Integer
                 Dim newsNavStoryItem As String
                 Dim newsNavCategoryItem As String
-                Dim storyCaption As String
+                'Dim storyCaption As String
                 Dim repeatList As String = ""
-
                 '
                 Call layout.Load(newsNav)
                 newsNavStoryItem = layout.GetOuter(".newsNavStoryItem")
@@ -92,21 +91,22 @@ Namespace newsletter2
                             '
                             Do While CS2.OK
                                 '
-                                Call repeatItem.Load(newsNavStoryItem)
-                                WorkingStoryId = CS2.GetInteger("ID")
-                                AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
-                                storyCaption = CS2.GetText("Name")
-                                Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
-                                If AccessString <> "" Then
-                                    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
-                                End If
-                                QS = cp.Doc.RefreshQueryString
-                                QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingStoryId), True)
-                                QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
-                                If AccessString <> "" Then
-                                    repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
-                                End If
-                                repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                                repeatList &= getNavItem(cp, cn, CS2, newsNavStoryItem)
+                                'Call repeatItem.Load(newsNavStoryItem)
+                                'WorkingStoryId = CS2.GetInteger("ID")
+                                'AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                                'storyCaption = CS2.GetText("Name")
+                                'Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
+                                'If AccessString <> "" Then
+                                '    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
+                                'End If
+                                'QS = cp.Doc.RefreshQueryString
+                                'QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingStoryId), True)
+                                'QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
+                                'If AccessString <> "" Then
+                                '    repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
+                                'End If
+                                'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
                                 '
                                 ArticleCount = ArticleCount + 1
                                 Call CS2.GoNext()
@@ -131,35 +131,37 @@ Namespace newsletter2
                         repeatList &= repeatItem.GetHtml()
                     End If
                     Do While cs.OK()
-                        Call repeatItem.Load(newsNavStoryItem)
-                        WorkingStoryId = cs.GetInteger("ID")
-                        AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
-                        storyCaption = cs.GetText("Name")
-                        'storyCaption = CS.GetEditLink() & CS.GetText("Name")
-                        If AccessString <> "" Then
-                            repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
-                        End If
-                        Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
-                        If cs.GetBoolean("AllowReadMore") Then
-                            '
-                            ' link to the story page
-                            '
-                            QS = cp.Doc.RefreshQueryString
-                            QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingStoryId), True)
-                            QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
-                        Else
-                            '
-                            ' link to the bookmark 'story#' on the cover
-                            '
-                            QS = "?" & cp.Doc.RefreshQueryString
-                            QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, "", False)
-                            QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover, True)
-                            QS = QS & "#story" & WorkingStoryId
-                        End If
-                        If AccessString <> "" Then
-                            repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
-                        End If
-                        repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                        repeatList &= getNavItem(cp, cn, cs, newsNavStoryItem)
+                        'Call repeatItem.Load(newsNavStoryItem)
+                        'WorkingStoryId = cs.GetInteger("ID")
+                        'AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                        'storyCaption = cs.GetText("Name")
+                        ''storyCaption = CS.GetEditLink() & CS.GetText("Name")
+                        'If AccessString <> "" Then
+                        '    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
+                        'End If
+                        'Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
+                        'If Not cn.isBlank(cp, cs.GetText("body")) Then
+                        '    'If cs.GetBoolean("AllowReadMore") Then
+                        '    '
+                        '    ' link to the story page
+                        '    '
+                        '    QS = cp.Doc.RefreshQueryString
+                        '    QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, CStr(WorkingStoryId), True)
+                        '    QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormDetails, True)
+                        'Else
+                        '    '
+                        '    ' link to the bookmark 'story#' on the cover
+                        '    '
+                        '    QS = "?" & cp.Doc.RefreshQueryString
+                        '    QS = cp.Utils.ModifyQueryString(QS, RequestNameStoryId, "", False)
+                        '    QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover, True)
+                        '    QS = QS & "#story" & WorkingStoryId
+                        'End If
+                        'If AccessString <> "" Then
+                        '    repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
+                        'End If
+                        'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
                         Call cs.GoNext()
                     Loop
                 End If
@@ -212,8 +214,7 @@ Namespace newsletter2
             Dim Stream As String = ""
             Dim qs As String = ""
             '
-            QS = cp.Doc.RefreshQueryString
-            'qs = cp.Utils.ModifyQueryString(qs, RequestNameNewsletterID, newsletterId)
+            qs = cp.Doc.RefreshQueryString
             qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormArchive)
             Stream &= "<a class=""caption"" href=""?" & qs & """>" & cp.Site.GetText(SitePropertyIssueArchive, "Archives") & "</a>"
             GetArchiveLink = Stream
@@ -223,10 +224,56 @@ Namespace newsletter2
             Dim Stream As String = ""
             Dim qs As String = ""
             '
-            QS = cp.Doc.RefreshQueryString
+            qs = cp.Doc.RefreshQueryString
             qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormCover)
             Stream &= "<a class=""caption"" href=""?" & qs & """>" & cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue") & "</a>"
             GetCurrentIssueLink = Stream
         End Function
+        '
+        Private Function getNavItem(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal cs As CPCSBaseClass, ByVal newsNavStoryItemLayout As String) As String
+            Dim returnHtml As String = ""
+            Try
+                Dim repeatItem As CPBlockBaseClass = cp.BlockNew()
+                Dim WorkingStoryId As Integer
+                Dim accessString As String
+                Dim storyCaption As String
+                Dim qs As String
+                '
+                Call repeatItem.Load(newsNavStoryItemLayout)
+                WorkingStoryId = cs.GetInteger("ID")
+                accessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                storyCaption = cs.GetText("Name")
+                'storyCaption = CS.GetEditLink() & CS.GetText("Name")
+                If accessString <> "" Then
+                    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & accessString & """>")
+                End If
+                Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
+                If Not cn.isBlank(cp, cs.GetText("body")) Then
+                    'If cs.GetBoolean("AllowReadMore") Then
+                    '
+                    ' link to the story page
+                    '
+                    qs = cp.Doc.RefreshQueryString
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(WorkingStoryId), True)
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails, True)
+                Else
+                    '
+                    ' link to the bookmark 'story#' on the cover
+                    '
+                    qs = cp.Doc.RefreshQueryString
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, "", False)
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormCover, True)
+                    qs = qs & "#story" & WorkingStoryId
+                End If
+                If accessString <> "" Then
+                    repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
+                End If
+                returnHtml = repeatItem.GetHtml().Replace("?", "?" & qs)
+            Catch ex As Exception
+                Call handleError(cp, ex, "getNavItem")
+            End Try
+            Return returnHtml
+        End Function
+        '
     End Class
 End Namespace

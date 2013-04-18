@@ -616,5 +616,28 @@ Namespace newsletter2
             End If
             Return returnStyles
         End Function
+        '
+        '
+        '
+        Friend Function isBlank(ByVal cp As CPBaseClass, ByVal source As String) As Boolean
+            Dim returnBool As Boolean = False
+            Try
+                Dim test As String = source
+                '
+                If test.Length = 0 Then
+                    returnBool = True
+                ElseIf test.Length < 1000 Then
+                    test = cp.Utils.ConvertHTML2Text(test)
+                    test = test.Replace(vbLf, "")
+                    test = test.Replace(vbCr, "")
+                    test = test.Replace(vbTab, "")
+                    test = test.Replace(" ", "")
+                    returnBool = (test.Length = 0)
+                End If
+            Catch ex As Exception
+                Call handleError(cp, ex, "isBlank")
+            End Try
+            Return returnBool
+        End Function
     End Class
 End Namespace
