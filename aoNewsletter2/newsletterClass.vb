@@ -130,7 +130,7 @@ Namespace newsletter2
                         returnHtml = "<p>There are currently no published issues of this newsletter</p>"
                     Else
                         If NewsletterID <> 0 Then
-                            Call cs.OpenRecord("Newsletters", NewsletterID, "StylesFilename,TemplateID")
+                            Call openRecord(CP, cs, "Newsletters", NewsletterID, "StylesFilename,TemplateID")
                             If cs.OK() Then
                                 TemplateID = cs.GetInteger("TemplateID")
                                 Call CP.Doc.AddHeadStyleLink(CP.Request.Protocol & CP.Site.DomainPrimary & CP.Site.FilePath & cs.GetText("StylesFileName"))
@@ -138,7 +138,7 @@ Namespace newsletter2
                             Call cs.Close()
                             '
                             If TemplateID <> 0 Then
-                                Call cs.OpenRecord("Newsletter Templates", TemplateID, "Template")
+                                Call openRecord(CP, cs, "Newsletter Templates", TemplateID, "Template")
                                 If Not cs.OK() Then
                                     '
                                     ' template set, but the ID is bad
@@ -159,7 +159,7 @@ Namespace newsletter2
                             If TemplateID = 0 Then
                                 TemplateID = cn.verifyDefaultTemplateGetId(CP)
                                 If TemplateID <> 0 Then
-                                    Call cs.OpenRecord("Newsletter Issues", IssueID)
+                                    Call openRecord(CP, cs, "Newsletter Issues", IssueID)
                                     If cs.OK() Then
                                         Call cs.SetField("TemplateID", TemplateID.ToString())
                                     End If
@@ -168,7 +168,7 @@ Namespace newsletter2
                             End If
                             '
                             If TemplateID > 0 Then
-                                Call cs.OpenRecord("Newsletter Templates", TemplateID)
+                                Call openRecord(CP, cs, "Newsletter Templates", TemplateID)
                                 If cs.OK() Then
                                     EditLink = cs.GetEditLink()
                                     TemplateCopy = cs.GetText("Template")
@@ -379,7 +379,7 @@ Namespace newsletter2
                 Dim templateId As Integer = 0
                 '
                 If IssueID > 0 Then
-                    Call cs.OpenRecord("Newsletters", NewsletterID)
+                    Call openRecord(CP, cs, "Newsletters", NewsletterID)
                     If cs.OK() Then
                         webTemplateID = cs.GetInteger("TemplateID")
                         emailTemplateID = cs.GetInteger("emailTemplateID")
@@ -392,7 +392,8 @@ Namespace newsletter2
                         '
                         ' verify it
                         '
-                        If Not cs.OpenRecord("newsletter templates", templateId) Then
+                        Call openRecord(cp, cs, "newsletter templates", templateId)
+                        If Not cs.OK Then
                             templateId = 0
                             Call cp.Db.ExecuteSQL("update newsletters set emailtemplateid=0 where id=" & NewsletterID)
                         Else
@@ -409,7 +410,9 @@ Namespace newsletter2
                         If templateId = 0 Then
                             templateId = cn.verifyDefaultTemplateGetId(cp)
                             Call cp.Db.ExecuteSQL("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
-                            If cs.OpenRecord("newsletter templates", templateId) Then
+                            '
+                            Call openRecord(cp, cs, "newsletter templates", templateId)
+                            If cs.OK Then
                                 templateCopy = cs.GetText("Template")
                             End If
                             Call cs.Close()
@@ -418,11 +421,12 @@ Namespace newsletter2
                             '
                             ' verify it, repair it with default template
                             '
-                            If Not cs.OpenRecord("newsletter templates", templateId) Then
+                            Call openRecord(cp, cs, "newsletter templates", templateId)
+                            If Not cs.OK Then
                                 Call cs.Close()
                                 templateId = cn.verifyDefaultTemplateGetId(cp)
                                 Call cp.Db.ExecuteSQL("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
-                                Call cs.OpenRecord("newsletter templates", templateId)
+                                Call openRecord(cp, cs, "newsletter templates", templateId)
                             End If
                             templateCopy = cs.GetText("Template")
                             Call cs.Close()
@@ -430,7 +434,7 @@ Namespace newsletter2
                         End If
                     End If
                     '
-                    Call cs.OpenRecord("Newsletter Templates", templateId)
+                    Call openRecord(CP, cs, "Newsletter Templates", templateId)
                     If cs.OK() Then
                         templateCopy = cs.GetText("Template")
                     End If

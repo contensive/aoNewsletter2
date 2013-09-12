@@ -619,7 +619,7 @@ Namespace newsletter2
                 '
                 TableList = "NewsletterIssuePages "
                 '
-                Call cs.OpenRecord("Newsletter Issues", IssueID)
+                Call openRecord(cp, cs, "Newsletter Issues", IssueID)
                 If cs.OK() Then
                     'If isEditing Then
                     '    returnHtmlItemList &= cs.GetEditLink()

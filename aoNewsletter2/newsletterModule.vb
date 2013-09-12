@@ -88,6 +88,21 @@
         '
         Public Const RequestNameRefer = "EditReferer"
         Public ReferLink As String
-
+        '
+        Public Function openRecord(ByVal cp As Contensive.BaseClasses.CPBaseClass, ByRef cs As Contensive.BaseClasses.CPCSBaseClass, ByVal contentName As String, ByVal recordID As Integer, Optional ByVal fieldList As String = "") As String
+            Dim s As String = ""
+            '
+            Try
+                cs.Open(contentName, "id=" & recordID, , , fieldList)
+            Catch ex As Exception
+                Try
+                    cp.Site.ErrorReport(ex, "error in newsletter2.newsletterCommonClass.openRecord")
+                Catch errObj As Exception
+                End Try
+            End Try
+            '
+            Return s
+        End Function
+        '
     End Module
 End Namespace
