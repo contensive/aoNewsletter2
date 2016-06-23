@@ -57,6 +57,12 @@ Namespace newsletter2
                 Dim archiveIssueID As Integer = 0
                 Dim ItemList As String = ""
                 Dim currentIssueID As Integer
+                Dim footerAdBanners As String = ""
+                Dim itemLayoutAdBanners As String = ""
+                Dim sponsor As String = ""
+                Dim publishDate As Date = Date.MinValue
+                Dim tagLine As String = ""
+                Dim mastheadFilename As String = ""
                 '
                 refreshQueryString = CP.Doc.RefreshQueryString
                 '
@@ -130,9 +136,10 @@ Namespace newsletter2
                         returnHtml = "<p>There are currently no published issues of this newsletter</p>"
                     Else
                         If NewsletterID <> 0 Then
-                            Call openRecord(CP, cs, "Newsletters", NewsletterID, "StylesFilename,TemplateID")
+                            Call openRecord(CP, cs, "Newsletters", NewsletterID, "StylesFilename,TemplateID,mastheadFilename")
                             If cs.OK() Then
                                 TemplateID = cs.GetInteger("TemplateID")
+                                mastheadFilename = cs.GetText("mastheadFilename")
                                 Call CP.Doc.AddHeadStyleLink(CP.Request.Protocol & CP.Site.DomainPrimary & CP.Site.FilePath & cs.GetText("StylesFileName"))
                             End If
                             Call cs.Close()
@@ -202,6 +209,9 @@ Namespace newsletter2
                         End If
                         '
                         Call layout.Load(TemplateCopy)
+                        If (Not String.IsNullOrEmpty(mastheadFilename)) Then
+                            layout.SetInner(".newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                        End If
                         '
                         nav = New newsletterNavClass
                         newsNav = layout.GetInner(".newsNav")
@@ -211,43 +221,145 @@ Namespace newsletter2
                             Case FormSearch
                                 itemLayout = layout.GetOuter(".newsSearchListItem")
                                 ItemList = Body.GetSearchItemList(CP, cn, ButtonValue, IssueID, refreshQueryString, itemLayout)
+                                itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
                                 Call layout.SetOuter(".newsSearchList", ItemList)
                                 Call layout.SetInner(".newsArchive", "")
                                 Call layout.SetOuter(".newsBody", "")
                                 Call layout.SetOuter(".newsCover", "")
+                                Call layout.SetOuter(".emailLinkToWeb", "")
                                 Call layout.SetOuter(".newsIssueCaption", "")
+                                Call layout.SetInner(".newsIssueSponsor", sponsor)
+                                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                                If (String.IsNullOrEmpty(tagLine)) Then
+                                    Call layout.SetOuter(".newsletterTagLine", "")
+                                Else
+                                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                                End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormArchive
                                 itemLayout = layout.GetOuter(".newsArchiveListItem")
                                 ItemList = Body.GetArchiveItemList(CP, cn, ButtonValue, currentIssueID, refreshQueryString, itemLayout, NewsletterID)
+                                itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
                                 Call layout.SetInner(".newsArchiveList", ItemList)
                                 Call layout.SetOuter(".newsBody", "")
                                 Call layout.SetOuter(".newsCover", "")
                                 Call layout.SetOuter(".newsSearch", "")
+                                Call layout.SetOuter(".emailLinkToWeb", "")
                                 Call layout.SetOuter(".newsIssueCaption", "")
+                                Call layout.SetInner(".newsIssueSponsor", sponsor)
+                                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                                If (String.IsNullOrEmpty(tagLine)) Then
+                                    Call layout.SetOuter(".newsletterTagLineRow", "")
+                                Else
+                                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                                End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormDetails
                                 newsBody = layout.GetInner(".newsBody")
                                 newsBody = Body.GetStory(CP, cn, storyID, IssueID, refreshQueryString, newsBody, isEditing)
+                                Call openRecord(CP, cs, "Newsletter Issues", IssueID)
+                                If cs.OK() Then
+                                    sponsor = cs.GetText("sponsor")
+                                    tagLine = cs.GetText("tagLine")
+                                    publishDate = cs.GetDate("publishDate")
+                                End If
+                                Call cs.Close()
+                                itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
                                 Call layout.SetInner(".newsBody", newsBody)
                                 Call layout.SetOuter(".newsArchive", "")
                                 Call layout.SetOuter(".newsCover", "")
                                 Call layout.SetOuter(".newsSearch", "")
+                                Call layout.SetOuter(".emailLinkToWeb", "")
                                 Call layout.SetInner(".newsIssueCaption", CP.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
+                                Call layout.SetInner(".newsIssueSponsor", sponsor)
+                                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                                If (String.IsNullOrEmpty(tagLine)) Then
+                                    Call layout.SetOuter(".newsletterTagLineRow", "")
+                                Else
+                                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                                End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case Else
                                 FormID = FormCover
                                 itemLayoutStory = layout.GetOuter(".newsCoverStoryItem")
+                                itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
                                 itemLayoutCategory = layout.GetOuter(".newsCoverCategoryItem")
-                                ItemList = Body.GetCover(CP, IssueID, storyID, refreshQueryString, FormID, itemLayoutStory, itemLayoutCategory, isEditing)
+                                ItemList = Body.GetCoverContent(CP, IssueID, storyID, refreshQueryString, FormID, itemLayoutStory, itemLayoutCategory, isEditing, sponsor, publishDate, tagLine)
+                                '
+                                ' add footer ad banner(s)
+                                '
+                                If (cs.Open("newsletter Issues", "id=" & IssueID)) Then
+                                    Dim adBanner As String
+                                    Dim adBannerLink As String
+                                    adBanner = cs.GetText("adBanner1")
+                                    If (Not String.IsNullOrEmpty(adBanner)) Then
+                                        adBannerLink = cs.GetText("adBannerLink1")
+                                        If (String.IsNullOrEmpty(adBannerLink)) Then
+                                            footerAdBanners &= "<img src=""" & CP.Site.FilePath & adBanner & """>"
+                                        Else
+                                            If (adBannerLink.IndexOf("://") < 0) Then
+                                                adBannerLink = "http://" & adBannerLink
+                                            End If
+                                            footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & CP.Site.FilePath & adBanner & """></a>"
+                                        End If
+                                    End If
+                                    ''
+                                    'adBanner = cs.GetText("adBanner2")
+                                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                                    '    footerAdBanners &= adBanner
+                                    'End If
+                                    ''
+                                    'adBanner = cs.GetText("adBanner3")
+                                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                                    '    footerAdBanners &= adBanner
+                                    'End If
+                                    ''
+                                    'adBanner = cs.GetText("adBanner4")
+                                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                                    '    footerAdBanners &= adBanner
+                                    'End If
+                                    ''
+                                    'adBanner = cs.GetText("adBanner5")
+                                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                                    '    footerAdBanners &= adBanner
+                                    'End If
+                                    ''
+                                    'adBanner = cs.GetText("adBanner6")
+                                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                                    '    footerAdBanners &= adBanner
+                                    'End If
+                                    '
+                                End If
+                                Call cs.Close()
+                                If (Not String.IsNullOrEmpty(footerAdBanners)) Then
+                                    Dim adBannerLayout As CPBlockBaseClass = CP.BlockNew()
+                                    adBannerLayout.Load(itemLayoutAdBanners)
+                                    adBannerLayout.SetInner(".newsletterAdvertisements", footerAdBanners)
+                                    ItemList &= adBannerLayout.GetHtml()
+                                End If
                                 Call layout.SetInner(".newsCoverList", ItemList)
                                 Call layout.SetOuter(".newsArchive", "")
                                 Call layout.SetOuter(".newsBody", "")
                                 Call layout.SetOuter(".newsSearch", "")
+                                Call layout.SetOuter(".emailLinkToWeb", "")
                                 Call layout.SetInner(".newsIssueCaption", CP.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
+                                Call layout.SetInner(".newsIssueSponsor", sponsor)
+                                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                                If (String.IsNullOrEmpty(tagLine)) Then
+                                    Call layout.SetOuter(".newsletterTagLineRow", "")
+                                Else
+                                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                                End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                         End Select
                         Call layout.SetInner(".newsNav", newsNav)
+                        '
+                        ' Add archive link
+                        '
+                        Dim newsArchiveLink As String = layout.GetInner(".newsArchiveLink")
+                        newsArchiveLink = newsArchiveLink.Replace("#", CP.Utils.ModifyLinkQueryString(currentLink, "formId", FormArchive.ToString))
+                        layout.SetInner(".newsArchiveLink", newsArchiveLink)
+                        '
                         returnHtml = layout.GetHtml()
                     End If
                     '
@@ -366,17 +478,19 @@ Namespace newsletter2
                 Dim Nav As newsletterNavClass
                 Dim Styles As String
                 Dim layout As CPBlockBaseClass = cp.BlockNew()
-                Dim newsCover As String = ""
+                Dim itemList As String = ""
                 Dim newsNav As String = ""
                 Dim emailBody As String = ""
                 Dim LoopPtr As Integer
                 Dim StartPos As Integer
                 Dim EndPos As Integer
                 Dim newsCoverStoryItem As String = ""
+                Dim itemLayoutAdBanners As String = ""
                 Dim newsCoverCategoryItem As String = ""
                 Dim emailTemplateID As Integer = 0
                 Dim updateNewsletterTemplateId As Boolean = False
                 Dim templateId As Integer = 0
+                Dim adBannerLink As String
                 '
                 If IssueID > 0 Then
                     Call openRecord(CP, cs, "Newsletters", NewsletterID)
@@ -449,24 +563,81 @@ Namespace newsletter2
                 '
                 ' There is a template, encoding it captures the newsletterBodyClass
                 '
+                Dim sponsor As String = ""
+                Dim publishDate As Date = Date.MinValue
+                Dim tagLine As String = ""
                 Call layout.Load(templateCopy)
-                '
-                'newsCover = layout.GetInner(".newsCover")
                 newsCoverStoryItem = layout.GetOuter(".newsCoverStoryItem")
+                itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
                 newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
                 Body = New newsletterBodyClass
-                newsCover = Body.GetCover(cp, IssueID, 0, refreshQueryString, FormCover, newsCoverStoryItem, newsCoverCategoryItem, False)
+                itemList = Body.GetCoverContent(cp, IssueID, 0, refreshQueryString, FormCover, newsCoverStoryItem, newsCoverCategoryItem, False, sponsor, publishDate, tagLine)
+                '
+                ' add footer ad banner(s)
+                '
+                Dim footerAdBanners As String = ""
+                If (cs.Open("newsletter Issues", "id=" & IssueID)) Then
+                    Dim adBanner As String
+                    adBanner = cs.GetText("adBanner1")
+                    If (Not String.IsNullOrEmpty(adBanner)) Then
+                        adBannerLink = cs.GetText("adBannerLink1")
+                        If (String.IsNullOrEmpty(adBannerLink)) Then
+                            footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """>"
+                        Else
+                            If (adBannerLink.IndexOf("://") < 0) Then
+                                adBannerLink = "http://" & adBannerLink
+                            End If
+                            footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """></a>"
+                        End If
+                    End If
+                    ''
+                    'adBanner = cs.GetText("adBanner2")
+                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                    '    footerAdBanners &= adBanner
+                    'End If
+                    ''
+                    'adBanner = cs.GetText("adBanner3")
+                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                    '    footerAdBanners &= adBanner
+                    'End If
+                    ''
+                    'adBanner = cs.GetText("adBanner4")
+                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                    '    footerAdBanners &= adBanner
+                    'End If
+                    ''
+                    'adBanner = cs.GetText("adBanner5")
+                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                    '    footerAdBanners &= adBanner
+                    'End If
+                    ''
+                    'adBanner = cs.GetText("adBanner6")
+                    'If (Not String.IsNullOrEmpty(adBanner)) Then
+                    '    footerAdBanners &= adBanner
+                    'End If
+                    '
+                End If
+                Call cs.Close()
+                If (Not String.IsNullOrEmpty(footerAdBanners)) Then
+                    Dim adBannerLayout As CPBlockBaseClass = cp.BlockNew()
+                    adBannerLayout.Load(itemLayoutAdBanners)
+                    adBannerLayout.SetInner(".newsletterAdvertisements", footerAdBanners)
+                    ItemList &= adBannerLayout.GetHtml()
+                End If
                 '
                 newsNav = layout.GetInner(".newsNav")
                 Nav = New newsletterNavClass
                 newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav, currentIssueId)
                 '
                 Call layout.SetInner(".newsNav", newsNav)
-                Call layout.SetInner(".newsCover", newsCover)
+                Call layout.SetInner(".newsCoverList", itemList)
                 Call layout.SetOuter(".newsBody", "")
                 Call layout.SetOuter(".newsArchive", "")
                 Call layout.SetOuter(".newsSearch", "")
                 Call layout.SetInner(".newsIssueCaption", cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
+                Call layout.SetInner(".newsIssueSponsor", sponsor)
+                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                Call layout.SetInner(".newsletterTagLine", tagLine)
                 '
                 emailBody = layout.GetHtml()
                 '

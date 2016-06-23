@@ -137,7 +137,7 @@ Namespace newsletter2
                             link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID").ToString())
                             Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
                             Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
-                            Stream &= Replace(layout.GetHtml(), "?", "?" & link)
+                            Stream &= layout.GetHtml().Replace("?", "?" & link)
                             Call cs.GoNext()
                         Loop
                     Else
@@ -600,7 +600,7 @@ Namespace newsletter2
         '    '
         'End Function
         ''
-        Friend Function GetCover(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal storyId As Integer, ByVal refreshQueryString As String, ByVal formid As Integer, ByVal newsCoverStoryItem As String, ByVal newsCoverCategoryItem As String, ByVal isEditing As Boolean) As String
+        Friend Function GetCoverContent(ByVal cp As CPBaseClass, ByVal IssueID As Integer, ByVal storyId As Integer, ByVal refreshQueryString As String, ByVal formid As Integer, ByVal newsCoverStoryItem As String, ByVal newsCoverCategoryItem As String, ByVal isEditing As Boolean, ByRef return_Sponsor As String, ByRef return_publishDate As Date, ByRef return_tagLine As String) As String
             Dim returnHtmlItemList As String = ""
             Try
                 '
@@ -616,15 +616,17 @@ Namespace newsletter2
                 Dim CategoryID As Integer
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
                 Dim qs As String
+                Dim cover As String
                 '
                 TableList = "NewsletterIssuePages "
                 '
                 Call openRecord(cp, cs, "Newsletter Issues", IssueID)
                 If cs.OK() Then
-                    'If isEditing Then
-                    '    returnHtmlItemList &= cs.GetEditLink()
-                    'End If
-                    returnHtmlItemList &= cs.GetText("Cover")
+                    cover = cs.GetText("Cover")
+                    return_Sponsor = cs.GetText("sponsor")
+                    return_tagLine = cs.GetText("tagLine")
+                    return_publishDate = encodeminDate(cs.GetDate("publishDate"))
+                    returnHtmlItemList = GetCoverStoryItemLayout(cp, newsCoverStoryItem, "", "", "", cover, "", "", "", "")
                 End If
                 Call cs.Close()
                 '
@@ -677,7 +679,7 @@ Namespace newsletter2
                             returnHtmlItemList &= layout.GetHtml()
                             '
                             Do While CS2.OK
-                                returnHtmlItemList &= GetStoryOverview(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
+                                returnHtmlItemList &= GetCoverStoryItem(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
                                 Call CS2.GoNext()
                             Loop
                             'returnHtmlItemList &= layout.GetHtml()
@@ -698,7 +700,7 @@ Namespace newsletter2
                     '    Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
                     'End If
                     Do While cs.OK()
-                        returnHtmlItemList &= GetStoryOverview(cp, cs, formid, refreshQueryString, newsCoverStoryItem, isEditing)
+                        returnHtmlItemList &= GetCoverStoryItem(cp, cs, formid, refreshQueryString, newsCoverStoryItem, isEditing)
                         Call cs.GoNext()
                     Loop
                 End If
@@ -709,9 +711,9 @@ Namespace newsletter2
                     Call layout.SetInner(".newsCoverListCaption", cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything) & "Add a story to this issue")
                     Call layout.SetInner(".newsCoverListOverview", "")
                     Call layout.SetInner(".newsCoverListReadMore", "")
+                    Call layout.SetInner(".infographicBox", "")
                     returnHtmlItemList &= layout.GetHtml()
                 End If
-                '
             Catch ex As Exception
                 Call handleError(cp, ex, "GetNewsletterBodyOverview")
             End Try
@@ -750,11 +752,10 @@ Namespace newsletter2
         '    Return returnHtml
         'End Function
         '
-        Private Function GetStoryOverview(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String, isEditing As Boolean) As String
+        Private Function GetCoverStoryItem(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String, isEditing As Boolean) As String
             Dim returnhtml As String = ""
             Try
                 '
-                Dim layout As CPBlockBaseClass = cp.BlockNew()
                 Dim StoryID As Integer
                 Dim StoryAccessString As String
                 Dim cn As New newsletterCommonClass
@@ -764,16 +765,17 @@ Namespace newsletter2
                 Dim readMore As String = ""
                 Dim overview As String = ""
                 Dim storyBody As String = ""
+                Dim coverInfographicthumbnail As String = ""
+                Dim coverInfographic As String = ""
+                Dim coverInfographicUrl As String = ""
                 '
-                Call layout.Load(newsCoverStoryItem)
                 StoryID = CSStories.GetInteger("ID")
+                coverInfographicthumbnail = CSStories.GetText("coverInfographicthumbnail")
+                coverInfographic = CSStories.GetText("coverInfographic")
+                coverInfographicUrl = CSStories.GetText("coverInfographicUrl")
                 storyBookmark = "story" & StoryID
-                StoryAccessString = cn.GetArticleAccessString(cp, StoryID)
                 '
-                If StoryAccessString <> "" Then
-                    Call layout.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>")
-                End If
-
+                StoryAccessString = cn.GetArticleAccessString(cp, StoryID)
                 '
                 If formId <> FormEmail Then
                     caption &= CSStories.GetEditLink()
@@ -782,19 +784,96 @@ Namespace newsletter2
                 If isEditing Then
                     caption = CSStories.GetEditLink() & caption
                 End If
-                overview = cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview"))
-                Call layout.SetInner(".newsCoverListCaption", caption)
-                Call layout.SetInner(".newsCoverListOverview", overview)
+                overview &= cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview"))
                 storyBody = CSStories.GetText("body")
-                If cn.isBlank(cp, StoryBody) Then
-                    'If Not CSStories.GetBoolean("AllowReadMore") Then
-                    Call layout.SetOuter(".newsCoverListReadMore", "")
-                Else
+                If Not cn.isBlank(cp, storyBody) Then
                     readMoreLink = refreshQueryString
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID.ToString())
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormDetails.ToString())
+                End If
+                returnhtml = GetCoverStoryItemLayout(cp, newsCoverStoryItem, StoryAccessString, storyBookmark, caption, overview, readMoreLink, coverInfographicthumbnail, coverInfographic, coverInfographicUrl)
+            Catch ex As Exception
+                Call handleError(cp, ex, "getStoryOverview")
+            End Try
+            Return returnhtml
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Populate an instance of the cover item template
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="newsCoverStoryItem"></param>
+        ''' <param name="StoryAccessString"></param>
+        ''' <param name="storyBookmark"></param>
+        ''' <param name="caption"></param>
+        ''' <param name="overview"></param>
+        ''' <param name="readMoreLink"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function GetCoverStoryItemLayout(ByVal cp As CPBaseClass, newsCoverStoryItem As String, StoryAccessString As String, storyBookmark As String, caption As String, overview As String, readMoreLink As String, coverinfographicThumbnail As String, coverinfographic As String, coverInfographicUrl As String) As String
+            Dim returnhtml As String = ""
+            Try
+                '
+                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                Dim cn As New newsletterCommonClass
+                Dim readMore As String = ""
+                Dim storyBody As String = ""
+                Dim img As String = ""
+                '
+                Call layout.Load(newsCoverStoryItem)
+                '
+                If String.IsNullOrEmpty(coverinfographicThumbnail) Then
+                    '
+                    ' no infographic
+                    '
+                    layout.SetOuter(".infographicBox", "")
+                Else
+                    img = "<img src=""" & cp.Site.FilePath & coverinfographicThumbnail & """ alt=""View the infographic"" class=""banner"" width=""100%"">"
+                    If String.IsNullOrEmpty(coverinfographic) Then
+                        '
+                        ' no image
+                        '
+                        If String.IsNullOrEmpty(coverInfographicUrl) Then
+                            layout.SetInner(".infographImage", img)
+                        Else
+                            If coverInfographicUrl.IndexOf("://") < 0 Then
+                                coverInfographicUrl = "http://" & coverInfographicUrl
+                            End If
+                            layout.SetInner(".infographImage", "<a href=""" & coverInfographicUrl & """ target=""_blank"">" & img & "</a>")
+                        End If
+                    Else
+                        '
+                        ' linked thumbnail
+                        '
+                        layout.SetInner(".infographImage", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">" & img & "</a>")
+                    End If
+                End If
+                If String.IsNullOrEmpty(coverinfographic) Then
+                    layout.SetOuter(".infographLink", "")
+                Else
+                    layout.SetInner(".infographLink", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">View the infographic online.</a>")
+                End If
+                If StoryAccessString <> "" Then
+                    Call layout.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>")
+                End If
+                If String.IsNullOrEmpty(caption) Then
+                    Call layout.SetOuter(".newsCoverListCaption", "")
+                Else
+                    Call layout.SetInner(".newsCoverListCaption", caption)
+                End If
+                If String.IsNullOrEmpty(overview) Then
+                    Call layout.SetOuter(".newsCoverListOverview", "")
+                Else
+                    Call layout.SetInner(".newsCoverListOverview", overview)
+                End If
+
+                If (String.IsNullOrEmpty(readMoreLink)) Then
+                    Call layout.SetOuter(".newsCoverListReadMore", "")
+                Else
                     readMore = layout.GetInner(".newsCoverListReadMore")
                     readMore = readMore.Replace("?", "?" & readMoreLink)
+                    readMore = readMore.Replace("#", "?" & readMoreLink)
                     Call layout.SetInner(".newsCoverListReadMore", readMore)
                 End If
                 If StoryAccessString <> "" Then

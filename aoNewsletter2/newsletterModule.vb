@@ -104,5 +104,12 @@
             Return s
         End Function
         '
+        Friend Function encodeMinDate(sourceDate As Date) As Date
+            If (sourceDate < #1/1/1900#) Then
+                Return Date.MinValue
+            End If
+            Return sourceDate
+        End Function
+        '
     End Module
 End Namespace
