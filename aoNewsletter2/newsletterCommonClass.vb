@@ -90,7 +90,9 @@ Namespace newsletter2
             Dim PublishDate As Date
             Dim Copy As String
             Dim DateAdded As Date
+            Dim isContentMan As Boolean
             '
+            isContentMan = cp.User.IsContentManager("Newsletters")
             'Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
             Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc")
             Do While cs.OK()
@@ -112,7 +114,7 @@ Namespace newsletter2
                 If PublishDate <> Date.MinValue Then
                     Copy = Copy & ", publish " & PublishDate.ToShortDateString
                 End If
-                If cp.User.IsContentManager("Newsletters") Then
+                If isContentMan Then
                     qs = cp.Doc.RefreshQueryString
                     qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, ID.ToString())
                     Copy = "<a href=""?" & qs & """>" & Copy & "</a>"
@@ -123,6 +125,11 @@ Namespace newsletter2
             Call cs.Close()
             '
             If GetUnpublishedIssueList <> "" Then
+                If isContentMan Then
+                    qs = cp.Doc.RefreshQueryString
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, "")
+                    GetUnpublishedIssueList &= "<li><a href=""?" & qs & """>Current Issue</a></li>"
+                End If
                 GetUnpublishedIssueList = "<UL>" & GetUnpublishedIssueList & "</UL>"
             End If
             '
