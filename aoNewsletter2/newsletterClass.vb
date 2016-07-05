@@ -246,12 +246,12 @@ Namespace newsletter2
                                 Call layout.SetOuter(".newsSearch", "")
                                 Call layout.SetOuter(".emailLinkToWeb", "")
                                 Call layout.SetOuter(".newsIssueCaption", "")
-                                Call layout.SetInner(".newsIssueSponsor", sponsor)
-                                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                                Call layout.SetInner(".newsIssueSponsor", "")
+                                Call layout.SetInner(".newsIssuePublishDate", "")
                                 If (String.IsNullOrEmpty(tagLine)) Then
                                     Call layout.SetOuter(".newsletterTagLineRow", "")
                                 Else
-                                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                                    Call layout.SetInner(".newsletterTagLine", "")
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormDetails
