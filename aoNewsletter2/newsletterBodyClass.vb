@@ -625,8 +625,10 @@ Namespace newsletter2
                     cover = cs.GetText("Cover")
                     return_Sponsor = cs.GetText("sponsor")
                     return_tagLine = cs.GetText("tagLine")
-                    return_publishDate = encodeminDate(cs.GetDate("publishDate"))
-                    returnHtmlItemList = GetCoverStoryItemLayout(cp, newsCoverStoryItem, "", "", "", cover, "", "", "", "")
+                    return_publishDate = encodeMinDate(cs.GetDate("publishDate"))
+                    If cover.Length > 50 Then
+                        returnHtmlItemList = GetCoverStoryItemLayout(cp, newsCoverStoryItem, "", "", "", cover, "", "", "", "")
+                    End If
                 End If
                 Call cs.Close()
                 '

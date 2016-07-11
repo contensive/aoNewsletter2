@@ -566,7 +566,21 @@ Namespace newsletter2
                 Dim sponsor As String = ""
                 Dim publishDate As Date = Date.MinValue
                 Dim tagLine As String = ""
+                Dim emailLinkToWebHtml As String
+                Dim qs As String
+                '
                 Call layout.Load(templateCopy)
+                '
+                ' set the link back to the web version
+                '
+                emailLinkToWebHtml = layout.GetInner(".emailLinkToWeb")
+                If Not String.IsNullOrEmpty(emailLinkToWebHtml) Then
+                    qs = cp.Doc.RefreshQueryString()
+                    qs = cp.Utils.ModifyQueryString(qs, "issueId", IssueID.ToString())
+                    emailLinkToWebHtml = emailLinkToWebHtml.Replace("href=""#""", "href=""?" & qs & """")
+                    layout.SetInner(".emailLinkToWeb", emailLinkToWebHtml)
+                End If
+                '
                 newsCoverStoryItem = layout.GetOuter(".newsCoverStoryItem")
                 itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
                 newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
