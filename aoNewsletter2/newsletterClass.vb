@@ -492,8 +492,10 @@ Namespace newsletter2
                 Dim templateId As Integer = 0
                 Dim adBannerLink As String
                 '
+                'Call cp.Utils.AppendLogFile("createEmailGetId, 000")
+                '
                 If IssueID > 0 Then
-                    Call openRecord(CP, cs, "Newsletters", NewsletterID)
+                    Call openRecord(cp, cs, "Newsletters", NewsletterID)
                     If cs.OK() Then
                         webTemplateID = cs.GetInteger("TemplateID")
                         emailTemplateID = cs.GetInteger("emailTemplateID")
@@ -516,6 +518,9 @@ Namespace newsletter2
                         Call cs.Close()
                         '
                     End If
+                    '
+                    'Call cp.Utils.AppendLogFile("createEmailGetId, 100")
+                    '
                     If templateId = 0 Then
                         '
                         ' no valid emailtemplate, try webtemplate
@@ -548,7 +553,7 @@ Namespace newsletter2
                         End If
                     End If
                     '
-                    Call openRecord(CP, cs, "Newsletter Templates", templateId)
+                    Call openRecord(cp, cs, "Newsletter Templates", templateId)
                     If cs.OK() Then
                         templateCopy = cs.GetText("Template")
                     End If
@@ -560,6 +565,9 @@ Namespace newsletter2
                     ' fix somehow
                     '
                 End If
+                '
+                'Call cp.Utils.AppendLogFile("createEmailGetId, 200")
+                '
                 '
                 ' There is a template, encoding it captures the newsletterBodyClass
                 '
@@ -586,6 +594,9 @@ Namespace newsletter2
                 newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
                 Body = New newsletterBodyClass
                 itemList = Body.GetCoverContent(cp, IssueID, 0, refreshQueryString, FormCover, newsCoverStoryItem, newsCoverCategoryItem, False, sponsor, publishDate, tagLine)
+                '
+                'Call cp.Utils.AppendLogFile("createEmailGetId, 300")
+                '
                 '
                 ' add footer ad banner(s)
                 '
@@ -632,16 +643,21 @@ Namespace newsletter2
                     '
                 End If
                 Call cs.Close()
+                '
+                'Call cp.Utils.AppendLogFile("createEmailGetId, 400")
+                '
                 If (Not String.IsNullOrEmpty(footerAdBanners)) Then
                     Dim adBannerLayout As CPBlockBaseClass = cp.BlockNew()
                     adBannerLayout.Load(itemLayoutAdBanners)
                     adBannerLayout.SetInner(".newsletterAdvertisements", footerAdBanners)
-                    ItemList &= adBannerLayout.GetHtml()
+                    itemList &= adBannerLayout.GetHtml()
                 End If
                 '
                 newsNav = layout.GetInner(".newsNav")
                 Nav = New newsletterNavClass
                 newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav, currentIssueId)
+                '
+                Call cp.Utils.AppendLogFile("createEmailGetId, 500")
                 '
                 Call layout.SetInner(".newsNav", newsNav)
                 Call layout.SetInner(".newsCoverList", itemList)
@@ -651,7 +667,23 @@ Namespace newsletter2
                 Call layout.SetInner(".newsIssueCaption", cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
                 Call layout.SetInner(".newsIssueSponsor", sponsor)
                 Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
-                Call layout.SetInner(".newsletterTagLine", tagLine)
+                If (String.IsNullOrEmpty(tagLine)) Then
+                    '
+                    Call cp.Utils.AppendLogFile("createEmailGetId, 510")
+                    '
+                    Call layout.SetOuter(".newsletterTagLineRow", "")
+                Else
+                    '
+                    Call cp.Utils.AppendLogFile("createEmailGetId, 520")
+                    '
+                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                End If
+                '
+                ' Add archive link
+                '
+                Dim newsArchiveLink As String = layout.GetInner(".newsArchiveLink")
+                newsArchiveLink = newsArchiveLink.Replace("#", cp.Utils.ModifyLinkQueryString("?" & refreshQueryString, "formId", FormArchive.ToString))
+                layout.SetInner(".newsArchiveLink", newsArchiveLink)
                 '
                 emailBody = layout.GetHtml()
                 '
@@ -684,6 +716,9 @@ Namespace newsletter2
                     Call cs.Save()
                 End If
                 Call cs.Close()
+                '
+                'Call cp.Utils.AppendLogFile("createEmailGetId, 999")
+                '
             Catch ex As Exception
                 Call HandleError(cp, ex, "CreateEmailGetID")
             End Try

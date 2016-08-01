@@ -62,6 +62,7 @@ Namespace newsletter2
             Dim GoToPage As String = ""
             Dim storyBody As String = ""
             '
+            BlockSearchForm = cp.Doc.GetBoolean("Block Archive Search Form")
             archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
             yearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
@@ -172,13 +173,15 @@ Namespace newsletter2
                 Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
                 If Not cs.OK Then
                     Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
+                    Call layout.SetInner(".newsArchiveListCaption", "No results were found")
+                    'Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
                     Call layout.SetInner(".newsArchiveListOverview", "")
                     Stream &= layout.GetHtml()
                     'Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
                 Else
                     Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
+                    Call layout.SetInner(".newsArchiveListCaption", "Search results")
+                    'Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
                     Call layout.SetInner(".newsArchiveListOverview", "")
                     Stream &= layout.GetHtml()
                     Do While cs.OK And RowCount < RecordsPerPage
@@ -223,14 +226,15 @@ Namespace newsletter2
                 End If
             End If
             '
-            BlockSearchForm = True
             If Not BlockSearchForm Then
                 '
                 ' Display search form
                 '
                 Dim searchForm As String = ""
-                searchForm &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
-                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
+                searchForm &= "<h2>Archive Search</h2>"
+                'searchForm &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
+                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & "</div>"
+                'searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>keyword search<br>"
                 searchForm &= cp.Html.InputText(RequestNameSearchKeywords, , , "50") & "</div>"
@@ -252,9 +256,10 @@ Namespace newsletter2
                 Next
                 YearString &= "</select>"
                 searchForm &= "<div>&nbsp;</div>"
-                searchForm &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button(FormButtonViewArchives) & "</div>"
+                searchForm &= "<div>" & MonthString & "&nbsp;&nbsp;&nbsp;" & YearString & "&nbsp;&nbsp;&nbsp;&nbsp;" & cp.Html.Button("button", FormButtonViewArchives) & "</div>"
+                searchForm &= "<div>&nbsp;</div>"
                 searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive.ToString())
-                searchForm &= cp.Html.Form(searchForm)
+                searchForm = cp.Html.Form(searchForm)
                 '
                 Call layout.Load(newsArchiveListItemLayout)
                 Call layout.SetInner(".newsArchiveListCaption", "")
