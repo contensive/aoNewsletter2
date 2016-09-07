@@ -628,55 +628,59 @@ Namespace newsletter2
                 '
                 'Call cp.Utils.AppendLogFile("createEmailGetId, 300")
                 '
-                '
-                ' add footer ad banner(s)
-                '
+                ''
+                '' add footer ad banner(s)
+                ''
                 Dim footerAdBanners As String = ""
+                '
                 If (cs.Open("newsletter Issues", "id=" & IssueID)) Then
                     Dim adBanner As String
-                    adBanner = cs.GetText("adBanner1")
-                    If (Not String.IsNullOrEmpty(adBanner)) Then
-                        adBannerLink = cs.GetText("adBannerLink1")
-                        If (String.IsNullOrEmpty(adBannerLink)) Then
-                            footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """>"
-                        Else
-                            If (adBannerLink.IndexOf("://") < 0) Then
-                                adBannerLink = "http://" & adBannerLink
-                            End If
-                            footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """></a>"
-                        End If
-                    End If
-                    ''
-                    'adBanner = cs.GetText("adBanner2")
-                    'If (Not String.IsNullOrEmpty(adBanner)) Then
-                    '    footerAdBanners &= adBanner
-                    'End If
-                    ''
-                    'adBanner = cs.GetText("adBanner3")
-                    'If (Not String.IsNullOrEmpty(adBanner)) Then
-                    '    footerAdBanners &= adBanner
-                    'End If
-                    ''
-                    'adBanner = cs.GetText("adBanner4")
-                    'If (Not String.IsNullOrEmpty(adBanner)) Then
-                    '    footerAdBanners &= adBanner
-                    'End If
-                    ''
-                    'adBanner = cs.GetText("adBanner5")
-                    'If (Not String.IsNullOrEmpty(adBanner)) Then
-                    '    footerAdBanners &= adBanner
-                    'End If
-                    ''
-                    'adBanner = cs.GetText("adBanner6")
-                    'If (Not String.IsNullOrEmpty(adBanner)) Then
-                    '    footerAdBanners &= adBanner
-                    'End If
+                    'Dim adBannerLink As String
+                    Dim bannerLayoutId As Integer
+                    Dim adBannerRowCnt As Integer = 1
+                    Dim adBannerColumnCnt As Integer = 1
+                    Dim pxColumnSpace As Integer = 0
+                    Dim pxRowSpace As Integer = 0
                     '
+                    bannerLayoutId = cs.GetInteger("bannerLayoutId")
+                    If (bannerLayoutId > 0) Then
+                        Dim csLayout As CPCSBaseClass = cp.CSNew()
+                        If csLayout.Open("Newsletter Ad Banner Layouts", "id=" & bannerLayoutId) Then
+                            adBannerRowCnt = csLayout.GetInteger("rowCnt")
+                            adBannerColumnCnt = csLayout.GetInteger("columnCnt")
+                            pxColumnSpace = csLayout.GetInteger("pxColumnSpace")
+                            pxRowSpace = csLayout.GetInteger("pxRowSpace")
+                        End If
+                        Call csLayout.Close()
+                    End If
+
+                    For rowPtr As Integer = 0 To adBannerRowCnt - 1
+                        If (pxRowSpace > 0) And (rowPtr > 0) Then
+                            footerAdBanners &= "<img src=""\cclib\images\spacer.gif"" width=""10"" height=""" & pxRowSpace.ToString() & """ style=""height:" & pxRowSpace.ToString() & "px"">"
+                        End If
+                        footerAdBanners &= "<div class=""newsletterAdvertisementRow"">"
+                        For columnPtr As Integer = 0 To adBannerColumnCnt - 1
+                            If (pxColumnSpace > 0) And (columnPtr > 0) Then
+                                footerAdBanners &= "<img src=""\cclib\images\spacer.gif"" width=""" & pxColumnSpace.ToString() & """ height=""10"" style=""width:" & pxColumnSpace.ToString() & "px"">"
+                            End If
+                            Dim adPtr As Integer = (rowPtr * adBannerColumnCnt) + columnPtr
+                            adBanner = cs.GetText("adBanner" & adPtr)
+                            If (Not String.IsNullOrEmpty(adBanner)) Then
+                                adBannerLink = cs.GetText("adBannerLink" & adPtr)
+                                If (String.IsNullOrEmpty(adBannerLink)) Then
+                                    footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """>"
+                                Else
+                                    If (adBannerLink.IndexOf("://") < 0) Then
+                                        adBannerLink = "http://" & adBannerLink
+                                    End If
+                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """></a>"
+                                End If
+                            End If
+                        Next
+                        footerAdBanners &= "</div>"
+                    Next
                 End If
                 Call cs.Close()
-                '
-                'Call cp.Utils.AppendLogFile("createEmailGetId, 400")
-                '
                 If (Not String.IsNullOrEmpty(footerAdBanners)) Then
                     Dim adBannerLayout As CPBlockBaseClass = cp.BlockNew()
                     adBannerLayout.Load(itemLayoutAdBanners)
