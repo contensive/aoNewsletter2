@@ -124,7 +124,10 @@ Namespace newsletter2
                     'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                     '
                     'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
-                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & currentIssueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * " _
+                        & " From NewsletterIssues " _
+                        & " WHERE (PublishDate < { fn NOW() }) AND (ID <> " & currentIssueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") " _
+                        & " ORDER BY PublishDate DESC"
                     '
                     Call cs.OpenSQL(ThisSQL)
                     If cs.OK Then
@@ -176,14 +179,14 @@ Namespace newsletter2
                     Call layout.SetInner(".newsArchiveListCaption", "No results were found")
                     'Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
                     Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= layout.GetHtml()
+                    Stream &= Replace(layout.GetHtml(), "?", "?" & cp.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True))  'layout.GetHtml()
                     'Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
                 Else
                     Call layout.Load(newsArchiveListItemLayout)
                     Call layout.SetInner(".newsArchiveListCaption", "Search results")
                     'Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
                     Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= layout.GetHtml()
+                    Stream &= Replace(layout.GetHtml(), "?", "?" & cp.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True)) 'layout.GetHtml()
                     Do While cs.OK And RowCount < RecordsPerPage
                         storyName = cs.GetText("storyName")
                         storyOverview = cs.GetText("Overview")

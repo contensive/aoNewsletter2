@@ -237,6 +237,21 @@ Namespace newsletter2
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormArchive
+                                '
+                                '
+                                '
+                                CP.Utils.AppendLog("test.log", "SearchKeywords value : " & CP.Doc.GetText("SearchKeywords"))
+                                Dim searchForm As String = ""
+                                searchForm &= "<div>"
+                                searchForm &= CP.Html.InputText(RequestNameSearchKeywords, , , "30")
+                                searchForm &= " <input type=""submit"" id=""js-ArchiveIssuesSubmit"" name=""Button"" value="" Search ""> " 'CP.Html.Button(FormButtonViewArchives, FormButtonViewArchives)
+                                searchForm &= "</div>"
+                                searchForm = CP.Html.Form(searchForm, , , , CP.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True))
+
+                                Call layout.SetInner(".newsArchiveSearch", searchForm)
+                                '
+                                '
+                                '
                                 itemLayout = layout.GetOuter(".newsArchiveListItem")
                                 ItemList = Body.GetArchiveItemList(CP, cn, ButtonValue, currentIssueID, refreshQueryString, itemLayout, NewsletterID)
                                 itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
