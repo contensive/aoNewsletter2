@@ -200,7 +200,9 @@ Namespace newsletter2
                             End If
                         End If
                         qs = refreshQueryString
-                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover.ToString())
+                        ' 01/12/2017 By Dwayne request change the lirk to the full history
+                        'qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover.ToString())
+                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormDetails.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
                         Call layout.Load(newsArchiveListItemLayout)
                         Call layout.SetInner(".newsArchiveListCaption", storyName)
