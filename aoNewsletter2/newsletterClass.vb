@@ -240,7 +240,6 @@ Namespace newsletter2
                                 '
                                 '
                                 '
-                                CP.Utils.AppendLog("test.log", "SearchKeywords value : " & CP.Doc.GetText("SearchKeywords"))
                                 Dim searchForm As String = ""
                                 searchForm &= "<div>"
                                 searchForm &= CP.Html.InputText(RequestNameSearchKeywords, , , "30")

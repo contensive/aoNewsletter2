@@ -141,7 +141,8 @@ Namespace newsletter2
                             link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID").ToString())
                             Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
                             Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
-                            Stream &= layout.GetHtml().Replace("?", "?" & link)
+                            'Stream &= layout.GetHtml().Replace("?", "?" & link)
+                            Stream &= Replace(layout.GetHtml(), "href=""?""", "href=""?" & link & """")
                             Call cs.GoNext()
                         Loop
                     Else
@@ -158,10 +159,13 @@ Namespace newsletter2
                 '
                 ' List search results of archive issues
                 '
+                cp.Utils.AppendLog("test.log", cp.Doc.GetInteger("newsletter").ToString())
+
                 'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                 ThisSQL2 = " select NL.id, nl.name, nl.publishdate, story.AllowReadMore, story.Overview, story.Body, story.id as ThisID ,story.newsletterid, story.name as storyName"
                 ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages story"
-                ThisSQL2 = ThisSQL2 & " Where (NL.ID = story.newsletterid)"
+                ThisSQL2 = ThisSQL2 & " Where (NL.ID = story.newsletterid) "
+                ThisSQL2 = ThisSQL2 & " and nl.NewsletterID=" & NewsletterID & " " ' 01/13/2017 Search only in the same NewsletterID
                 If monthSelected <> 0 Then
                     ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
                 End If
@@ -173,7 +177,8 @@ Namespace newsletter2
                 End If
                 ThisSQL2 = ThisSQL2 & "  ORDER BY PublishDate DESC"
                 '
-                Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
+                'Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
+                Call cs.OpenSQL(ThisSQL2, "")
                 If Not cs.OK Then
                     Call layout.Load(newsArchiveListItemLayout)
                     Call layout.SetInner(".newsArchiveListCaption", "No results were found")
@@ -200,35 +205,40 @@ Namespace newsletter2
                             End If
                         End If
                         qs = refreshQueryString
-                        ' 01/12/2017 By Dwayne request change the lirk to the full history
+                        ' 01/12/2017 Dwayne request change the link to the full history
                         'qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, "formid", FormDetails.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
                         Call layout.Load(newsArchiveListItemLayout)
                         Call layout.SetInner(".newsArchiveListCaption", storyName)
                         Call layout.SetInner(".newsArchiveListOverview", storyOverview)
-                        Stream &= Replace(layout.GetHtml(), "?", "?" & qs)
+                        If layout.GetHtml().Contains("?") Then
+                            cp.Utils.AppendLog("Test2.log", layout.GetHtml())
+                        End If
+                        Stream &= Replace(layout.GetHtml(), "href=""?""", "href=""?" & qs & """")
                         Call cs.GoNext()
                         RowCount = RowCount + 1
                     Loop
                 End If
                 '
-                If FileCount <> 0 Then
-                    GoToPage = ""
-                    Do While PageCount <= NumberofPages
-                        qs = refreshQueryString
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount.ToString())
-                        qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
-                        GoToPage &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
-                        PageCount = PageCount + 1
-                        GoToPage &= "&nbsp;&nbsp;&nbsp;"
-                    Loop
-                    Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", GoToPage)
-                    Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= layout.GetHtml()
-                End If
+                ' 01/13/2017 comment pagination
+                '
+                'If FileCount <> 0 Then
+                '    GoToPage = ""
+                '    Do While PageCount <= NumberofPages
+                '        qs = refreshQueryString
+                '        qs = cp.Utils.ModifyQueryString(qs, RequestNameButtonValue, FormButtonViewArchives)
+                '        qs = cp.Utils.ModifyQueryString(qs, RequestNamePageNumber, PageCount.ToString())
+                '        qs = cp.Utils.ModifyQueryString(qs, RequestNameSearchKeywords, SearchKeywords)
+                '        GoToPage &= "<a href=""?" & qs & """>" & (PageCount) & "</a>"
+                '        PageCount = PageCount + 1
+                '        GoToPage &= "&nbsp;&nbsp;&nbsp;"
+                '    Loop
+                '    Call layout.Load(newsArchiveListItemLayout)
+                '    Call layout.SetInner(".newsArchiveListCaption", GoToPage)
+                '    Call layout.SetInner(".newsArchiveListOverview", "")
+                '    Stream &= layout.GetHtml()
+                'End If
             End If
             '
             If Not BlockSearchForm Then

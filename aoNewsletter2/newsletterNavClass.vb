@@ -56,7 +56,8 @@ Namespace newsletter2
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameIssueID, CStr(issueid), True)
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover, True)
                 Call repeatItem.SetInner(".newsNavItemCaption", "Home")
-                repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                repeatList &= repeatItem.GetHtml().Replace("href=""?""", "href=""?" & QS & """")
                 '
                 NavSQL = "SELECT DISTINCT NIC.ID AS CategoryID, NIR.SortOrder, NIC.Name AS CategoryName"
                 NavSQL = NavSQL & " FROM NewsletterIssueCategories NIC, NewsletterIssueCategoryRules NIR"
@@ -174,7 +175,8 @@ Namespace newsletter2
                     QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover)
                     Call repeatItem.Load(newsNavStoryItem)
                     Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue"))
-                    repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                    'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                    repeatList &= repeatItem.GetHtml().Replace("href=""?""", "href=""?" & QS & """")
                 End If
                 '
                 ' Display Archive Link if there are archive issues
@@ -196,7 +198,8 @@ Namespace newsletter2
                         QS = cp.Doc.RefreshQueryString
                         'QS = cp.Utils.ModifyQueryString(QS, RequestNameNewsletterID, NewsletterID)
                         QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormArchive)
-                        repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                        'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
+                        repeatList &= repeatItem.GetHtml().Replace("href=""?""", "href=""?" & QS & """")
                     End If
                 End If
                 Call cs.Close()
@@ -268,7 +271,8 @@ Namespace newsletter2
                 If accessString <> "" Then
                     repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
                 End If
-                returnHtml = repeatItem.GetHtml().Replace("?", "?" & qs)
+                'returnHtml = repeatItem.GetHtml().Replace("?", "?" & qs)
+                returnHtml = repeatItem.GetHtml().Replace("href=""?""", "href=""?" & qs & """")
             Catch ex As Exception
                 Call handleError(cp, ex, "getNavItem")
             End Try
