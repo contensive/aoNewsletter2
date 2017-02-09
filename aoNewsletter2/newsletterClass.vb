@@ -536,6 +536,7 @@ Namespace newsletter2
                 Dim updateNewsletterTemplateId As Boolean = False
                 Dim templateId As Integer = 0
                 Dim adBannerLink As String
+                Dim mastheadFilename As String = ""
                 '
                 'Call cp.Utils.AppendLogFile("createEmailGetId, 000")
                 '
@@ -545,6 +546,7 @@ Namespace newsletter2
                         webTemplateID = cs.GetInteger("TemplateID")
                         emailTemplateID = cs.GetInteger("emailTemplateID")
                         Styles = cp.File.ReadVirtual(cs.GetText("StylesFileName"))
+                        mastheadFilename = cs.GetText("mastheadFilename")
                     End If
                     Call cs.Close()
                     '
@@ -611,8 +613,6 @@ Namespace newsletter2
                     '
                 End If
                 '
-                'Call cp.Utils.AppendLogFile("createEmailGetId, 200")
-                '
                 '
                 ' There is a template, encoding it captures the newsletterBodyClass
                 '
@@ -623,6 +623,9 @@ Namespace newsletter2
                 Dim qs As String
                 '
                 Call layout.Load(templateCopy)
+                If (Not String.IsNullOrEmpty(mastheadFilename)) Then
+                    layout.SetInner(".newsHeaderMasthead", "<img src=""" & cp.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                End If
                 '
                 ' set the link back to the web version
                 '
