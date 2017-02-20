@@ -1,5 +1,5 @@
 ﻿Namespace newsletter2
-    Module newsletterModule
+    Module constantsModule
         Public Const DefaultEmailLinkSubject = "A link to NCA Currents newsletter"
         '
         Public Const guidLayoutDefaultTemplate = "{24AB7755-C205-4C12-AE51-A58F885F1596}"
@@ -102,13 +102,6 @@
             End Try
             '
             Return s
-        End Function
-        '
-        Friend Function encodeMinDate(sourceDate As Date) As Date
-            If (sourceDate < #1/1/1900#) Then
-                Return Date.MinValue
-            End If
-            Return sourceDate
         End Function
         '
     End Module

@@ -65,9 +65,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CPBase">
-      <HintPath>..\..\Release\CPBase.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\contensive.clib.4.1.2\lib\net35\CPBase.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -82,7 +82,8 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="newsletterBodyClass.vb" />
+    <Compile Include="Controllers\genericController.vb" />
+    <Compile Include="Legacy\newsletterBodyClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -98,11 +99,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="newsletterCommonClass.vb" />
-    <Compile Include="newsletterExtensionClass.vb" />
-    <Compile Include="newsletterModule.vb" />
-    <Compile Include="newsletterNavClass.vb" />
-    <Compile Include="newsletterClass.vb" />
+    <Compile Include="Legacy\newsletterCommonClass.vb" />
+    <Compile Include="Legacy\newsletterExtensionClass.vb" />
+    <Compile Include="constantsModule.vb" />
+    <Compile Include="Legacy\newsletterNavClass.vb" />
+    <Compile Include="Interfaces\Addons\newsletterClass.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -122,6 +123,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -139,6 +141,14 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\Events\" />
+    <Folder Include="Interfaces\Remotes\" />
+    <Folder Include="Models\Context\" />
+    <Folder Include="Models\Entity\" />
+    <Folder Include="Models\View\" />
+    <Folder Include="Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

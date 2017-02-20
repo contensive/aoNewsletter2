@@ -1,4 +1,5 @@
-﻿Option Explicit On
+﻿
+Option Explicit On
 Option Strict On
 
 Imports System
@@ -7,24 +8,7 @@ Imports System.Text
 Imports Contensive.BaseClasses
 
 Namespace newsletter2
-    '
-    ' Sample Vb addon
-    '
     Public Class newsletterBodyClass
-        '
-        '=====================================================================================
-        ' common report for this class
-        '=====================================================================================
-        '
-        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
-            Try
-                cp.Site.ErrorReport(ex, "Unexpected error in newsletterBodyClass." & method)
-            Catch exLost As Exception
-                '
-                ' stop anything thrown from cp errorReport
-                '
-            End Try
-        End Sub
         '
         Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
             '
@@ -645,7 +629,7 @@ Namespace newsletter2
                     cover = cs.GetText("Cover")
                     return_Sponsor = cs.GetText("sponsor")
                     return_tagLine = cs.GetText("tagLine")
-                    return_publishDate = encodeMinDate(cs.GetDate("publishDate"))
+                    return_publishDate = genericController.encodeMinDate(cs.GetDate("publishDate"))
                     If cover.Length > 50 Then
                         returnHtmlItemList = GetCoverStoryItemLayout(cp, newsCoverStoryItem, "", "", "", cover, "", "", "", "")
                     End If
@@ -1031,5 +1015,19 @@ Namespace newsletter2
             End Try
             Return returnHtml
         End Function
+        '
+        '=====================================================================================
+        ' common report for this class
+        '=====================================================================================
+        '
+        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+            Try
+                cp.Site.ErrorReport(ex, "Unexpected error in newsletterBodyClass." & method)
+            Catch exLost As Exception
+                '
+                ' stop anything thrown from cp errorReport
+                '
+            End Try
+        End Sub
     End Class
 End Namespace

@@ -8,16 +8,15 @@ Imports System.Text
 Imports Contensive.BaseClasses
 
 Namespace newsletter2
-    '
-    ' Sample Vb addon
-    '
     Public Class newsletterClass
         Inherits AddonBaseClass
-        '
-        '=====================================================================================
         ' 
         '=====================================================================================
-        '
+        ''' <summary>
+        ''' Newsletter Addon Interface
+        ''' </summary>
+        ''' <param name="CP"></param>
+        ''' <returns></returns>
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
@@ -426,8 +425,8 @@ Namespace newsletter2
                             ' For this issue
                             '
                             Controls = Controls & "<h3>For this Issue</h3><ul>"
-                            Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterStories) & "&af=4&aa=2&ad=1&wc=" & CP.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
-                            Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
+                            Controls = Controls & "<li><div class=""AdminLink""><a href = """ & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterStories) & "&af=4&aa=2&ad=1&wc=" & CP.Utils.EncodeRequestVariable("NewsletterID=" & IssueID) & "&" & ReferLink & """>Add a new story</a></div></li>"
+                            Controls = Controls & "<li><div class=""AdminLink""><a href = """ & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterIssues) & "&af=4&id=" & IssueID & "&" & ReferLink & """>Edit this issue</a></div></li>"
                             If (InStr(1, CP.Request.PathPage, "/admin", vbTextCompare) <> 0) Or (LCase(CP.Site.GetText("adminUrl")) = LCase(CP.Request.PathPage)) Then
                                 Controls = Controls & "<li><div class=""AdminLink"">Create&nbsp;email&nbsp;version (not available from admin site)</div></li>"
                             Else
@@ -443,8 +442,8 @@ Namespace newsletter2
                             ' For this newsletter
                             '
                             Controls = Controls & "<h3>For this Newsletter</h3><ul>"
-                            Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
-                            Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit this newsletter</a></div></li>"
+                            Controls = Controls & "<li><div class=""AdminLink""><a href = """ & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletterIssues) & "&wl0=newsletterid&wr0=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Add a new issue</a></div></li>"
+                            Controls = Controls & "<li><div class=""AdminLink""><a href = """ & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&id=" & NewsletterID & "&af=4&aa=2&ad=1&" & "&" & ReferLink & """>Edit this newsletter</a></div></li>"
                             Controls = Controls & "</ul>"
                             '
                             ' Search for unpublished versions
@@ -459,8 +458,8 @@ Namespace newsletter2
                         ' General Controls
                         '
                         Controls = Controls & "<h3>General</h3><ul>"
-                        Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
-                        ' Controls = Controls & "<li><div class=""AdminLink""><a href = ""http://" & CP.Site.DomainPrimary & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
+                        Controls = Controls & "<li><div class=""AdminLink""><a href = """ & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameIssueCategories) & "&" & ReferLink & """>Edit categories</a></div></li>"
+                        ' Controls = Controls & "<li><div class=""AdminLink""><a href = """ & CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameNewsletters) & "&af=4&" & "&" & ReferLink & """>Add a new newsletter</a></div></li>"
                         Controls = Controls & "</ul>"
                         '
                         ' instructions
@@ -537,6 +536,7 @@ Namespace newsletter2
                 Dim templateId As Integer = 0
                 Dim adBannerLink As String
                 Dim mastheadFilename As String = ""
+                Dim footerFilename As String = ""
                 '
                 'Call cp.Utils.AppendLogFile("createEmailGetId, 000")
                 '
@@ -547,6 +547,7 @@ Namespace newsletter2
                         emailTemplateID = cs.GetInteger("emailTemplateID")
                         Styles = cp.File.ReadVirtual(cs.GetText("StylesFileName"))
                         mastheadFilename = cs.GetText("mastheadFilename")
+                        footerFilename = cs.GetText("footerFilename")
                     End If
                     Call cs.Close()
                     '
@@ -625,6 +626,9 @@ Namespace newsletter2
                 Call layout.Load(templateCopy)
                 If (Not String.IsNullOrEmpty(mastheadFilename)) Then
                     layout.SetInner(".newsHeaderMasthead", "<img src=""" & cp.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                End If
+                If (Not String.IsNullOrEmpty(footerFilename)) Then
+                    layout.SetInner(".newsFooter", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
                 End If
                 '
                 ' set the link back to the web version
