@@ -12,7 +12,7 @@ Namespace newsletter2
         '
         Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
             '
-            Dim layout As CPBlockBaseClass = cp.BlockNew()
+            Dim layout As New blockClass
             Dim recordTop As Integer
             Dim RecordsPerPage As Integer
             Dim archiveIssuesToDisplay As Integer
@@ -116,25 +116,25 @@ Namespace newsletter2
                     Call cs.OpenSQL(ThisSQL)
                     If cs.OK Then
                         Do While cs.OK
-                            Call layout.Load(newsArchiveListItemLayout)
+                            Call layout.load(newsArchiveListItemLayout)
                             issueDate = cs.GetDate("PublishDate")
                             If IsDate(issueDate) Then
                                 issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
                             End If
                             link = refreshQueryString
                             link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID").ToString())
-                            Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
-                            Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
+                            Call layout.setClassInner("newsArchiveListCaption", cs.GetText("Name"))
+                            Call layout.setClassInner("newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
                             'Stream &= layout.GetHtml().Replace("?", "?" & link)
-                            Stream &= Replace(layout.GetHtml(), "href=""?""", "href=""?" & link & """")
+                            Stream &= Replace(layout.getHtml(), "href=""?""", "href=""?" & link & """")
                             Call cs.GoNext()
                         Loop
                     Else
                         BlockSearchForm = True
-                        Call layout.Load(newsArchiveListItemLayout)
-                        Call layout.SetInner(".newsArchiveListCaption", "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>")
-                        Call layout.SetInner(".newsArchiveListOverview", "")
-                        Stream &= layout.GetHtml()
+                        Call layout.load(newsArchiveListItemLayout)
+                        Call layout.setClassInner("newsArchiveListCaption", "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>")
+                        Call layout.setClassInner("newsArchiveListOverview", "")
+                        Stream &= layout.getHtml()
                     End If
                     Call cs.Close()
                 End If
@@ -164,18 +164,18 @@ Namespace newsletter2
                 'Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
                 Call cs.OpenSQL(ThisSQL2, "")
                 If Not cs.OK Then
-                    Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", "No results were found")
-                    'Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
-                    Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= Replace(layout.GetHtml(), "?", "?" & cp.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True))  'layout.GetHtml()
+                    Call layout.load(newsArchiveListItemLayout)
+                    Call layout.setClassInner("newsArchiveListCaption", "No results were found")
+                    'Call layout.SetClassInner("newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
+                    Call layout.setClassInner("newsArchiveListOverview", "")
+                    Stream &= Replace(layout.getHtml(), "?", "?" & cp.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True))  'layout.GetHtml()
                     'Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
                 Else
-                    Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", "Search results")
-                    'Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
-                    Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= Replace(layout.GetHtml(), "?", "?" & cp.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True)) 'layout.GetHtml()
+                    Call layout.load(newsArchiveListItemLayout)
+                    Call layout.setClassInner("newsArchiveListCaption", "Search results")
+                    'Call layout.SetClassInner("newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
+                    Call layout.setClassInner("newsArchiveListOverview", "")
+                    Stream &= Replace(layout.getHtml(), "?", "?" & cp.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True)) 'layout.GetHtml()
                     Do While cs.OK And RowCount < RecordsPerPage
                         storyName = cs.GetText("storyName")
                         storyOverview = cs.GetText("Overview")
@@ -193,13 +193,13 @@ Namespace newsletter2
                         'qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, "formid", FormDetails.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
-                        Call layout.Load(newsArchiveListItemLayout)
-                        Call layout.SetInner(".newsArchiveListCaption", storyName)
-                        Call layout.SetInner(".newsArchiveListOverview", storyOverview)
-                        If layout.GetHtml().Contains("?") Then
-                            cp.Utils.AppendLog("Test2.log", layout.GetHtml())
+                        Call layout.load(newsArchiveListItemLayout)
+                        Call layout.setClassInner("newsArchiveListCaption", storyName)
+                        Call layout.setClassInner("newsArchiveListOverview", storyOverview)
+                        If layout.getHtml().Contains("?") Then
+                            cp.Utils.AppendLog("Test2.log", layout.getHtml())
                         End If
-                        Stream &= Replace(layout.GetHtml(), "href=""?""", "href=""?" & qs & """")
+                        Stream &= Replace(layout.getHtml(), "href=""?""", "href=""?" & qs & """")
                         Call cs.GoNext()
                         RowCount = RowCount + 1
                     Loop
@@ -219,8 +219,8 @@ Namespace newsletter2
                 '        GoToPage &= "&nbsp;&nbsp;&nbsp;"
                 '    Loop
                 '    Call layout.Load(newsArchiveListItemLayout)
-                '    Call layout.SetInner(".newsArchiveListCaption", GoToPage)
-                '    Call layout.SetInner(".newsArchiveListOverview", "")
+                '    Call layout.SetClassInner("newsArchiveListCaption", GoToPage)
+                '    Call layout.SetClassInner("newsArchiveListOverview", "")
                 '    Stream &= layout.GetHtml()
                 'End If
             End If
@@ -260,10 +260,10 @@ Namespace newsletter2
                 searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive.ToString())
                 searchForm = cp.Html.Form(searchForm)
                 '
-                Call layout.Load(newsArchiveListItemLayout)
-                Call layout.SetInner(".newsArchiveListCaption", "")
-                Call layout.SetInner(".newsArchiveListOverview", searchForm)
-                Stream &= layout.GetHtml()
+                Call layout.load(newsArchiveListItemLayout)
+                Call layout.setClassInner("newsArchiveListCaption", "")
+                Call layout.setClassInner("newsArchiveListOverview", searchForm)
+                Stream &= layout.getHtml()
             End If
             '
             '
@@ -273,7 +273,7 @@ Namespace newsletter2
         '
         Friend Function GetSearchItemList(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String) As String
             '
-            Dim layout As CPBlockBaseClass = cp.BlockNew()
+            Dim layout As New blockClass()
             Dim recordTop As Integer
             Dim RecordsPerPage As Integer
             Dim archiveIssuesToDisplay As Integer
@@ -374,24 +374,24 @@ Namespace newsletter2
                     Call cs.OpenSQL(ThisSQL)
                     If cs.OK Then
                         Do While cs.OK
-                            Call layout.Load(newsArchiveListItemLayout)
+                            Call layout.load(newsArchiveListItemLayout)
                             issueDate = cs.GetDate("PublishDate")
                             If IsDate(issueDate) Then
                                 issueDateFormatted = MonthName(Month(issueDate), True) & " " & Day(issueDate) & ", " & Year(issueDate)
                             End If
                             link = refreshQueryString
                             link = cp.Utils.ModifyQueryString(link, RequestNameIssueID, cs.GetInteger("ID").ToString())
-                            Call layout.SetInner(".newsArchiveListCaption", cs.GetText("Name"))
-                            Call layout.SetInner(".newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
-                            Stream &= Replace(layout.GetHtml(), "?", "?" & link)
+                            Call layout.setClassInner("newsArchiveListCaption", cs.GetText("Name"))
+                            Call layout.setClassInner("newsArchiveListOverview", cp.Utils.EncodeContentForWeb(cs.GetText("Overview")))
+                            Stream &= Replace(layout.getHtml(), "?", "?" & link)
                             Call cs.GoNext()
                         Loop
                     Else
                         BlockSearchForm = True
-                        Call layout.Load(newsArchiveListItemLayout)
-                        Call layout.SetInner(".newsArchiveListCaption", "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>")
-                        Call layout.SetInner(".newsArchiveListOverview", "")
-                        Stream &= layout.GetHtml()
+                        Call layout.load(newsArchiveListItemLayout)
+                        Call layout.setClassInner("newsArchiveListCaption", "<span class=""ccError"">" & cp.Site.GetText(SitePropertyNoNewsletterArchives, "There are currently no archived issues.") & "</span>")
+                        Call layout.setClassInner("newsArchiveListOverview", "")
+                        Stream &= layout.getHtml()
                     End If
                     Call cs.Close()
                 End If
@@ -417,16 +417,16 @@ Namespace newsletter2
                 '
                 Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
                 If Not cs.OK Then
-                    Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
-                    Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= layout.GetHtml()
+                    Call layout.load(newsArchiveListItemLayout)
+                    Call layout.setClassInner("newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found"))
+                    Call layout.setClassInner("newsArchiveListOverview", "")
+                    Stream &= layout.getHtml()
                     'Stream &= cp.Content.GetCopy("Newsletter Search No Results Found", "No results were found")
                 Else
-                    Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
-                    Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= layout.GetHtml()
+                    Call layout.load(newsArchiveListItemLayout)
+                    Call layout.setClassInner("newsArchiveListCaption", cp.Content.GetCopy("Newsletter Search Results Found", "Search results"))
+                    Call layout.setClassInner("newsArchiveListOverview", "")
+                    Stream &= layout.getHtml()
                     Do While cs.OK And RowCount < RecordsPerPage
                         storyName = cs.GetText("storyName")
                         storyOverview = cs.GetText("Overview")
@@ -442,10 +442,10 @@ Namespace newsletter2
                         qs = refreshQueryString
                         qs = cp.Utils.ModifyQueryString(qs, "formid", "400")
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
-                        Call layout.Load(newsArchiveListItemLayout)
-                        Call layout.SetInner(".newsArchiveListCaption", storyName)
-                        Call layout.SetInner(".newsArchiveListOverview", storyOverview)
-                        Stream &= Replace(layout.GetHtml(), "?", "?" & qs)
+                        Call layout.load(newsArchiveListItemLayout)
+                        Call layout.setClassInner("newsArchiveListCaption", storyName)
+                        Call layout.setClassInner("newsArchiveListOverview", storyOverview)
+                        Stream &= Replace(layout.getHtml(), "?", "?" & qs)
                         Call cs.GoNext()
                         RowCount = RowCount + 1
                     Loop
@@ -462,10 +462,10 @@ Namespace newsletter2
                         PageCount = PageCount + 1
                         GoToPage &= "&nbsp;&nbsp;&nbsp;"
                     Loop
-                    Call layout.Load(newsArchiveListItemLayout)
-                    Call layout.SetInner(".newsArchiveListCaption", GoToPage)
-                    Call layout.SetInner(".newsArchiveListOverview", "")
-                    Stream &= layout.GetHtml()
+                    Call layout.load(newsArchiveListItemLayout)
+                    Call layout.setClassInner("newsArchiveListCaption", GoToPage)
+                    Call layout.setClassInner("newsArchiveListOverview", "")
+                    Stream &= layout.getHtml()
                 End If
             End If
             '
@@ -501,10 +501,10 @@ Namespace newsletter2
                 searchForm &= cp.Html.Hidden(RequestNameFormID, FormArchive.ToString())
                 searchForm &= cp.Html.Form(searchForm)
                 '
-                Call layout.Load(newsArchiveListItemLayout)
-                Call layout.SetInner(".newsArchiveListCaption", "")
-                Call layout.SetInner(".newsArchiveListOverview", searchForm)
-                Stream &= layout.GetHtml()
+                Call layout.load(newsArchiveListItemLayout)
+                Call layout.setClassInner("newsArchiveListCaption", "")
+                Call layout.setClassInner("newsArchiveListOverview", searchForm)
+                Stream &= layout.getHtml()
             End If
             '
             '
@@ -608,7 +608,7 @@ Namespace newsletter2
             Dim returnHtmlItemList As String = ""
             Try
                 '
-                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                Dim layout As New blockClass
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim Criteria As String
                 Dim TableList As String
@@ -673,7 +673,7 @@ Namespace newsletter2
                             '
                             ' there are stories under this topic, wrap in div to allow a story indent
                             '
-                            Call layout.Load(newsCoverCategoryItem)
+                            Call layout.load(newsCoverCategoryItem)
                             CategoryName = cs.GetText("CategoryName")
                             If isEditing And (RecordCount <> 0) Then
                                 qs = refreshQueryString
@@ -681,8 +681,8 @@ Namespace newsletter2
                                 qs = cp.Utils.ModifyQueryString(qs, RequestNameSortUp, CategoryID.ToString())
                                 CategoryName &= "&nbsp;<a href=""?" & qs & """><span style=""font-family:helvetica,arial,san-serif;font-weight:Normal;font-size:13px;text-decoration:none;"">[Move Up]</span></a> "
                             End If
-                            Call layout.SetInner(".newsCoverCategoryItem", CategoryName)
-                            returnHtmlItemList &= layout.GetHtml()
+                            Call layout.setClassInner("newsCoverCategoryItem", CategoryName)
+                            returnHtmlItemList &= layout.getHtml()
                             '
                             Do While CS2.OK
                                 returnHtmlItemList &= GetCoverStoryItem(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
@@ -713,12 +713,12 @@ Namespace newsletter2
                 Call cs.Close()
                 '
                 If isEditing Then
-                    Call layout.Load(newsCoverStoryItem)
-                    Call layout.SetInner(".newsCoverListCaption", cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything) & "Add a story to this issue")
-                    Call layout.SetInner(".newsCoverListOverview", "")
-                    Call layout.SetInner(".newsCoverListReadMore", "")
-                    Call layout.SetInner(".infographicBox", "")
-                    returnHtmlItemList &= layout.GetHtml()
+                    Call layout.load(newsCoverStoryItem)
+                    Call layout.setClassInner("newsCoverListCaption", cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything) & "Add a story to this issue")
+                    Call layout.setClassInner("newsCoverListOverview", "")
+                    Call layout.setClassInner("newsCoverListReadMore", "")
+                    Call layout.setClassInner("infographicBox", "")
+                    returnHtmlItemList &= layout.getHtml()
                 End If
             Catch ex As Exception
                 Call handleError(cp, ex, "GetNewsletterBodyOverview")
@@ -821,19 +821,19 @@ Namespace newsletter2
             Dim returnhtml As String = ""
             Try
                 '
-                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                Dim layout As New blockClass
                 Dim cn As New newsletterCommonClass
                 Dim readMore As String = ""
                 Dim storyBody As String = ""
                 Dim img As String = ""
                 '
-                Call layout.Load(newsCoverStoryItem)
+                Call layout.load(newsCoverStoryItem)
                 '
                 If String.IsNullOrEmpty(coverinfographicThumbnail) Then
                     '
                     ' no infographic
                     '
-                    layout.SetOuter(".infographicBox", "")
+                    layout.setClassOuter("infographicBox", "")
                 Else
                     img = "<img src=""" & cp.Site.FilePath & coverinfographicThumbnail & """ alt=""View the infographic"" class=""banner"" width=""100%"">"
                     If String.IsNullOrEmpty(coverinfographic) Then
@@ -841,52 +841,52 @@ Namespace newsletter2
                         ' no image
                         '
                         If String.IsNullOrEmpty(coverInfographicUrl) Then
-                            layout.SetInner(".infographImage", img)
+                            layout.setClassInner("infographImage", img)
                         Else
                             If coverInfographicUrl.IndexOf("://") < 0 Then
                                 coverInfographicUrl = "http://" & coverInfographicUrl
                             End If
-                            layout.SetInner(".infographImage", "<a href=""" & coverInfographicUrl & """ target=""_blank"">" & img & "</a>")
+                            layout.setClassInner("infographImage", "<a href=""" & coverInfographicUrl & """ target=""_blank"">" & img & "</a>")
                         End If
                     Else
                         '
                         ' linked thumbnail
                         '
-                        layout.SetInner(".infographImage", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">" & img & "</a>")
+                        layout.setClassInner("infographImage", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">" & img & "</a>")
                     End If
                 End If
                 If String.IsNullOrEmpty(coverinfographic) Then
-                    layout.SetOuter(".infographLink", "")
+                    layout.setClassOuter("infographLink", "")
                 Else
-                    layout.SetInner(".infographLink", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">View the infographic online.</a>")
+                    layout.setClassInner("infographLink", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">View the infographic online.</a>")
                 End If
                 If StoryAccessString <> "" Then
-                    Call layout.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>")
+                    Call layout.prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>")
                 End If
                 If String.IsNullOrEmpty(caption) Then
-                    Call layout.SetOuter(".newsCoverListCaption", "")
+                    Call layout.setClassOuter("newsCoverListCaption", "")
                 Else
-                    Call layout.SetInner(".newsCoverListCaption", caption)
+                    Call layout.setClassInner("newsCoverListCaption", caption)
                 End If
                 If String.IsNullOrEmpty(overview) Then
-                    Call layout.SetOuter(".newsCoverListOverview", "")
+                    Call layout.setClassOuter("newsCoverListOverview", "")
                 Else
-                    Call layout.SetInner(".newsCoverListOverview", overview)
+                    Call layout.setClassInner("newsCoverListOverview", overview)
                 End If
 
                 If (String.IsNullOrEmpty(readMoreLink)) Then
-                    Call layout.SetOuter(".newsCoverListReadMore", "")
+                    Call layout.setClassOuter("newsCoverListReadMore", "")
                 Else
-                    readMore = layout.GetInner(".newsCoverListReadMore")
+                    readMore = layout.getClassInner("newsCoverListReadMore")
                     readMore = readMore.Replace("?", "?" & readMoreLink)
                     readMore = readMore.Replace("#", "?" & readMoreLink)
-                    Call layout.SetInner(".newsCoverListReadMore", readMore)
+                    Call layout.setClassInner("newsCoverListReadMore", readMore)
                 End If
                 If StoryAccessString <> "" Then
-                    Call layout.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
+                    Call layout.append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
                 End If
                 '
-                returnhtml = layout.GetHtml()
+                returnhtml = layout.getHtml()
             Catch ex As Exception
                 Call handleError(cp, ex, "getStoryOverview")
             End Try
@@ -909,7 +909,7 @@ Namespace newsletter2
                 Dim storyOverview As String
                 Dim storyBody As String
                 Dim qs As String = ""
-                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                Dim layout As New blockClass
                 '
                 Call layout.Load(newsBody)
                 '
@@ -917,7 +917,7 @@ Namespace newsletter2
                 EmailIcon = "<img border=0 src=/ccLib/images/IconEmail.gif>"
                 '
                 If storyId = 0 Then
-                    Call layout.SetInner(".newsBodyStory", "<span class=""ccError"">The requested story is currently unavailable.</span>")
+                    Call layout.SetClassInner("newsBodyStory", "<span class=""ccError"">The requested story is currently unavailable.</span>")
                 Else
                     Call cs.Open(ContentNameNewsletterStories, "ID=" & storyId)
                     If cs.OK() Then
@@ -944,8 +944,8 @@ Namespace newsletter2
                             Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormDetails
                             returnHtml &= "<div class=""EmailIcon""><a target=_blank href=""?" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
                         End If
-                        Call layout.SetInner(".newsBodyCaption", storyName)
-                        Call layout.SetInner(".newsBodyStory", storyBody)
+                        Call layout.SetClassInner("newsBodyCaption", storyName)
+                        Call layout.SetClassInner("newsBodyStory", storyBody)
                         '
                         ' update RSS fields if empty
                         '

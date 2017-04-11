@@ -22,7 +22,7 @@ Namespace newsletter2
             Try
                 Dim refreshQueryString As String = ""
                 '
-                Dim layout2 As New HtmlAgilityPack.HtmlDocument
+                Dim layout As New blockClass
                 Dim newsBody As String = ""
                 Dim newsNav As String = ""
                 '
@@ -207,32 +207,32 @@ Namespace newsletter2
                             '
                         End If
                         '
-                        Call layout2.LoadHtml(TemplateCopy)
+                        layout.load(TemplateCopy)
                         If (Not String.IsNullOrEmpty(mastheadFilename)) Then
-                            htmlSetClassInner(layout2, "newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                            layout.setClassInner("newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ class=""banner"" />")
                         End If
                         '
                         nav = New newsletterNavClass
-                        newsNav = htmlGetClassInner(layout2, "newsNav")
+                        newsNav = layout.getClassInner("newsNav")
                         '
                         Body = New newsletterBodyClass
                         Select Case FormID
                             Case FormSearch
-                                itemLayout = htmlGetClassOuter(layout2, "newsSearchListItem")
+                                itemLayout = layout.getClassOuter("newsSearchListItem")
                                 ItemList = Body.GetSearchItemList(CP, cn, ButtonValue, IssueID, refreshQueryString, itemLayout)
-                                itemLayoutAdBanners = htmlGetClassOuter(layout2, "adBannerItem")
-                                Call htmlSetClassOuter(layout2, "newsSearchList", ItemList)
-                                Call htmlSetClassInner(layout2, "newsArchive", "")
-                                Call htmlSetClassOuter(layout2, "newsBody", "")
-                                Call htmlSetClassOuter(layout2, "newsCover", "")
-                                Call htmlSetClassOuter(layout2, "emailLinkToWeb", "")
-                                Call htmlSetClassOuter(layout2, "newsIssueCaption", "")
-                                Call htmlSetClassInner(layout2, "newsIssueSponsor", sponsor)
-                                Call htmlSetClassInner(layout2, "newsIssuePublishDate", publishDate.ToShortDateString)
+                                itemLayoutAdBanners = layout.getClassOuter("adBannerItem")
+                                Call layout.setClassOuter("newsSearchList", ItemList)
+                                Call layout.setClassInner("newsArchive", "")
+                                Call layout.setClassOuter("newsBody", "")
+                                Call layout.setClassOuter("newsCover", "")
+                                Call layout.setClassOuter("emailLinkToWeb", "")
+                                Call layout.setClassOuter("newsIssueCaption", "")
+                                Call layout.setClassInner("newsIssueSponsor", sponsor)
+                                Call layout.setClassInner("newsIssuePublishDate", publishDate.ToShortDateString)
                                 If (String.IsNullOrEmpty(tagLine)) Then
-                                    Call htmlSetClassOuter(layout2, "newsletterTagLine", "")
+                                    Call layout.setClassOuter("newsletterTagLine", "")
                                 Else
-                                    Call htmlSetClassInner(layout2, "newsletterTagLine", tagLine)
+                                    Call layout.setClassInner("newsletterTagLine", tagLine)
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormArchive
@@ -246,29 +246,29 @@ Namespace newsletter2
                                 searchForm &= "</div>"
                                 searchForm = CP.Html.Form(searchForm, , , , CP.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True))
 
-                                Call htmlSetClassInner(layout2, "newsArchiveSearch", searchForm)
+                                Call layout.setClassInner("newsArchiveSearch", searchForm)
                                 '
                                 '
                                 '
-                                itemLayout = htmlGetClassOuter(layout2, "newsArchiveListItem")
+                                itemLayout = layout.getClassOuter("newsArchiveListItem")
                                 ItemList = Body.GetArchiveItemList(CP, cn, ButtonValue, currentIssueID, refreshQueryString, itemLayout, NewsletterID)
-                                itemLayoutAdBanners = htmlGetClassOuter(layout2, "adBannerItem")
-                                Call htmlSetClassInner(layout2, "newsArchiveList", ItemList)
-                                Call htmlSetClassOuter(layout2, "newsBody", "")
-                                Call htmlSetClassOuter(layout2, "newsCover", "")
-                                Call htmlSetClassOuter(layout2, "newsSearch", "")
-                                Call htmlSetClassOuter(layout2, "emailLinkToWeb", "")
-                                Call htmlSetClassOuter(layout2, "newsIssueCaption", "")
-                                Call htmlSetClassInner(layout2, "newsIssueSponsor", "")
-                                Call htmlSetClassInner(layout2, "newsIssuePublishDate", "")
+                                itemLayoutAdBanners = layout.getClassOuter("adBannerItem")
+                                Call layout.setClassInner("newsArchiveList", ItemList)
+                                Call layout.setClassOuter("newsBody", "")
+                                Call layout.setClassOuter("newsCover", "")
+                                Call layout.setClassOuter("newsSearch", "")
+                                Call layout.setClassOuter("emailLinkToWeb", "")
+                                Call layout.setClassOuter("newsIssueCaption", "")
+                                Call layout.setClassInner("newsIssueSponsor", "")
+                                Call layout.setClassInner("newsIssuePublishDate", "")
                                 If (String.IsNullOrEmpty(tagLine)) Then
-                                    Call htmlSetClassOuter(layout2, "newsletterTagLineRow", "")
+                                    Call layout.setClassOuter("newsletterTagLineRow", "")
                                 Else
-                                    Call htmlSetClassInner(layout2, "newsletterTagLine", "")
+                                    Call layout.setClassInner("newsletterTagLine", "")
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormDetails
-                                newsBody = htmlGetClassInner(layout2, "newsBody")
+                                newsBody = layout.getClassInner("newsBody")
                                 newsBody = Body.GetStory(CP, cn, storyID, IssueID, refreshQueryString, newsBody, isEditing)
                                 Call openRecord(CP, cs, "Newsletter Issues", IssueID)
                                 If cs.OK() Then
@@ -277,26 +277,26 @@ Namespace newsletter2
                                     publishDate = cs.GetDate("publishDate")
                                 End If
                                 Call cs.Close()
-                                itemLayoutAdBanners = htmlGetClassOuter(layout2, "adBannerItem")
-                                Call htmlSetClassInner(layout2, "newsBody", newsBody)
-                                Call htmlSetClassOuter(layout2, "newsArchive", "")
-                                Call htmlSetClassOuter(layout2, "newsCover", "")
-                                Call htmlSetClassOuter(layout2, "newsSearch", "")
-                                Call htmlSetClassOuter(layout2, "emailLinkToWeb", "")
-                                Call htmlSetClassInner(layout2, "newsIssueCaption", CP.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
-                                Call htmlSetClassInner(layout2, "newsIssueSponsor", sponsor)
-                                Call htmlSetClassInner(layout2, "newsIssuePublishDate", publishDate.ToShortDateString)
+                                itemLayoutAdBanners = layout.getClassOuter("adBannerItem")
+                                Call layout.setClassInner("newsBody", newsBody)
+                                Call layout.setClassOuter("newsArchive", "")
+                                Call layout.setClassOuter("newsCover", "")
+                                Call layout.setClassOuter("newsSearch", "")
+                                Call layout.setClassOuter("emailLinkToWeb", "")
+                                Call layout.setClassInner("newsIssueCaption", CP.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
+                                Call layout.setClassInner("newsIssueSponsor", sponsor)
+                                Call layout.setClassInner("newsIssuePublishDate", publishDate.ToShortDateString)
                                 If (String.IsNullOrEmpty(tagLine)) Then
-                                    Call htmlSetClassOuter(layout2, "newsletterTagLineRow", "")
+                                    Call layout.setClassOuter("newsletterTagLineRow", "")
                                 Else
-                                    Call htmlSetClassInner(layout2, "newsletterTagLine", tagLine)
+                                    Call layout.setClassInner("newsletterTagLine", tagLine)
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case Else
                                 FormID = FormCover
-                                itemLayoutStory = htmlGetClassOuter(layout2, "newsCoverStoryItem")
-                                itemLayoutAdBanners = htmlGetClassOuter(layout2, "adBannerItem")
-                                itemLayoutCategory = htmlGetClassOuter(layout2, "newsCoverCategoryItem")
+                                itemLayoutStory = layout.getClassOuter("newsCoverStoryItem")
+                                itemLayoutAdBanners = layout.getClassOuter("adBannerItem")
+                                itemLayoutCategory = layout.getClassOuter("newsCoverCategoryItem")
                                 ItemList = Body.GetCoverContent(CP, IssueID, storyID, refreshQueryString, FormID, itemLayoutStory, itemLayoutCategory, isEditing, sponsor, publishDate, tagLine)
                                 '
                                 ' add footer ad banner(s)
@@ -376,35 +376,35 @@ Namespace newsletter2
                                 End If
                                 Call cs.Close()
                                 If (Not String.IsNullOrEmpty(footerAdBanners)) Then
-                                    Dim adBannerLayout2 As New HtmlAgilityPack.HtmlDocument
-                                    adBannerLayout2.LoadHtml(itemLayoutAdBanners)
-                                    htmlSetClassInner(adBannerLayout2, "newsletterAdvertisements", footerAdBanners)
-                                    ItemList &= adBannerLayout2.DocumentNode.OuterHtml()
+                                    Dim adBannerLayout2 As New blockClass()
+                                    adBannerLayout2.load(footerAdBanners)
+                                    adBannerLayout2.setClassInner("newsletterAdvertisements", footerAdBanners)
+                                    ItemList &= adBannerLayout2.getHtml()
                                 End If
-                                Call htmlSetClassInner(layout2, "newsCoverList", ItemList)
-                                Call htmlSetClassOuter(layout2, "newsArchive", "")
-                                Call htmlSetClassOuter(layout2, "newsBody", "")
-                                Call htmlSetClassOuter(layout2, "newsSearch", "")
-                                Call htmlSetClassOuter(layout2, "emailLinkToWeb", "")
-                                Call htmlSetClassInner(layout2, "newsIssueCaption", CP.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
-                                Call htmlSetClassInner(layout2, "newsIssueSponsor", sponsor)
-                                Call htmlSetClassInner(layout2, "newsIssuePublishDate", publishDate.ToShortDateString)
+                                Call layout.setClassInner("newsCoverList", ItemList)
+                                Call layout.setClassOuter("newsArchive", "")
+                                Call layout.setClassOuter("newsBody", "")
+                                Call layout.setClassOuter("newsSearch", "")
+                                Call layout.setClassOuter("emailLinkToWeb", "")
+                                Call layout.setClassInner("newsIssueCaption", CP.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
+                                Call layout.setClassInner("newsIssueSponsor", sponsor)
+                                Call layout.setClassInner("newsIssuePublishDate", publishDate.ToShortDateString)
                                 If (String.IsNullOrEmpty(tagLine)) Then
-                                    Call htmlSetClassOuter(layout2, "newsletterTagLineRow", "")
+                                    Call layout.setClassOuter("newsletterTagLineRow", "")
                                 Else
-                                    Call htmlSetClassInner(layout2, "newsletterTagLine", tagLine)
+                                    Call layout.setClassInner("newsletterTagLine", tagLine)
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                         End Select
-                        Call htmlSetClassInner(layout2, "newsNav", newsNav)
+                        Call layout.setClassInner("newsNav", newsNav)
                         '
                         ' Add archive link
                         '
-                        Dim newsArchiveLink As String = htmlGetClassInner(layout2, "newsArchiveLink")
+                        Dim newsArchiveLink As String = layout.getClassInner("newsArchiveLink")
                         newsArchiveLink = newsArchiveLink.Replace("#", CP.Utils.ModifyLinkQueryString(currentLink, "formId", FormArchive.ToString))
-                        htmlSetClassInner(layout2, "newsArchiveLink", newsArchiveLink)
+                        layout.setClassInner("newsArchiveLink", newsArchiveLink)
                         '
-                        returnHtml = layout2.DocumentNode.OuterHtml
+                        returnHtml = layout.getHtml()
                     End If
                     '
                     ' List Unpublished issues for admins
@@ -521,7 +521,7 @@ Namespace newsletter2
                 Dim webTemplateID As Integer
                 Dim Nav As newsletterNavClass
                 Dim Styles As String
-                Dim layout As CPBlockBaseClass = cp.BlockNew()
+                Dim layout As New blockClass
                 Dim itemList As String = ""
                 Dim newsNav As String = ""
                 Dim emailBody As String = ""
@@ -623,27 +623,27 @@ Namespace newsletter2
                 Dim emailLinkToWebHtml As String
                 Dim qs As String
                 '
-                Call layout.Load(templateCopy)
+                layout.load(templateCopy)
                 If (Not String.IsNullOrEmpty(mastheadFilename)) Then
-                    layout.SetInner(".newsHeaderMasthead", "<img src=""" & cp.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                    layout.setClassInner("newsHeaderMasthead", "<img src=""" & cp.Site.FilePath & mastheadFilename & """ class=""banner"" />")
                 End If
                 If (Not String.IsNullOrEmpty(footerFilename)) Then
-                    layout.SetInner(".newsFooter", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
+                    layout.setClassInner("newsFooter", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
                 End If
                 '
                 ' set the link back to the web version
                 '
-                emailLinkToWebHtml = layout.GetInner(".emailLinkToWeb")
+                emailLinkToWebHtml = layout.getClassInner("emailLinkToWeb")
                 If Not String.IsNullOrEmpty(emailLinkToWebHtml) Then
                     qs = cp.Doc.RefreshQueryString()
                     qs = cp.Utils.ModifyQueryString(qs, "issueId", IssueID.ToString())
                     emailLinkToWebHtml = emailLinkToWebHtml.Replace("href=""#""", "href=""?" & qs & """")
-                    layout.SetInner(".emailLinkToWeb", emailLinkToWebHtml)
+                    layout.setClassInner("emailLinkToWeb", emailLinkToWebHtml)
                 End If
                 '
-                newsCoverStoryItem = layout.GetOuter(".newsCoverStoryItem")
-                itemLayoutAdBanners = layout.GetOuter(".adBannerItem")
-                newsCoverCategoryItem = layout.GetOuter(".newsCoverCategoryItem")
+                newsCoverStoryItem = layout.getClassOuter("newsCoverStoryItem")
+                itemLayoutAdBanners = layout.getClassOuter("adBannerItem")
+                newsCoverCategoryItem = layout.getClassOuter("newsCoverCategoryItem")
                 Body = New newsletterBodyClass
                 itemList = Body.GetCoverContent(cp, IssueID, 0, refreshQueryString, FormCover, newsCoverStoryItem, newsCoverCategoryItem, False, sponsor, publishDate, tagLine)
                 '
@@ -703,45 +703,45 @@ Namespace newsletter2
                 End If
                 Call cs.Close()
                 If (Not String.IsNullOrEmpty(footerAdBanners)) Then
-                    Dim adBannerLayout As CPBlockBaseClass = cp.BlockNew()
-                    adBannerLayout.Load(itemLayoutAdBanners)
-                    adBannerLayout.SetInner(".newsletterAdvertisements", footerAdBanners)
-                    itemList &= adBannerLayout.GetHtml()
+                    Dim adBannerLayout As New blockClass()
+                    adBannerLayout.load(itemLayoutAdBanners)
+                    adBannerLayout.setClassInner("newsletterAdvertisements", footerAdBanners)
+                    itemList &= adBannerLayout.getHtml()
                 End If
                 '
-                newsNav = layout.GetInner(".newsNav")
+                newsNav = layout.getClassInner("newsNav")
                 Nav = New newsletterNavClass
                 newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav, currentIssueId)
                 '
                 Call cp.Utils.AppendLogFile("createEmailGetId, 500")
                 '
-                Call layout.SetInner(".newsNav", newsNav)
-                Call layout.SetInner(".newsCoverList", itemList)
-                Call layout.SetOuter(".newsBody", "")
-                Call layout.SetOuter(".newsArchive", "")
-                Call layout.SetOuter(".newsSearch", "")
-                Call layout.SetInner(".newsIssueCaption", cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
-                Call layout.SetInner(".newsIssueSponsor", sponsor)
-                Call layout.SetInner(".newsIssuePublishDate", publishDate.ToShortDateString)
+                Call layout.setClassInner("newsNav", newsNav)
+                Call layout.setClassInner("newsCoverList", itemList)
+                Call layout.setClassOuter("newsBody", "")
+                Call layout.setClassOuter("newsArchive", "")
+                Call layout.setClassOuter("newsSearch", "")
+                Call layout.setClassInner("newsIssueCaption", cp.Content.GetRecordName(ContentNameNewsletterIssues, IssueID))
+                Call layout.setClassInner("newsIssueSponsor", sponsor)
+                Call layout.setClassInner("newsIssuePublishDate", publishDate.ToShortDateString)
                 If (String.IsNullOrEmpty(tagLine)) Then
                     '
                     Call cp.Utils.AppendLogFile("createEmailGetId, 510")
                     '
-                    Call layout.SetOuter(".newsletterTagLineRow", "")
+                    Call layout.setClassOuter("newsletterTagLineRow", "")
                 Else
                     '
                     Call cp.Utils.AppendLogFile("createEmailGetId, 520")
                     '
-                    Call layout.SetInner(".newsletterTagLine", tagLine)
+                    Call layout.setClassInner("newsletterTagLine", tagLine)
                 End If
                 '
                 ' Add archive link
                 '
-                Dim newsArchiveLink As String = layout.GetInner(".newsArchiveLink")
+                Dim newsArchiveLink As String = layout.getClassInner("newsArchiveLink")
                 newsArchiveLink = newsArchiveLink.Replace("#", cp.Utils.ModifyLinkQueryString("?" & refreshQueryString, "formId", FormArchive.ToString))
-                layout.SetInner(".newsArchiveLink", newsArchiveLink)
+                layout.setClassInner("newsArchiveLink", newsArchiveLink)
                 '
-                emailBody = layout.GetHtml()
+                emailBody = layout.getHtml()
                 '
                 ' Remove comments - dont know why, but emails fail with comments embedded
                 '
@@ -780,41 +780,41 @@ Namespace newsletter2
             End Try
             Return returnId
         End Function
-        '
-        Private Function htmlGetClassInner(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String) As String
-            Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
-            If Not (node Is Nothing) Then
-                Return node.InnerHtml()
-            End If
-            Return String.Empty
-        End Function
-        '
-        Private Function htmlGetClassOuter(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String) As String
-            Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
-            If Not (node Is Nothing) Then
-                Return node.OuterHtml()
-            End If
-            Return String.Empty
-        End Function
-        '
-        Private Sub htmlSetClassInner(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String, replacement As String)
-            Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
-            If Not (nodes Is Nothing) Then
-                For Each node As HtmlAgilityPack.HtmlNode In nodes
-                    node.InnerHtml = replacement
-                Next
-            End If
-        End Sub
-        '
-        Private Sub htmlSetClassOuter(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String, replacement As String)
-            Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
-            If Not (nodes Is Nothing) Then
-                For Each node As HtmlAgilityPack.HtmlNode In nodes
-                    Dim newNode As HtmlAgilityPack.HtmlNode = HtmlAgilityPack.HtmlNode.CreateNode(replacement)
-                    node.ParentNode.ReplaceChild(newNode, node)
-                Next
-            End If
-        End Sub
+        ''
+        'Private Function htmlGetClassInner(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String) As String
+        '    Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
+        '    If Not (node Is Nothing) Then
+        '        Return node.InnerHtml()
+        '    End If
+        '    Return String.Empty
+        'End Function
+        ''
+        'Private Function htmlGetClassOuter(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String) As String
+        '    Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
+        '    If Not (node Is Nothing) Then
+        '        Return node.OuterHtml()
+        '    End If
+        '    Return String.Empty
+        'End Function
+        ''
+        'Private Sub htmlSetClassInner(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String, replacement As String)
+        '    Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
+        '    If Not (nodes Is Nothing) Then
+        '        For Each node As HtmlAgilityPack.HtmlNode In nodes
+        '            node.InnerHtml = replacement
+        '        Next
+        '    End If
+        'End Sub
+        ''
+        'Private Sub htmlSetClassOuter(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String, replacement As String)
+        '    Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
+        '    If Not (nodes Is Nothing) Then
+        '        For Each node As HtmlAgilityPack.HtmlNode In nodes
+        '            Dim newNode As HtmlAgilityPack.HtmlNode = HtmlAgilityPack.HtmlNode.CreateNode(replacement)
+        '            node.ParentNode.ReplaceChild(newNode, node)
+        '        Next
+        '    End If
+        'End Sub
         '
     End Class
 End Namespace

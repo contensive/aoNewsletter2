@@ -90,6 +90,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\blockClass.vb" />
     <Compile Include="Controllers\genericController.vb" />
     <Compile Include="Legacy\newsletterBodyClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

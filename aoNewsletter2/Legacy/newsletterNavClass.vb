@@ -26,8 +26,8 @@ Namespace newsletter2
         Friend Function GetNav(ByVal cp As CPBaseClass, ByVal issueid As Integer, ByVal NewsletterID As Integer, ByVal isContentManager As Boolean, ByVal FormID As Integer, ByVal newsNav As String, ByVal currentIssueId As Integer) As String
             Dim returnHtml As String = ""
             Try
-                Dim layout As CPBlockBaseClass = cp.BlockNew()
-                Dim repeatItem As CPBlockBaseClass = cp.BlockNew()
+                Dim layout As New blockClass
+                Dim repeatItem As New blockClass
                 '
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
@@ -47,17 +47,17 @@ Namespace newsletter2
                 'Dim storyCaption As String
                 Dim repeatList As String = ""
                 '
-                Call layout.Load(newsNav)
-                newsNavStoryItem = layout.GetOuter(".newsNavStoryItem")
-                newsNavCategoryItem = layout.GetOuter(".newsNavCategoryItem")
+                Call layout.load(newsNav)
+                newsNavStoryItem = layout.getClassOuter("newsNavStoryItem")
+                newsNavCategoryItem = layout.getClassOuter("newsNavCategoryItem")
                 '
-                Call repeatItem.Load(newsNavStoryItem)
+                Call repeatItem.load(newsNavStoryItem)
                 QS = cp.Doc.RefreshQueryString
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameIssueID, CStr(issueid), True)
                 QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover, True)
-                Call repeatItem.SetInner(".newsNavItemCaption", "Home")
+                Call repeatItem.setClassInner("newsNavItemCaption", "Home")
                 'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
-                repeatList &= repeatItem.GetHtml().Replace("href=""?""", "href=""?" & QS & """")
+                repeatList &= repeatItem.getHtml().Replace("href=""?""", "href=""?" & QS & """")
                 '
                 NavSQL = "SELECT DISTINCT NIC.ID AS CategoryID, NIR.SortOrder, NIC.Name AS CategoryName"
                 NavSQL = NavSQL & " FROM NewsletterIssueCategories NIC, NewsletterIssueCategoryRules NIR"
@@ -80,9 +80,9 @@ Namespace newsletter2
                                     repeatList &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                                 End If
                                 '
-                                Call repeatItem.Load(newsNavCategoryItem)
-                                Call repeatItem.SetInner(".newsNavItemCaption", CategoryName)
-                                repeatList &= repeatItem.GetHtml()
+                                Call repeatItem.load(newsNavCategoryItem)
+                                Call repeatItem.setClassInner("newsNavItemCaption", CategoryName)
+                                repeatList &= repeatItem.getHtml()
                                 '
                                 If AccessString <> "" Then
                                     repeatList &= "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >"
@@ -97,7 +97,7 @@ Namespace newsletter2
                                 'WorkingStoryId = CS2.GetInteger("ID")
                                 'AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
                                 'storyCaption = CS2.GetText("Name")
-                                'Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
+                                'Call repeatItem.SetClassInner("newsNavItemCaption", storyCaption)
                                 'If AccessString <> "" Then
                                 '    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
                                 'End If
@@ -127,9 +127,9 @@ Namespace newsletter2
                         ' This is a list of uncategorized articles following the categories -- give it a heading
                         '
                         CategoryName = cp.Site.GetText("Newsletter Nav Caption Other Articles", "Other Articles")
-                        Call repeatItem.Load(newsNavCategoryItem)
-                        Call repeatItem.SetInner(".newsNavItemCaption", CategoryName)
-                        repeatList &= repeatItem.GetHtml()
+                        Call repeatItem.load(newsNavCategoryItem)
+                        Call repeatItem.setClassInner("newsNavItemCaption", CategoryName)
+                        repeatList &= repeatItem.getHtml()
                     End If
                     Do While cs.OK()
                         repeatList &= getNavItem(cp, cn, cs, newsNavStoryItem)
@@ -141,7 +141,7 @@ Namespace newsletter2
                         'If AccessString <> "" Then
                         '    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
                         'End If
-                        'Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
+                        'Call repeatItem.SetClassInner("newsNavItemCaption", storyCaption)
                         'If Not cn.isBlank(cp, cs.GetText("body")) Then
                         '    'If cs.GetBoolean("AllowReadMore") Then
                         '    '
@@ -173,10 +173,10 @@ Namespace newsletter2
                 If (issueid <> currentIssueId) And (currentIssueId <> 0) Then
                     QS = cp.Doc.RefreshQueryString
                     QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormCover)
-                    Call repeatItem.Load(newsNavStoryItem)
-                    Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue"))
+                    Call repeatItem.load(newsNavStoryItem)
+                    Call repeatItem.setClassInner("newsNavItemCaption", cp.Site.GetText(SitePropertyCurrentIssue, "Current Issue"))
                     'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
-                    repeatList &= repeatItem.GetHtml().Replace("href=""?""", "href=""?" & QS & """")
+                    repeatList &= repeatItem.getHtml().Replace("href=""?""", "href=""?" & QS & """")
                 End If
                 '
                 ' Display Archive Link if there are archive issues
@@ -193,20 +193,20 @@ Namespace newsletter2
                         '
                         ' If there are more then one published issues, the others are archive issues
                         '
-                        Call repeatItem.Load(newsNavStoryItem)
-                        Call repeatItem.SetInner(".newsNavItemCaption", cp.Site.GetText(SitePropertyIssueArchive, "Archives"))
+                        Call repeatItem.load(newsNavStoryItem)
+                        Call repeatItem.setClassInner("newsNavItemCaption", cp.Site.GetText(SitePropertyIssueArchive, "Archives"))
                         QS = cp.Doc.RefreshQueryString
                         'QS = cp.Utils.ModifyQueryString(QS, RequestNameNewsletterID, NewsletterID)
                         QS = cp.Utils.ModifyQueryString(QS, RequestNameFormID, FormArchive)
                         'repeatList &= repeatItem.GetHtml().Replace("?", "?" & QS)
-                        repeatList &= repeatItem.GetHtml().Replace("href=""?""", "href=""?" & QS & """")
+                        repeatList &= repeatItem.getHtml().Replace("href=""?""", "href=""?" & QS & """")
                     End If
                 End If
                 Call cs.Close()
                 '
-                Call layout.SetInner(".newsNavList", repeatList)
+                Call layout.setClassInner("newsNavList", repeatList)
                 '
-                returnHtml = layout.GetHtml()
+                returnHtml = layout.getHtml()
             Catch ex As Exception
 
             End Try
@@ -236,7 +236,7 @@ Namespace newsletter2
         Private Function getNavItem(ByVal cp As CPBaseClass, ByVal cn As newsletterCommonClass, ByVal cs As CPCSBaseClass, ByVal newsNavStoryItemLayout As String) As String
             Dim returnHtml As String = ""
             Try
-                Dim repeatItem As CPBlockBaseClass = cp.BlockNew()
+                Dim repeatItem As New blockClass
                 Dim WorkingStoryId As Integer
                 Dim accessString As String
                 Dim storyCaption As String
@@ -248,9 +248,9 @@ Namespace newsletter2
                 storyCaption = cs.GetText("Name")
                 'storyCaption = CS.GetEditLink() & CS.GetText("Name")
                 If accessString <> "" Then
-                    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & accessString & """>")
+                    repeatItem.load("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & accessString & """>" & repeatItem.getHtml())
                 End If
-                Call repeatItem.SetInner(".newsNavItemCaption", storyCaption)
+                Call repeatItem.SetClassInner("newsNavItemCaption", storyCaption)
                 If Not cn.isBlank(cp, cs.GetText("body")) Then
                     'If cs.GetBoolean("AllowReadMore") Then
                     '
@@ -269,7 +269,7 @@ Namespace newsletter2
                     qs = qs & "#story" & WorkingStoryId
                 End If
                 If accessString <> "" Then
-                    repeatItem.Append("<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
+                    repeatItem.load(repeatItem.getHtml() & "<AC type=""AGGREGATEFUNCTION"" name=""block text end"" >")
                 End If
                 'returnHtml = repeatItem.GetHtml().Replace("?", "?" & qs)
                 returnHtml = repeatItem.GetHtml().Replace("href=""?""", "href=""?" & qs & """")
