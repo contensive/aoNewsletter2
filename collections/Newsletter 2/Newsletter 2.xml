@@ -41,6 +41,51 @@ Block Archive Search Form=yes[yes|no]
 		<Styles></Styles>
 		<Scripting Language="" EntryPoint="" Timeout="5000"/>
 	</Addon>
+	<Addon name="newsletter2 Settings" guid="{fa787411-f505-433d-990b-47bb55473ef0}" type="Setting">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML><![CDATA[<Form>
+	<Description>Settings that affect TLPA custom features</Description>
+	<Help>Help Copy</Help>
+	<HelpLink>http://wiki.kmacloud.net/index.php?title=TLPA</HelpLink>
+	<Tab name="Newsletter2 site settings" heading="Settings related to the newsletter" description="">
+		<SiteProperty caption="NEWSLETTER SEARCH RESULTS RECORDS PER PAGE" name="NEWSLETTER SEARCH RESULTS RECORDS PER PAGE" ReadOnly="0" Type="Integer" Selector="" Description="Set the number of stories to display on a newsletter archive search">99999</SiteProperty>
+		
+	</Tab>
+</Form>
+]]></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
 	<data>
 		<record content="layouts" guid="{24AB7755-C205-4C12-AE51-A58F885F1596}" name="Newsletter Template Default">
 			<field name="Layout"><![CDATA[<style>
