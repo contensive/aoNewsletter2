@@ -197,7 +197,7 @@ Namespace newsletter2
                         Call layout.setClassInner("newsArchiveListCaption", storyName)
                         Call layout.setClassInner("newsArchiveListOverview", storyOverview)
                         If layout.getHtml().Contains("?") Then
-                            cp.Utils.AppendLog("Test2.log", layout.getHtml())
+                            ' cp.Utils.AppendLog("Test2.log", layout.getHtml())
                         End If
                         Stream &= Replace(layout.getHtml(), "href=""?""", "href=""?" & qs & """")
                         Call cs.GoNext()
