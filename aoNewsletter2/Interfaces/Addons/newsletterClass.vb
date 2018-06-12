@@ -62,6 +62,7 @@ Namespace newsletter2
                 Dim publishDate As Date = Date.MinValue
                 Dim tagLine As String = ""
                 Dim mastheadFilename As String = ""
+                Dim problemList As New List(Of String)
                 '
                 refreshQueryString = CP.Doc.RefreshQueryString
                 '
@@ -269,6 +270,9 @@ Namespace newsletter2
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case FormDetails
                                 newsBody = layout.getClassInner("newsBody")
+                                If (String.IsNullOrEmpty(newsBody.Trim())) Then
+                                    problemList.Add("The newsletter template does not contain a class with 'newsBody', required for a detail page.")
+                                End If
                                 newsBody = Body.GetStory(CP, cn, storyID, IssueID, refreshQueryString, newsBody, isEditing)
                                 Call openRecord(CP, cs, "Newsletter Issues", IssueID)
                                 If cs.OK() Then
@@ -419,6 +423,14 @@ Namespace newsletter2
                             qs = qs & "&"
                         Else
                             qs = qs & "?"
+                        End If
+                        If (problemList.Count > 0) Then
+                            Dim controlItems As String = ""
+                            For Each problem As String In problemList
+                                controlItems += CP.Html.li(problem)
+                            Next
+                            Controls = Controls & "<h3>Problems Found on this Page</h3>"
+                            Controls += CP.Html.ul(controlItems)
                         End If
                         If IssueID <> 0 Then
                             '
