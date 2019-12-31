@@ -86,13 +86,13 @@ Namespace newsletter2
                     '
                     ' PageID given, get Issue from PageID (and check against Newsletter)
                     '
-                    Call cs.Open(ContentNameNewsletterStories, "(id=" & storyID & ")", , , "NewsletterID")
+                    Call cs.Open(ContentNameNewsletterStories, "(id=" & storyID & ")")
                     If cs.OK() Then
                         IssueID = cs.GetInteger("NewsletterID")
                     End If
                     Call cs.Close()
                     '
-                    Call cs.Open(ContentNameNewsletterIssues, "(id=" & IssueID & ")and(Newsletterid=" & NewsletterID & ")", , , "ID")
+                    Call cs.Open(ContentNameNewsletterIssues, "(id=" & IssueID & ")and(Newsletterid=" & NewsletterID & ")")
                     If Not cs.OK() Then
                         '
                         ' Bad Issue, reset to current issue of current newsletter
@@ -242,10 +242,10 @@ Namespace newsletter2
                                 '
                                 Dim searchForm As String = ""
                                 searchForm &= "<div>"
-                                searchForm &= CP.Html.InputText(RequestNameSearchKeywords, , , "30")
+                                searchForm &= CP.Html.InputText(RequestNameSearchKeywords)
                                 searchForm &= " <input type=""submit"" id=""js-ArchiveIssuesSubmit"" name=""Button"" value="" Search ""> " 'CP.Html.Button(FormButtonViewArchives, FormButtonViewArchives)
                                 searchForm &= "</div>"
-                                searchForm = CP.Html.Form(searchForm, , , , CP.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString(), True))
+                                searchForm = CP.Html.Form(searchForm, "", "", "", CP.Utils.ModifyQueryString(refreshQueryString, RequestNameFormID, FormArchive.ToString()))
 
                                 Call layout.setClassInner("newsArchiveSearch", searchForm)
                                 '

@@ -93,7 +93,7 @@
             Dim s As String = ""
             '
             Try
-                cs.Open(contentName, "id=" & recordID, , , fieldList)
+                cs.Open(contentName, "id=" & recordID, "", True, fieldList)
             Catch ex As Exception
                 Try
                     cp.Site.ErrorReport(ex, "error in newsletter2.newsletterCommonClass.openRecord")

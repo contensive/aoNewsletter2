@@ -161,3 +161,7 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+.vs/aoNewsletter2/v15/Server/sqlite3/db.lock
+.vs/aoNewsletter2/v15/Server/sqlite3/storage.ide
+.vs/aoNewsletter2/v15/Server/sqlite3/storage.ide-shm
+.vs/aoNewsletter2/v15/Server/sqlite3/storage.ide-wal

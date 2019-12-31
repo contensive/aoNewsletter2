@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Collection name="Newsletter 2" guid="{B1853855-4E37-4099-9972-C1A9455EFA05}" system="No" updatable="Yes" blockNavigatorNode="No">
+	<HelpLink>http://wiki.kmacloud.net/index.php?title=Newsletter</HelpLink>
+	<Help></Help>
+	<Addon name="Newsletter 2" guid="{E56A34E0-E013-41CB-87F6-52F22D5F7694}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[newsletter2.newsletterClass]]></DotNetClass>
+		<ArgumentList><![CDATA[Newsletter=0[Created for this page:0|listid(newsletters)]
+Archive Issues To Display=10
+Block Archive Search Form=yes[yes|no]
+]]></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>Yes</Content>
+		<Template>Yes</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="newsletter2 Settings" guid="{fa787411-f505-433d-990b-47bb55473ef0}" type="Setting">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML><![CDATA[<Form>
+	<Description>Settings that affect TLPA custom features</Description>
+	<Help>Help Copy</Help>
+	<HelpLink>http://wiki.kmacloud.net/index.php?title=TLPA</HelpLink>
+	<Tab name="Newsletter2 site settings" heading="Settings related to the newsletter" description="">
+		<SiteProperty caption="NEWSLETTER SEARCH RESULTS RECORDS PER PAGE" name="NEWSLETTER SEARCH RESULTS RECORDS PER PAGE" ReadOnly="0" Type="Integer" Selector="" Description="Set the number of stories to display on a newsletter archive search">99999</SiteProperty>
+		
+	</Tab>
+</Form>
+]]></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<data>
+		<record content="layouts" guid="{24AB7755-C205-4C12-AE51-A58F885F1596}" name="Newsletter Template Default">
+			<field name="Layout"><![CDATA[<style>
+	/* define to match inline styles (for email) and over-ride site stylesheets (for pages) */
+	#newsTemplate div
+	,#newsTemplate p
+	,#newsTemplate li
+	,#newsTemplate td {
+		font-family:georgia,serif;
+		font-size:14px;
+		font-weight:normal
+	}
+	#newsTemplate h1
+	,#newsTemplate h2
+	,#newsTemplate h3
+	,#newsTemplate h4
+	,#newsTemplate .newsCoverListCaption
+	,#newsTemplate .newsNavCaption
+	,#newsTemplate .newsBodyCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:16px;
+		font-weight:bold
+	}
+	#newsTemplate .newsNavItemCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:14px;
+	}
+	#newsTemplate .newsCoverCategoryItem
+	{
+		color:#fff;
+		background-color:#4a4;
+		font-family:helvetica,san-serif;
+		font-size:16px;
+		font-weight:bold
+	}
+	#newsTemplate .newsCoverListReadMoreCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:12px;
+		font-weight:normal;
+	}
+	
+</style>
+<div id="newsTemplate" style="width:600px;margin:0 auto;font-family:georgia,serif;font-size:14px;">
+	<table style="border:none;BORDER-COLLAPSE:collapse;TEXT-ALIGN: left; MARGIN: 0px; WIDTH: 600px" cellpadding="0">
+		<tbody>
+			<tr align="left">
+				<td style="border:none;TEXT-ALIGN:left;overflow:hidden;">
+					<div style="width:600px;height:246px" class="newsHeaderMasthead">
+						<img width="600" height="246 "border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="/images/FpiEBHeaderFPI.jpg">
+					</div>
+					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #888;" class="newsIssueCaption">
+						Issue Caption
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style=";border: none; vertical-align:top; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px">
+					<div class="newsCover" style="padding:20px 10px 0 10px;">
+						<div class="newsCoverList">
+							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#4a4;font-family:helvetica,san-serif;font-size:16px;">
+								Industry news
+							</div>
+							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;border-top:1px solid #888;">
+								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Story Headline</div>
+								<div class="newsCoverListOverview" style="font-family:georgia,serif;font-size:14px;">
+									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+								</div>
+								<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">	
+					<div style="width:600px;height:169px;TEXT-ALIGN: left" class="newsFooter">
+						<img width="600" height="169" border="0" src="/images/FpiEBfooterFPI.jpg" alt="Welcome" title="Welcome" >
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>]]></field>
+			<field name="StylesFilename"></field>
+			<field name="Active">True</field>
+			<field name="SortOrder"></field>
+		</record>
+		<record content="layouts" guid="{5CBE8DAB-4CC0-4114-BADB-248D7929C486}" name="Newsletter Issue Default">
+			<field name="Layout"><![CDATA[<p>Congratulations!</p>
+<p>You have created the first issue of your newsletter. Here are a few suggestions to help you customize it.</p>
+<p>You can always get online help at <a target="_blank" href="http://support.contensive.com/Newsletter-add-on">http://support.contensive.com/Newsletter-add-on</a>. This link is available on the admin navigator.</p>
+<p>The newsletter can have many issues. For instance, you may publish a new issue of the newsletter each month. The most current issue will appear on your website. older issues will be available through the Archives link that appears when you more more than one issue.</p>
+<p>Each issue has a cover page (what you are reading now) as well as many stories. All the stories of an issue will be listed on the cover page. Click on them to read more.</p>
+<p>To add or modify issues and stories, log in and turn on edit. Edit icons will appear, and you get a tool panel under the newsletter.</p>
+<p>You can create an email from a newsletter from this tool panel.</p>
+<p>Good luck!</p>]]></field>
+			<field name="StylesFilename"></field>
+			<field name="Active">True</field>
+			<field name="SortOrder"></field>
+		</record>
+		<record content="layouts" guid="{C10A769F-CB9B-4E69-AFCC-858852E90782}" name="Newsletter Default Story Overview">
+			<field name="Layout"><![CDATA[<p>This is the first story of your new newsletter. This block of copy is called the overview and appears on the cover of the newsletter.</p>]]></field>
+			<field name="StylesFilename"></field>
+			<field name="Active">True</field>
+			<field name="SortOrder"></field>
+		</record>
+		<record content="layouts" guid="{4A1A2A6B-E422-464E-B76F-5C254E31E1EF}" name="Newsletter Default Story Copy">
+			<field name="Layout"><![CDATA[<p>This is the first story of your new newsletter.  This is the full copy of your newsletter.</p>
+<p>This story will appear on a page of its own so it can be as long as you need. You can edit this copy from the newsletter page, or from the admin site under Manage Addons, Newsletter 2.</p>
+<p style="margin-top: 0px; margin-bottom: 14px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent risus odio, scelerisque pretium adipiscing nec, lacinia vel mi. In viverra blandit libero, et consequat magna convallis rutrum. Quisque cursus, metus eu dictum luctus, neque nunc accumsan nisl, vel dapibus urna arcu at urna. Phasellus rutrum sem id libero interdum vitae rhoncus massa adipiscing. Sed non ligula non massa mattis mollis. Suspendisse turpis felis, ornare vel mollis vel, commodo ut risus. Maecenas sapien magna, congue ut vulputate ut, convallis quis mi. </p>
+<p style="margin-top: 0px; margin-bottom: 14px;">Vestibulum bibendum, magna vel molestie convallis, sem orci molestie purus, in vulputate quam velit in massa. Maecenas lobortis lobortis ullamcorper. Curabitur scelerisque nisi tellus, at egestas mi. Praesent interdum magna vel justo auctor at convallis orci luctus. Maecenas tristique, neque nec auctor tincidunt, diam urna gravida purus, at sagittis leo nulla volutpat massa. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer tristique dui sed orci semper quis tincidunt tellus ullamcorper. Proin semper, nibh nec congue pretium, tortor neque dapibus risus, at semper enim risus ac leo. Quisque adipiscing pretium libero non dictum.</p>
+<p style="margin-top: 0px; margin-bottom: 14px;">Nam vulputate sem sit amet enim scelerisque dictum. Vivamus ac imperdiet augue. Pellentesque eget ipsum leo, a consequat tellus. Cras cursus fringilla nisl, quis sagittis tortor sollicitudin ultrices. Mauris non purus ac velit rhoncus rutrum at a erat. Morbi rhoncus elit sed magna congue sagittis. Praesent sagittis sem ut ante semper ac congue orci mollis. Ut nisl lacus, feugiat at faucibus in, porttitor non nibh. Sed nunc arcu, faucibus et vestibulum eleifend, adipiscing quis nibh. Integer egestas felis eu tortor cursus feugiat. Sed in dui a velit viverra ullamcorper. Vestibulum ac justo in tortor lacinia porta vitae quis eros.</p>
+<p>&nbsp;</p>]]></field>
+			<field name="StylesFilename"></field>
+			<field name="Active">True</field>
+			<field name="SortOrder"></field>
+		</record>
+		<record content="layouts" guid="{02FCBD4C-C610-493B-AA44-453DD3D8865A}" name="Newsletter Template Default Email">
+			<field name="Layout"><![CDATA[<style>
+	/* define to match inline styles (for email) and over-ride site stylesheets (for pages) */
+	#newsTemplate div
+	,#newsTemplate p
+	,#newsTemplate li
+	,#newsTemplate td {
+		font-family:georgia,serif;
+		font-size:14px;
+		font-weight:normal
+	}
+	#newsTemplate h1
+	,#newsTemplate h2
+	,#newsTemplate h3
+	,#newsTemplate h4
+	,#newsTemplate .newsCoverListCaption
+	,#newsTemplate .newsNavCaption
+	,#newsTemplate .newsBodyCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:16px;
+		font-weight:bold
+	}
+	#newsTemplate .newsNavItemCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:14px;
+	}
+	#newsTemplate .newsCoverCategoryItem
+	{
+		color:#fff;
+		background-color:#4a4;
+		font-family:helvetica,san-serif;
+		font-size:16px;
+		font-weight:bold
+	}
+	#newsTemplate .newsCoverListReadMoreCaption
+	{
+		font-family:helvetica,san-serif;
+		font-size:12px;
+		font-weight:normal;
+	}
+	
+</style>
+<div id="newsTemplate" style="width:600px;margin:0 auto;font-family:georgia,serif;font-size:14px;">
+	<table style="border:none;BORDER-COLLAPSE:collapse;TEXT-ALIGN: left; MARGIN: 0px; WIDTH: 600px" cellpadding="0">
+		<tbody>
+			<tr align="left">
+				<td style="border:none;TEXT-ALIGN:left;overflow:hidden;">
+					<div style="width:600px;height:246px" class="newsHeaderMasthead">
+						<img width="600" height="246 "border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="/images/FpiEBHeaderFPI.jpg">
+					</div>
+					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #888;" class="newsIssueCaption">
+						Issue Caption
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style=";border: none; vertical-align:top; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px">
+					<div class="newsCover" style="padding:20px 10px 0 10px;">
+						<div class="newsCoverList">
+							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#4a4;font-family:helvetica,san-serif;font-size:16px;">
+								Industry news
+							</div>
+							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;border-top:1px solid #888;">
+								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Story Headline</div>
+								<div class="newsCoverListOverview" style="font-family:georgia,serif;font-size:14px;">
+									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+								</div>
+								<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">	
+					<div style="width:600px;height:169px;TEXT-ALIGN: left" class="newsFooter">
+						<img width="600" height="169" border="0" src="/images/FpiEBfooterFPI.jpg" alt="Welcome" title="Welcome" >
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>]]></field>
+			<field name="StylesFilename"></field>
+			<field name="Active">True</field>
+			<field name="SortOrder"></field>
+		</record>
+	</data>
+	<CDef Name="RSS Feed Newsletter Issue Page Rules" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccRSSFeedRules" ContentDataSourceName="Default" ContentTableName="ccRSSFeedRules" DefaultSortMethod="By Name" DeveloperOnly="1" DropDownFieldList="Name" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{A07BD4CF-CB73-4346-AE4A-EC66C8D897CE}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The name for this rule. It is not required but can be helpful top locate this rule in a list.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="False" Caption="Active" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="rssFeedID" active="True" AdminOnly="False" Authorable="True" Caption="RSS Feed" DeveloperOnly="False" EditSortPriority="300" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[When selected, this rule only applies to this RSS Feed.]]></HelpDefault>
+		</Field>
+		<Field Name="newsletterIssuePageID" active="True" AdminOnly="False" Authorable="True" Caption="Newsletter Story" DeveloperOnly="False" EditSortPriority="310" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Stories" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[When selected, this rule only applies to this Newsletter Story.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Issue Category Rules" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterIssueCategoryRules" ContentDataSourceName="Default" ContentTableName="NewsletterIssueCategoryRules" DefaultSortMethod="By Name" DeveloperOnly="1" DropDownFieldList="NAME" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{AB3FB4C8-549B-41DA-9EEE-6883BDE11238}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The name of this rule. It is not necessary but may be helpful to locate this rule in a list of rules.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="False" Caption="Active" DeveloperOnly="False" EditSortPriority="200" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="9999" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Sort Order" DeveloperOnly="False" EditSortPriority="500" FieldType="Text" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="9999" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="NewsletterIssueID" active="True" AdminOnly="False" Authorable="True" Caption="Issue" DeveloperOnly="False" EditSortPriority="300" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="99" IndexWidth="50" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Issues" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[When selected, this rule only applies to this issue.]]></HelpDefault>
+		</Field>
+		<Field Name="CategoryID" active="True" AdminOnly="False" Authorable="True" Caption="Category" DeveloperOnly="False" EditSortPriority="400" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="99" IndexWidth="50" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Categories" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[When selected, this rule only applies to this category.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Stories" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterIssuePages" ContentDataSourceName="Default" ContentTableName="NewsletterIssuePages" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{BC6DC9D5-FF99-4560-A029-967CDD1405D5}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="10" IndexSortDirection="" IndexSortOrder="99" IndexWidth="31" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the name of your story. It will also be used as the headline.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="True" Caption="Active" DeveloperOnly="False" EditSortPriority="1030" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Mark this story inactive will prevent it from displaying in the issue.]]></HelpDefault>
+		</Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="True" Caption="Sort Order" DeveloperOnly="False" EditSortPriority="1040" FieldType="Text" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="zzz" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This field determines the order which stories will be displayed on the cover page of the issue, and in the issue navigation.]]></HelpDefault>
+		</Field>
+		<Field Name="NewsletterID" active="True" AdminOnly="False" Authorable="True" Caption="Issue" DeveloperOnly="False" EditSortPriority="1010" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="23" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Issues" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the issue in which this story appears.]]></HelpDefault>
+		</Field>
+		<Field Name="CategoryID" active="True" AdminOnly="False" Authorable="True" Caption="Category" DeveloperOnly="False" EditSortPriority="1020" FieldType="Lookup" HTMLContent="False" IndexColumn="20" IndexSortDirection="" IndexSortOrder="0" IndexWidth="34" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Categories" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Use optional categories to separate your stories into groups.]]></HelpDefault>
+		</Field>
+		<Field Name="Overview" active="True" AdminOnly="False" Authorable="True" Caption="Cover Overview" DeveloperOnly="False" EditSortPriority="1100" FieldType="HTML" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the overview for this story. It is displayed on the newsletter cover under the link to the story. This copy will also be used in the RSS feed for the newsletter.]]></HelpDefault>
+		</Field>
+		<Field Name="Body" active="True" AdminOnly="False" Authorable="True" Caption="Full Story" DeveloperOnly="False" EditSortPriority="1200" FieldType="HTML" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the main body of the story. It is included on the story's page, linked from front page and the In This Issue navigation]]></HelpDefault>
+		</Field>
+		<Field Name="AllowPrinterPage" active="True" AdminOnly="False" Authorable="False" Caption="Allow Printer Page" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="0" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Checking this box enables a print link at the top of the story.]]></HelpDefault>
+		</Field>
+		<Field Name="AllowEmailPage" active="True" AdminOnly="False" Authorable="False" Caption="Allow Email Page" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="0" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Checking this box enables an email link at the top of the story.]]></HelpDefault>
+		</Field>
+		<Field Name="AllowReadMore" active="True" AdminOnly="False" Authorable="False" Caption="Allow Read More" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[When checked, the cover of the newsletter will display the overview copy and include a read-more link to the page with the whole story.]]></HelpDefault>
+		</Field>
+		<Field Name="RSSFeeds" active="True" AdminOnly="False" Authorable="True" Caption="RSS Feeds" DeveloperOnly="False" EditSortPriority="100" FieldType="ManyToMany" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="RSS Feeds" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="rssFeedID" ManyToManyRuleSecondaryField="newsletterIssuePageID" IsModified="True" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="RSS Feeds" ManyToManyRuleContent="RSS Feed Newsletter Issue Page Rules" >
+			<HelpDefault><![CDATA[(optional) Select the RSS feed(s) you would like this story to be included on. Enter each of the values below for the feed, or leave them blank and they will be automatically populated the first time this story is read on the website.]]></HelpDefault>
+		</Field>
+		<Field Name="RSSTitle" active="True" AdminOnly="False" Authorable="True" Caption="Title" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="RSS Feeds" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The main title used for the RSS feed story. This is similar to the story name. Leave it blank and it will be automatically populated the first time the story is read on the website.]]></HelpDefault>
+		</Field>
+		<Field Name="RSSDescription" active="True" AdminOnly="False" Authorable="True" Caption="Description" DeveloperOnly="False" EditSortPriority="120" FieldType="LongText" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="RSS Feeds" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The description of the RSS feed story. This is similar to the story overview. Leave it blank and it will be automatically populated the first time the story is read on the website.]]></HelpDefault>
+		</Field>
+		<Field Name="RSSDatePublish" active="True" AdminOnly="False" Authorable="True" Caption="Date Publish" DeveloperOnly="False" EditSortPriority="130" FieldType="Date" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="RSS Feeds" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the date this story will become available on the RSS Feed. Since this date is independant of the story's issue publich date, you should take care not to make this available in the RSS feed if the link points to a story that is not yet published.]]></HelpDefault>
+		</Field>
+		<Field Name="RRSSDateExpire" active="True" AdminOnly="False" Authorable="True" Caption="Date Expires" DeveloperOnly="False" EditSortPriority="140" FieldType="Date" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="RSS Feeds" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[After this date the story will no longer be available on the RSS feed.]]></HelpDefault>
+		</Field>
+		<Field Name="RSSLink" active="True" AdminOnly="False" Authorable="True" Caption="RSS Link Override" DeveloperOnly="False" EditSortPriority="150" FieldType="Link" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="RSS Feeds" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Enter the link which the RSS feed will use when someone clicks on the Title. This should take them to the story within the site. Leave it blank and it will be automatically populated the first time the story is read on the website.]]></HelpDefault>
+		</Field>
+		<Field Name="groupBlocks" active="True" AdminOnly="False" Authorable="True" Caption="Allow Just These Groups" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Blocking" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="NewsletterPageID " ManyToManyRuleSecondaryField="groupId" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Groups" ManyToManyRuleContent="Newsletter Story Group Rules" ></Field>
+		<Field Name="coverInfographic" active="True" AdminOnly="False" Authorable="True" Caption="Cover Infographic (req. thumbnail)" DeveloperOnly="False" EditSortPriority="1150" FieldType="Image" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[If provided, a link will be created for the infographic to open in new tab. If a thumbnail is provided, the thumbnail will be linked.]]></HelpDefault>
+		</Field>
+		<Field Name="coverInfographicthumbnail" active="True" AdminOnly="False" Authorable="True" Caption="Cover Infographic Thumbnail" DeveloperOnly="False" EditSortPriority="1140" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This story will include a this infographic thumbnail on both the cover and the full story. If a Infographic is also included (below), the cover and the full story page will link to the infographic (open in new tab).]]></HelpDefault>
+		</Field>
+		<Field Name="coverInfographicUrl" active="True" AdminOnly="False" Authorable="True" Caption="Cover Infographic URL (alt)" DeveloperOnly="False" EditSortPriority="1160" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[If this field is included and no Cover Infographic is provided, the thumbnail will be linked to this URL.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Issues" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterIssues" ContentDataSourceName="Default" ContentTableName="NewsletterIssues" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME, PUBLISHDATE" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{DA2F692A-145F-4F25-9DED-7FA2760675CF}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="10" IndexSortDirection="" IndexSortOrder="99" IndexWidth="26" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The name of this issue. For instance, if this is the January issue of your Events newsletter, this name field might be January.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="True" Caption="Active" DeveloperOnly="False" EditSortPriority="200" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Mark inactive to disable the view of this issue]]></HelpDefault>
+		</Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="True" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Use this field to set a sort order for the newsletter issues. If this field is blank the issues will be sorted by publish date.]]></HelpDefault>
+		</Field>
+		<Field Name="Cover" active="True" AdminOnly="False" Authorable="True" Caption="Cover" DeveloperOnly="False" EditSortPriority="1000" FieldType="HTMLFile" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the cover copy for the newsletter. This copy will display at the top of the page when someone views the main page of the newsletter. This copy is not shown when displaying individual stories.]]></HelpDefault>
+		</Field>
+		<Field Name="Overview" active="True" AdminOnly="False" Authorable="True" Caption="Overview for Archive Page" DeveloperOnly="False" EditSortPriority="1050" FieldType="HTML" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The Overview copy is a brief version of the cover copy, used when displaying a list of issues. For instance, this is displayed in the archive view.]]></HelpDefault>
+		</Field>
+		<Field Name="PublishDate" active="True" AdminOnly="False" Authorable="True" Caption="Publish Date" DeveloperOnly="False" EditSortPriority="500" FieldType="Date" HTMLContent="False" IndexColumn="20" IndexSortDirection="" IndexSortOrder="99" IndexWidth="32" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[When set, this issue will not be visible on the public site until this date has passed. You might use this field when creating a new issue of the newsletter. Set it to a future date when you want to show this issue. While you are editing, you will still be able to see unpublished issues using the admin controls under the newsletter.]]></HelpDefault>
+		</Field>
+		<Field Name="NewsletterID" active="True" AdminOnly="False" Authorable="True" Caption="Newsletter" DeveloperOnly="False" EditSortPriority="200" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="99" IndexWidth="32" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletters" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the newsletter that this issue is associated with. For instance, if this is the January issue of the Events newsletter, you would select Events in this list.]]></HelpDefault>
+		</Field>
+		<Field Name="sponsor" active="True" AdminOnly="False" Authorable="True" Caption="Cover Sponsor" DeveloperOnly="False" EditSortPriority="300" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[If the template includes the sponsor tag on the cover, this field will be put in the tag.]]></HelpDefault>
+		</Field>
+		<Field Name="tagline" active="True" AdminOnly="False" Authorable="True" Caption="Cover Tagline" DeveloperOnly="False" EditSortPriority="400" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[If the template includes the tagline tag on the cover, this field will be put in the tag. If this field is empty, the element with class newsletterTagLineRow will be removed.]]></HelpDefault>
+		</Field>
+		<Field Name="bannerCampaignId" active="True" AdminOnly="False" Authorable="True" Caption="Banner Campaign" DeveloperOnly="False" EditSortPriority="1000" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="bannerLayoutId" active="True" AdminOnly="False" Authorable="True" Caption="Layout" DeveloperOnly="False" EditSortPriority="1000" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Ad Banner Layouts" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Select the layout to determine the number of rows and columns for the ad banner presentation. Leave this blank to prevent ad banners.]]></HelpDefault>
+		</Field>
+		<Field Name="Banners" active="True" AdminOnly="False" Authorable="False" Caption="Banners" DeveloperOnly="False" EditSortPriority="2000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="issueId" ManyToManyRuleSecondaryField="bannerId" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Banners" ManyToManyRuleContent="Newsletter Issue Banner Rules" ></Field>
+		<Field Name="adBanner1" active="True" AdminOnly="False" Authorable="True" Caption="Banner 2" DeveloperOnly="False" EditSortPriority="1020" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A banner image matching the Ad Banner Layout selected.]]></HelpDefault>
+		</Field>
+		<Field Name="adBannerLink1" active="True" AdminOnly="False" Authorable="True" Caption="Banner 2 Link" DeveloperOnly="False" EditSortPriority="1025" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The url where the user will be sent if they click on the ad banner.]]></HelpDefault>
+		</Field>
+		<Field Name="adBannerLink0" active="True" AdminOnly="False" Authorable="True" Caption="Banner 1 Link" DeveloperOnly="False" EditSortPriority="1015" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The url where the user will be sent if they click on the ad banner.]]></HelpDefault>
+		</Field>
+		<Field Name="adBanner0" active="True" AdminOnly="False" Authorable="True" Caption="Banner 1" DeveloperOnly="False" EditSortPriority="1010" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A banner image matching the Ad Banner Layout selected.]]></HelpDefault>
+		</Field>
+		<Field Name="adBanner2" active="True" AdminOnly="False" Authorable="True" Caption="Banner 3" DeveloperOnly="False" EditSortPriority="1310" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A banner image matching the Ad Banner Layout selected.]]></HelpDefault>
+		</Field>
+		<Field Name="adBanner3" active="True" AdminOnly="False" Authorable="True" Caption="Banner 4" DeveloperOnly="False" EditSortPriority="1410" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A banner image matching the Ad Banner Layout selected.]]></HelpDefault>
+		</Field>
+		<Field Name="adBanner4" active="True" AdminOnly="False" Authorable="True" Caption="Banner 5" DeveloperOnly="False" EditSortPriority="1510" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A banner image matching the Ad Banner Layout selected.]]></HelpDefault>
+		</Field>
+		<Field Name="adBanner5" active="True" AdminOnly="False" Authorable="True" Caption="Banner 6" DeveloperOnly="False" EditSortPriority="1610" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A banner image matching the Ad Banner Layout selected.]]></HelpDefault>
+		</Field>
+		<Field Name="adBannerLink2" active="True" AdminOnly="False" Authorable="True" Caption="Banner 3 Link" DeveloperOnly="False" EditSortPriority="1320" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The url where the user will be sent if they click on the ad banner.]]></HelpDefault>
+		</Field>
+		<Field Name="adBannerLink3" active="True" AdminOnly="False" Authorable="True" Caption="Banner 4 Link" DeveloperOnly="False" EditSortPriority="1420" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The url where the user will be sent if they click on the ad banner.]]></HelpDefault>
+		</Field>
+		<Field Name="adBannerLink4" active="True" AdminOnly="False" Authorable="True" Caption="Banner 5 Link" DeveloperOnly="False" EditSortPriority="1520" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The url where the user will be sent if they click on the ad banner.]]></HelpDefault>
+		</Field>
+		<Field Name="adBannerLink5" active="True" AdminOnly="False" Authorable="True" Caption="Banner 6 Link" DeveloperOnly="False" EditSortPriority="1620" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Ad Banners" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The url where the user will be sent if they click on the ad banner.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Templates" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterTemplates" ContentDataSourceName="Default" ContentTableName="NewsletterTemplates" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{84D3FFD9-95D7-4161-9CFE-3371AA62835E}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The name you use for this template. This name will not be visible to people who see your newsletter.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="False" Caption="Active" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="Template" active="True" AdminOnly="False" Authorable="True" Caption="Template" DeveloperOnly="False" EditSortPriority="1000" FieldType="HTML" HTMLContent="True" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[This is the newsletter template. Since newsletters can generate a group email, it is recommended that you include all styles needed inlinem, and NOT reference styles from the site stylesheet.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletters" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="Newsletters" ContentDataSourceName="Default" ContentTableName="Newsletters" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{EE578D56-7BA8-454E-BB94-0495736EF462}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="99" IndexWidth="18" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The name for this newsletter. For instance, Current News, or Industry News. Each issue will have it's own name, such as January Edition.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="False" Caption="Active" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="9999" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="TemplateID" active="True" AdminOnly="False" Authorable="True" Caption="Template" DeveloperOnly="False" EditSortPriority="1200" FieldType="Lookup" HTMLContent="False" IndexColumn="10" IndexSortDirection="" IndexSortOrder="99" IndexWidth="32" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Templates" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Select the template for this newsletter. The template is the html document that your newsletter stories will be added to.]]></HelpDefault>
+		</Field>
+		<Field Name="StylesFileName" active="True" AdminOnly="False" Authorable="True" Caption="Styles" DeveloperOnly="False" EditSortPriority="0" FieldType="CSSFile" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Styles" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="emailTemplateId" active="True" AdminOnly="False" Authorable="True" Caption="Email Template (optional)" DeveloperOnly="False" EditSortPriority="1300" FieldType="Lookup" HTMLContent="False" IndexColumn="20" IndexSortDirection="" IndexSortOrder="99" IndexWidth="40" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Templates" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[If you have a different template for email, select it here. If None, then the standard Newsletter template will be used for email as well.]]></HelpDefault>
+		</Field>
+		<Field Name="mastheadFilename" active="True" AdminOnly="False" Authorable="True" Caption="Masthead Image" DeveloperOnly="False" EditSortPriority="1400" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[ Optional. If your template(s) include an html element with a class newsHeaderMasthead, an html img tag will be inserted into that element. The default template uses and image 600px wide x 246px tall.]]></HelpDefault>
+		</Field>
+		<Field Name="footerFilename" active="True" AdminOnly="False" Authorable="True" Caption="Footer Image " DeveloperOnly="False" EditSortPriority="1410" FieldType="File" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Optional. If your template(s) include an html element like a div with a class newsFooter, an html img tag will be inserted into that element. The default template uses and image 600px wide x 169px tall.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Categories" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterIssueCategories" ContentDataSourceName="Default" ContentTableName="NewsletterIssueCategories" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{901D3FAE-9317-4787-BCE9-633CAEB04696}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" >
+			<HelpDefault><![CDATA[The name for this category as it will appear on the newsletter.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="False" Caption="Active" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="9999" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" ></Field>
+	</CDef>
+	<CDef Name="Newsletter Story Group Rules" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterPageGroupRules" ContentDataSourceName="Default" ContentTableName="NewsletterPageGroupRules" DefaultSortMethod="By Name" DeveloperOnly="1" DropDownFieldList="NAME" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{F95F0832-E773-49E5-B287-C389AE9DFDCA}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" >
+			<HelpDefault><![CDATA[The name for this rule. It is not required but helpful if you later need to locate this rule in a list.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="False" Caption="Active" DeveloperOnly="False" EditSortPriority="9999" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" ></Field>
+		<Field Name="GroupID" active="True" AdminOnly="False" Authorable="True" Caption="Group" DeveloperOnly="False" EditSortPriority="300" FieldType="Lookup" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Groups" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" >
+			<HelpDefault><![CDATA[When selected, this rule only applies to this group.]]></HelpDefault>
+		</Field>
+		<Field Name="NewsletterPageID" active="True" AdminOnly="False" Authorable="True" Caption="Story" DeveloperOnly="False" EditSortPriority="400" FieldType="Lookup" HTMLContent="False" IndexColumn="-1" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Stories" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="Shared Styles Add-on Rules" >
+			<HelpDefault><![CDATA[When selected, this rule only applies to this story.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Ad Banner Layouts" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterAdBannerLayouts" ContentDataSourceName="Default" ContentTableName="NewsletterAdBannerLayouts" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{61D497DB-EDFA-4D6E-8A0C-B37853BF44AA}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[A simple description of the layout. This name has no effect on the display of the ads. Typically you would include the recommended dimensions of the ad and the number of rows and columns to help content managers.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="True" Caption="Active" DeveloperOnly="False" EditSortPriority="200" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="rowCnt" active="True" AdminOnly="False" Authorable="True" Caption="Rows" DeveloperOnly="False" EditSortPriority="1020" FieldType="Integer" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The number of rows intended for this layout.]]></HelpDefault>
+		</Field>
+		<Field Name="columnCnt" active="True" AdminOnly="False" Authorable="True" Caption="Columns" DeveloperOnly="False" EditSortPriority="1030" FieldType="Integer" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The number of columns intended for this layout.]]></HelpDefault>
+		</Field>
+		<Field Name="pxColumnSpace" active="True" AdminOnly="False" Authorable="True" Caption="Space Between Columns (px)" DeveloperOnly="False" EditSortPriority="2000" FieldType="Integer" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The integer number of pixels required between each ad in the same row.]]></HelpDefault>
+		</Field>
+		<Field Name="pxRowSpace" active="True" AdminOnly="False" Authorable="True" Caption="Space Between Rows (px)" DeveloperOnly="False" EditSortPriority="2010" FieldType="Integer" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The integer number of pixels required between each row of ads.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<CDef Name="Newsletter Issue Banner Rules" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="NewsletterIssueBannerRules" ContentDataSourceName="Default" ContentTableName="NewsletterIssueBannerRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{6368431A-1043-4E19-AA95-88D3014735DA}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="True" Caption="Active" DeveloperOnly="False" EditSortPriority="200" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="issueId" active="True" AdminOnly="False" Authorable="True" Caption="Issue" DeveloperOnly="False" EditSortPriority="1000" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Newsletter Issues" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="bannerId" active="True" AdminOnly="False" Authorable="True" Caption="Banner" DeveloperOnly="False" EditSortPriority="2000" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="Banners" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+	</CDef>
+	<CDef Name="RSS Feeds" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccRSSFeeds" ContentDataSourceName="Default" ContentTableName="ccRSSFeeds" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="Content Editors" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{8808CE15-6204-4E2E-B650-3730AAB0F3EF}" >
+		<Field Name="Name" active="True" AdminOnly="False" Authorable="True" Caption="Name" DeveloperOnly="False" EditSortPriority="110" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="True" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The name for your RSS feed. This name will appear within the feed as its caption, as well as on your site in the RSS Feed Link List.]]></HelpDefault>
+		</Field>
+		<Field Name="Active" active="True" AdminOnly="False" Authorable="True" Caption="Active" DeveloperOnly="False" EditSortPriority="200" FieldType="Boolean" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="1" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Mark this feed inactive as a last resort to prevent it from being read by others online.]]></HelpDefault>
+		</Field>
+		<Field Name="SortOrder" active="True" AdminOnly="False" Authorable="False" Caption="Alpha Sort Order" DeveloperOnly="False" EditSortPriority="2000" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="0" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="RSSFilename" active="True" AdminOnly="False" Authorable="True" Caption="RSS Filename" DeveloperOnly="False" EditSortPriority="1060" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Status" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="True" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The filename for your feed. It will be saved in your website in the RSS folder like:http://yourdomain/RSS/RSSFilenamewhere RSSFilename is the string saved in this field.]]></HelpDefault>
+		</Field>
+		<Field Name="RSSDateUpdated" active="True" AdminOnly="False" Authorable="True" Caption="Last Updated" DeveloperOnly="False" EditSortPriority="1070" FieldType="Date" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Status" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="True" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The date when this RSS Feed was last updated.]]></HelpDefault>
+		</Field>
+		<Field Name="Title" active="False" AdminOnly="False" Authorable="True" Caption="deleteme" DeveloperOnly="False" EditSortPriority="9999" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
+		<Field Name="Description" active="True" AdminOnly="False" Authorable="True" Caption="Description" DeveloperOnly="False" EditSortPriority="1030" FieldType="LongText" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="True" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The description is visible to those subscribed to your feed.]]></HelpDefault>
+		</Field>
+		<Field Name="LogoFilename" active="True" AdminOnly="False" Authorable="True" Caption="Logo" DeveloperOnly="False" EditSortPriority="1040" FieldType="Image" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[Add an image to your feed. This image will appear in the RSS Reader of those subscribed with the descritpion.]]></HelpDefault>
+		</Field>
+		<Field Name="Link" active="True" AdminOnly="False" Authorable="True" Caption="Link" DeveloperOnly="False" EditSortPriority="1020" FieldType="Link" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[The link to be used for the RSS feed header. This is not for each story, but for the feed itself. You might set it to your site, or to the landing page where you want people to land when they have questions about your feed itself.]]></HelpDefault>
+		</Field>
+		<Field Name="Copyright" active="True" AdminOnly="False" Authorable="True" Caption="Copyright" DeveloperOnly="False" EditSortPriority="1050" FieldType="Text" HTMLContent="False" IndexColumn="0" IndexSortDirection="" IndexSortOrder="0" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Features" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" >
+			<HelpDefault><![CDATA[(Optional) Include copyright information you want to appear in your feed.]]></HelpDefault>
+		</Field>
+	</CDef>
+	<ImportCollection name="Banner Campaigns">{2B178115-EB9A-4D2A-8BFC-A949307272D2}</ImportCollection>
+	<Resource name="fpiebfooterfpi.jpg" type="www" path="images" />
+	<Resource name="fpiebheaderfpi.jpg" type="www" path="images" />
+	<Resource name="aonewsletter2.dll" type="executable" path="" />
+</Collection>

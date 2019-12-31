@@ -61,7 +61,7 @@ Namespace newsletter2
             Try
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 '
-                Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc", , "ID")
+                Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc")
                 If cs.OK() Then
                     returnId = cs.GetInteger("ID")
                 End If
@@ -439,7 +439,7 @@ Namespace newsletter2
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Stream As String = ""
             '
-            Call cs.Open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")", , , "SortOrder")
+            Call cs.Open("Newsletter Issue Category Rules", "(CategoryID=" & CategoryID & ") AND (NewsletterIssueID=" & IssueID & ")")
             If cs.OK() Then
                 Stream = cs.GetText("SortOrder")
             End If
