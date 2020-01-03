@@ -827,6 +827,7 @@ Namespace newsletter2
                 Dim storyBody As String = ""
                 Dim img As String = ""
                 '
+
                 Call layout.load(newsCoverStoryItem)
                 '
                 If String.IsNullOrEmpty(coverinfographicThumbnail) Then
@@ -835,6 +836,7 @@ Namespace newsletter2
                     '
                     layout.setClassOuter("infographicBox", "")
                 Else
+                    coverinfographicThumbnail = Uri.EscapeUriString(coverinfographicThumbnail)
                     img = "<img src=""" & cp.Site.FilePath & coverinfographicThumbnail & """ alt=""View the infographic"" class=""banner"" width=""100%"">"
                     If String.IsNullOrEmpty(coverinfographic) Then
                         '
@@ -846,12 +848,14 @@ Namespace newsletter2
                             If coverInfographicUrl.IndexOf("://") < 0 Then
                                 coverInfographicUrl = "http://" & coverInfographicUrl
                             End If
+                            coverInfographicUrl = Uri.EscapeUriString(coverInfographicUrl)
                             layout.setClassInner("infographImage", "<a href=""" & coverInfographicUrl & """ target=""_blank"">" & img & "</a>")
                         End If
                     Else
                         '
                         ' linked thumbnail
                         '
+                        coverinfographic = Uri.EscapeUriString(coverinfographic)
                         layout.setClassInner("infographImage", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">" & img & "</a>")
                     End If
                 End If

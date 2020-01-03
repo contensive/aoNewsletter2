@@ -210,6 +210,7 @@ Namespace newsletter2
                         '
                         layout.load(TemplateCopy)
                         If (Not String.IsNullOrEmpty(mastheadFilename)) Then
+                            mastheadFilename = Uri.EscapeUriString(mastheadFilename)
                             layout.setClassInner("newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ class=""banner"" />")
                         End If
                         '
@@ -340,11 +341,14 @@ Namespace newsletter2
                                             If (Not String.IsNullOrEmpty(adBanner)) Then
                                                 adBannerLink = cs.GetText("adBannerLink" & adPtr)
                                                 If (String.IsNullOrEmpty(adBannerLink)) Then
+                                                    adBanner = Uri.EscapeUriString(adBanner)
                                                     footerAdBanners &= "<img src=""" & CP.Site.FilePath & adBanner & """>"
                                                 Else
                                                     If (adBannerLink.IndexOf("://") < 0) Then
                                                         adBannerLink = "http://" & adBannerLink
                                                     End If
+                                                    adBanner = Uri.EscapeUriString(adBanner)
+                                                    adBannerLink = Uri.EscapeUriString(adBannerLink)
                                                     footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & CP.Site.FilePath & adBanner & """></a>"
                                                 End If
                                             End If
@@ -637,9 +641,11 @@ Namespace newsletter2
                 '
                 layout.load(templateCopy)
                 If (Not String.IsNullOrEmpty(mastheadFilename)) Then
+                    mastheadFilename = Uri.EscapeUriString(mastheadFilename)
                     layout.setClassInner("newsHeaderMasthead", "<img src=""" & cp.Site.FilePath & mastheadFilename & """ class=""banner"" />")
                 End If
                 If (Not String.IsNullOrEmpty(footerFilename)) Then
+                    footerFilename = Uri.EscapeUriString(footerFilename)
                     layout.setClassInner("newsFooter", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
                 End If
                 '
@@ -701,11 +707,14 @@ Namespace newsletter2
                             If (Not String.IsNullOrEmpty(adBanner)) Then
                                 adBannerLink = cs.GetText("adBannerLink" & adPtr)
                                 If (String.IsNullOrEmpty(adBannerLink)) Then
+                                    adBanner = Uri.EscapeUriString(adBanner)
                                     footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """>"
                                 Else
                                     If (adBannerLink.IndexOf("://") < 0) Then
                                         adBannerLink = "http://" & adBannerLink
                                     End If
+                                    adBanner = Uri.EscapeUriString(adBanner)
+                                    adBannerLink = Uri.EscapeUriString(adBannerLink)
                                     footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """></a>"
                                 End If
                             End If
