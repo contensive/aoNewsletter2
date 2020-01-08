@@ -51,7 +51,7 @@ Namespace newsletter2
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
             yearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
             SearchKeywords = cp.Doc.GetText(RequestNameSearchKeywords)
-            RecordsPerPage = cp.Site.GetInteger("Newsletter Search Results Records Per Page", "3")
+            RecordsPerPage = cp.Site.GetInteger("Newsletter Search Results Records Per Page", 3)
             recordTop = cp.Doc.GetInteger(RequestNameRecordTop)
             '
             PageNumber = cp.Doc.GetInteger(RequestNamePageNumber)
@@ -143,7 +143,7 @@ Namespace newsletter2
                 '
                 ' List search results of archive issues
                 '
-                cp.Utils.AppendLog("test.log", cp.Doc.GetInteger("newsletter").ToString())
+                cp.Utils.AppendLog(cp.Doc.GetInteger("newsletter").ToString())
 
                 'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                 ThisSQL2 = " select NL.id, nl.name, nl.publishdate, story.AllowReadMore, story.Overview, story.Body, story.id as ThisID ,story.newsletterid, story.name as storyName"
