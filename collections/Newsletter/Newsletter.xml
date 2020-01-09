@@ -29,6 +29,7 @@ Block Archive Search Form=yes[yes|no]
 		<Template>Yes</Template>
 		<Email>No</Email>
 		<Admin>No</Admin>
+		<Category>Applications.Social Media</Category>
 		<OnPageEndEvent>No</OnPageEndEvent>
 		<OnPageStartEvent>No</OnPageStartEvent>
 		<OnBodyStart>No</OnBodyStart>
