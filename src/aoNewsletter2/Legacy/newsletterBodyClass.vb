@@ -1007,6 +1007,7 @@ Namespace newsletter2
             Catch ex As Exception
                 Call handleError(cp, ex, "getNewsletterBodyDetails")
             End Try
+            Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
             Return returnHtml
         End Function
         '

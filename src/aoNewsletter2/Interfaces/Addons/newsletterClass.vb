@@ -491,6 +491,7 @@ Namespace newsletter2
                         If Controls <> "" Then
                             returnHtml = returnHtml & cn.GetAdminHintWrapper(CP, Controls)
                         End If
+
                     End If
                     '
                     ' Add any user errors
@@ -503,6 +504,7 @@ Namespace newsletter2
             Catch ex As Exception
                 HandleError(CP, ex, "execute")
             End Try
+            Call CP.Utils.ExecuteAddonAsProcess("RSS Feed Process")
             Return returnHtml
         End Function
         '
