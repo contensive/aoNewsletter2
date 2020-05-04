@@ -91,13 +91,16 @@ Block Archive Search Form=yes[yes|no]
 	</Addon>
 	<data>
 		<record content="layouts" guid="{24AB7755-C205-4C12-AE51-A58F885F1596}" name="Newsletter Template Default">
-			<field name="Layout"><![CDATA[<style>
+			<field name="Layout"><![CDATA[
+			
+			
+			<style>
 	/* define to match inline styles (for email) and over-ride site stylesheets (for pages) */
 	#newsTemplate div
 	,#newsTemplate p
 	,#newsTemplate li
 	,#newsTemplate td {
-		font-family:georgia,serif;
+		font-family: 'Roboto', sans-serif;
 		font-size:14px;
 		font-weight:normal
 	}
@@ -109,72 +112,80 @@ Block Archive Search Form=yes[yes|no]
 	,#newsTemplate .newsNavCaption
 	,#newsTemplate .newsBodyCaption
 	{
-		font-family:helvetica,san-serif;
+		font-family: 'Roboto Slab', serif;
 		font-size:16px;
 		font-weight:bold
 	}
 	#newsTemplate .newsNavItemCaption
 	{
-		font-family:helvetica,san-serif;
-		font-size:14px;
+		font-family: 'Roboto Slab', serif;
+		font-size:16px;
 	}
 	#newsTemplate .newsCoverCategoryItem
 	{
 		color:#fff;
-		background-color:#4a4;
-		font-family:helvetica,san-serif;
-		font-size:16px;
+		background-color:#a9a9a9;
+		font-family: 'Roboto', sans-serif;
+		font-size:18px;
 		font-weight:bold
 	}
 	#newsTemplate .newsCoverListReadMoreCaption
 	{
-		font-family:helvetica,san-serif;
-		font-size:12px;
+		font-family: 'Roboto', sans-serif;
+		font-size:14px;
 		font-weight:normal;
+		color: #17a2b8!important;
 	}
-	
+	#newsTemplate a {
+
+		text-decoration: none !important;
+	}
+
 </style>
-<div id="newsTemplate" style="width:600px;margin:0 auto;font-family:georgia,serif;font-size:14px;">
+<div id="newsTemplate" style="width:600px;margin:0 auto;font-family: 'Roboto', sans-serif;font-size:14px;">
 	<table style="border:none;BORDER-COLLAPSE:collapse;TEXT-ALIGN: left; MARGIN: 0px; WIDTH: 600px" cellpadding="0">
 		<tbody>
 			<tr align="left">
 				<td style="border:none;TEXT-ALIGN:left;overflow:hidden;">
-					<div style="width:600px;height:246px" class="newsHeaderMasthead">
-						<img width="600" height="246 "border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="/images/FpiEBHeaderFPI.jpg">
+					<div style="width:600px;height:100%" class="newsHeaderMasthead">
+						<img width="600" height="100%" border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="https://s3.amazonaws.com/cdn.s30.memberboss.com/dkidwell/files/cclibraryfiles/filename/000000000001/newsletterImg.jpg" data-image="eloob61wa1ah">
 					</div>
-					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #888;" class="newsIssueCaption">
+					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family: 'Roboto Slab', serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #a9a9a9;" class="newsIssueCaption pt-4">
 						Issue Caption
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td style=";border: none; vertical-align:top; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px">
-					<div class="newsCover" style="padding:20px 10px 0 10px;">
+					<div class="newsCover">
 						<div class="newsCoverList">
-							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#4a4;font-family:helvetica,san-serif;font-size:16px;">
+							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#a9a9a9;font-family: 'Roboto Slab', serif;font-size:16px;">
 								Industry news
 							</div>
-							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;border-top:1px solid #888;">
-								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Story Headline</div>
-								<div class="newsCoverListOverview" style="font-family:georgia,serif;font-size:14px;">
+							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;">
+								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family: 'Roboto Slab', serif;font-size:16px; border-top:1px solid #d9d9d9; padding-top: 10px;">Story Headline</div>
+								<div class="newsCoverListOverview" style="font-family: 'Roboto', sans-serif;font-size:14px;">
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
-								<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
+								<div class="newsCoverListReadMore  pb-3"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
 							</div>
 						</div>
 					</div>
 				</td>
 			</tr>
 			<tr>
-				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">	
-					<div style="width:600px;height:169px;TEXT-ALIGN: left" class="newsFooter">
-						<img width="600" height="169" border="0" src="/images/FpiEBfooterFPI.jpg" alt="Welcome" title="Welcome" >
+				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">
+					<div style="width:600px;height:100%;TEXT-ALIGN: left" class="newsFooter pb-4">
+						<img width="600" height="100%" border="0" src="https://s3.amazonaws.com/cdn.s30.memberboss.com/dkidwell/files/cclibraryfiles/filename/000000000002/iStock-854423834.jpg" alt="Welcome" title="Welcome" data-image="d52ssk1nrfvs">
 					</div>
 				</td>
 			</tr>
 		</tbody>
 	</table>
-</div>]]></field>
+</div>
+
+
+]]></field>
 			<field name="StylesFilename"></field>
 			<field name="Active">True</field>
 			<field name="SortOrder"></field>
@@ -210,13 +221,15 @@ Block Archive Search Form=yes[yes|no]
 			<field name="SortOrder"></field>
 		</record>
 		<record content="layouts" guid="{02FCBD4C-C610-493B-AA44-453DD3D8865A}" name="Newsletter Template Default Email">
-			<field name="Layout"><![CDATA[<style>
+			<field name="Layout"><![CDATA[
+			
+<style>
 	/* define to match inline styles (for email) and over-ride site stylesheets (for pages) */
 	#newsTemplate div
 	,#newsTemplate p
 	,#newsTemplate li
 	,#newsTemplate td {
-		font-family:georgia,serif;
+		font-family: 'Roboto', sans-serif;
 		font-size:14px;
 		font-weight:normal
 	}
@@ -228,72 +241,80 @@ Block Archive Search Form=yes[yes|no]
 	,#newsTemplate .newsNavCaption
 	,#newsTemplate .newsBodyCaption
 	{
-		font-family:helvetica,san-serif;
+		font-family: 'Roboto Slab', serif;
 		font-size:16px;
 		font-weight:bold
 	}
 	#newsTemplate .newsNavItemCaption
 	{
-		font-family:helvetica,san-serif;
-		font-size:14px;
+		font-family: 'Roboto Slab', serif;
+		font-size:16px;
 	}
 	#newsTemplate .newsCoverCategoryItem
 	{
 		color:#fff;
-		background-color:#4a4;
-		font-family:helvetica,san-serif;
-		font-size:16px;
+		background-color:#a9a9a9;
+		font-family: 'Roboto', sans-serif;
+		font-size:18px;
 		font-weight:bold
 	}
 	#newsTemplate .newsCoverListReadMoreCaption
 	{
-		font-family:helvetica,san-serif;
-		font-size:12px;
+		font-family: 'Roboto', sans-serif;
+		font-size:14px;
 		font-weight:normal;
+		color: #17a2b8!important;
 	}
-	
+	#newsTemplate a {
+
+		text-decoration: none !important;
+	}
+
 </style>
-<div id="newsTemplate" style="width:600px;margin:0 auto;font-family:georgia,serif;font-size:14px;">
+<div id="newsTemplate" style="width:600px;margin:0 auto;font-family: 'Roboto', sans-serif;font-size:14px;">
 	<table style="border:none;BORDER-COLLAPSE:collapse;TEXT-ALIGN: left; MARGIN: 0px; WIDTH: 600px" cellpadding="0">
 		<tbody>
 			<tr align="left">
 				<td style="border:none;TEXT-ALIGN:left;overflow:hidden;">
-					<div style="width:600px;height:246px" class="newsHeaderMasthead">
-						<img width="600" height="246 "border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="/images/FpiEBHeaderFPI.jpg">
+					<div style="width:600px;height:100%" class="newsHeaderMasthead">
+						<img width="600" height="100%" border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="https://s3.amazonaws.com/cdn.s30.memberboss.com/dkidwell/files/cclibraryfiles/filename/000000000001/newsletterImg.jpg" data-image="eloob61wa1ah">
 					</div>
-					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #888;" class="newsIssueCaption">
+					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family: 'Roboto Slab', serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #a9a9a9;" class="newsIssueCaption pt-4">
 						Issue Caption
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td style=";border: none; vertical-align:top; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px">
-					<div class="newsCover" style="padding:20px 10px 0 10px;">
+					<div class="newsCover">
 						<div class="newsCoverList">
-							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#4a4;font-family:helvetica,san-serif;font-size:16px;">
+							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#a9a9a9;font-family: 'Roboto Slab', serif;font-size:16px;">
 								Industry news
 							</div>
-							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;border-top:1px solid #888;">
-								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Story Headline</div>
-								<div class="newsCoverListOverview" style="font-family:georgia,serif;font-size:14px;">
+							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;">
+								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family: 'Roboto Slab', serif;font-size:16px; border-top:1px solid #d9d9d9; padding-top: 10px;">Story Headline</div>
+								<div class="newsCoverListOverview" style="font-family: 'Roboto', sans-serif;font-size:14px;">
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
-								<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
+								<div class="newsCoverListReadMore  pb-3"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
 							</div>
 						</div>
 					</div>
 				</td>
 			</tr>
 			<tr>
-				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">	
-					<div style="width:600px;height:169px;TEXT-ALIGN: left" class="newsFooter">
-						<img width="600" height="169" border="0" src="/images/FpiEBfooterFPI.jpg" alt="Welcome" title="Welcome" >
+				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">
+					<div style="width:600px;height:100%;TEXT-ALIGN: left" class="newsFooter pb-4">
+						<img width="600" height="100%" border="0" src="https://s3.amazonaws.com/cdn.s30.memberboss.com/dkidwell/files/cclibraryfiles/filename/000000000002/iStock-854423834.jpg" alt="Welcome" title="Welcome" data-image="d52ssk1nrfvs">
 					</div>
 				</td>
 			</tr>
 		</tbody>
 	</table>
-</div>]]></field>
+</div>
+
+
+]]></field>
 			<field name="StylesFilename"></field>
 			<field name="Active">True</field>
 			<field name="SortOrder"></field>
