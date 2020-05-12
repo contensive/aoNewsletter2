@@ -184,6 +184,7 @@ Namespace newsletter2
                                 Call cs.Close()
                             End If
                         End If
+
                         '
                         ' Process forms
                         '
