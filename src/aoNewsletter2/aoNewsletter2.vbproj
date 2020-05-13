@@ -7,8 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{581CEF2C-3905-47C4-AA0A-1522CC6CE24D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace>Contensive.Addons.Newsletter</RootNamespace>
     <AssemblyName>aoNewsletter2</AssemblyName>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -73,12 +72,17 @@
     <AssemblyOriginatorKeyFile>newletter.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2001.3.8\lib\net472\CPBase.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="ContensiveDbModels, Version=5.2004.14.6, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contensive.DbModels.5.2004.14.6\lib\net461\ContensiveDbModels.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.17.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.17\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contensive.CPBaseClass.5.2004.14.6\lib\net472\CPBase.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.23.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.23\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -94,12 +98,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\blockClass.vb" />
-    <Compile Include="Controllers\genericController.vb" />
-    <Compile Include="Legacy\newsletterBodyClass.vb" />
+    <Compile Include="Controllers\DesignBlockController.vb" />
+    <Compile Include="Controllers\GenericController.vb" />
+    <Compile Include="Models\Db\DesignBlockBaseModel.vb" />
+    <Compile Include="Models\Db\DesignBlockFontModel.vb" />
+    <Compile Include="Models\Db\_BlankModel.vb" />
+    <Compile Include="Models\Db\NewsletterModel.vb" />
+    <Compile Include="Models\View\DesignBlockViewBaseModel.vb" />
+    <Compile Include="Views\DesignBlock.vb" />
+    <Compile Include="Views\NewsletterBodyClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -111,11 +123,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Legacy\newsletterCommonClass.vb" />
-    <Compile Include="Legacy\newsletterExtensionClass.vb" />
-    <Compile Include="constantsModule.vb" />
-    <Compile Include="Legacy\newsletterNavClass.vb" />
-    <Compile Include="Interfaces\Addons\newsletterClass.vb" />
+    <Compile Include="Views\NewsletterCommonClass.vb" />
+    <Compile Include="Views\NewsletterExtensionClass.vb" />
+    <Compile Include="Constants.vb" />
+    <Compile Include="Views\NewsletterNavClass.vb" />
+    <Compile Include="Views\NewsletterClass.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -155,14 +167,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\Events\" />
-    <Folder Include="Interfaces\Remotes\" />
-    <Folder Include="Models\Context\" />
-    <Folder Include="Models\Entity\" />
-    <Folder Include="Models\View\" />
-    <Folder Include="Views\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

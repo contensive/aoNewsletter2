@@ -7,11 +7,11 @@ Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
 
-Namespace newsletter2
+Namespace Controllers
     ''' <summary>
     ''' A replacement for cp.block using htmlAgility
     ''' </summary>
-    Public Class blockClass
+    Public Class BlockClass
         '
         Dim layout2 As HtmlAgilityPack.HtmlDocument
         '
