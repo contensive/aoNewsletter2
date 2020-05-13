@@ -101,11 +101,13 @@
     <Compile Include="Controllers\DesignBlockController.vb" />
     <Compile Include="Controllers\GenericController.vb" />
     <Compile Include="Models\Db\DesignBlockBaseModel.vb" />
-    <Compile Include="Models\Db\DesignBlockFontModel.vb" />
+    <Compile Include="Models\Db\DesignBlockThemeModel.vb" />
     <Compile Include="Models\Db\_BlankModel.vb" />
     <Compile Include="Models\Db\NewsletterModel.vb" />
     <Compile Include="Models\View\DesignBlockViewBaseModel.vb" />
-    <Compile Include="Views\DesignBlock.vb" />
+    <Compile Include="Models\View\NewsletterViewModel.vb" />
+    <Compile Include="Views\NewsletterOnInstallClass.vb" />
+    <Compile Include="Views\NewsletterDesignBlockClass.vb" />
     <Compile Include="Views\NewsletterBodyClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -123,7 +125,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Views\NewsletterCommonClass.vb" />
+    <Compile Include="Controllers\NewsletterController.vb" />
     <Compile Include="Views\NewsletterExtensionClass.vb" />
     <Compile Include="Constants.vb" />
     <Compile Include="Views\NewsletterNavClass.vb" />
@@ -168,6 +170,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\NewsletterLayout.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

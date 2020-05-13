@@ -59,5 +59,21 @@ Namespace My.Resources
                 resourceCulture = value
             End Set
         End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to &lt;div class=&quot;designBlockContainer blockNewsletter {{outerContainerClass}}&quot; style=&quot;{{styleHeight}}{{styleBackgroundImage}}&quot;&gt;
+        '''	&lt;div class=&quot;{{contentContainerClass}}&quot;&gt;
+        '''		&lt;div class=&quot;blockNewsletterInner&quot;&gt;
+        '''			{{{legacyNewsletter}}}
+        '''		&lt;/div&gt;
+        '''	&lt;/div&gt;
+        '''&lt;/div&gt;
+        '''.
+        '''</summary>
+        Friend ReadOnly Property NewsletterLayout() As String
+            Get
+                Return ResourceManager.GetString("NewsletterLayout", resourceCulture)
+            End Get
+        End Property
     End Module
 End Namespace

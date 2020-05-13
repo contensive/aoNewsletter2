@@ -1,5 +1,14 @@
 ﻿
 Module Constants
+    '
+    ''' <summary>
+    ''' newsletter version used in onInstall to migrate data. Site property saves the version last installed
+    ''' </summary>
+    Public Const newsletterVersion As Integer = 3
+    ''' <summary>
+    ''' site property name for last installed version
+    ''' </summary>
+    Public Const spName_NewsletterVersion = "aoNewsletterVersion"
     Public Const DefaultEmailLinkSubject = "A link to NCA Currents newsletter"
     '
     Public Const guidLayoutDefaultTemplate = "{24AB7755-C205-4C12-AE51-A58F885F1596}"
@@ -55,7 +64,6 @@ Module Constants
     '
     Public Const DefaultRecord = "Default"
     '
-    Public Const PropertyAddOnVersion = "aoNewsletterVersion"
     Public Const VisitPropertyNewsletter = "SelectedNewsletter"
     '
     Public Const StringReplaceStart = "{{"
@@ -64,7 +72,7 @@ Module Constants
     Public Const FormCover = 100
     Public Const FormArchive = 200
     Public Const FormEmail = 300
-    Public Const FormDetails = 400
+    Public Const FormStory = 400
     Public Const FormSearch = 500
     '
     Public Const PageNameArchives = "Newsletter Archives"

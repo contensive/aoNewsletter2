@@ -1,0 +1,7 @@
+﻿<div class="designBlockContainer blockNewsletter {{outerContainerClass}}" style="{{styleHeight}}{{styleBackgroundImage}}">
+	<div class="{{contentContainerClass}}">
+		<div class="blockNewsletterInner">
+			{{{legacyNewsletter}}}
+		</div>
+	</div>
+</div>

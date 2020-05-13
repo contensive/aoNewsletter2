@@ -1,0 +1,1 @@
+// javascript file created as exported for addon [Newsletter], collection [Newsletter] in site [app200509]

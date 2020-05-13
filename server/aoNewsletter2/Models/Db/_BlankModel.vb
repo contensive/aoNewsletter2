@@ -22,9 +22,8 @@ Namespace Models.Db
 
             If (result Is Nothing) Then
                 result = DesignBlockBaseModel.addDefault(Of BlankModel)(cp)
-                result.name = tableMetadata.contentName & " " + result.id
+                result.name = tableMetadata.contentName & " " & result.id
                 result.ccguid = settingsGuid
-                result.fontStyleId = 0
                 result.themeStyleId = 0
                 result.padTop = False
                 result.padBottom = False

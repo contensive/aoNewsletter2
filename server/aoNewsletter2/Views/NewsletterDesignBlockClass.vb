@@ -10,7 +10,7 @@ Namespace Views
     ''' <summary>
     ''' Design block with a centered headline, image, paragraph text and a button.
     ''' </summary>
-    Public Class TileClass
+    Public Class NewsletterDesignBlockClass
         Inherits AddonBaseClass
         '
         '====================================================================================================
@@ -25,16 +25,19 @@ Namespace Views
                 If (String.IsNullOrEmpty(settingsGuid)) Then Return result
                 '
                 ' -- locate or create a data record for this guid
-                Dim settings = DbTileModel.createOrAddSettings(CP, settingsGuid)
+                Dim settings = NewsletterModel.createOrAddSettings(CP, settingsGuid)
                 If (settings Is Nothing) Then Throw New ApplicationException("Could not create the design block settings record.")
                 '
+                ' -- create legacy newsletter
+                Dim legacyNewsletter As String = (New NewsletterClass()).Execute(CP)
+                '
                 ' -- translate the Db model to a view model and mustache it into the layout
-                Dim viewModel = TileViewModel.create(CP, settings)
+                Dim viewModel = NewsletterViewModel.create(CP, settings, legacyNewsletter)
                 If (viewModel Is Nothing) Then Throw New ApplicationException("Could not create design block view model.")
-                result = Nustache.Core.Render.StringToString(My.Resources.TileLayout, viewModel)
+                result = Nustache.Core.Render.StringToString(My.Resources.NewsletterLayout, viewModel)
                 '
                 ' -- if editing enabled, add the link and wrapperwrapper
-                Return GenericController.addEditWrapper(CP, result, settings.id, settings.name, DbTileModel.contentName)
+                Return CP.Content.GetEditWrapper(result, NewsletterModel.tableMetadata.contentName, settings.id)
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
                 Return "<!-- " & designBlockName & ", Unexpected Exception -->"

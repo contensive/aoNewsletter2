@@ -19,7 +19,6 @@ Namespace Models.Db
         ' -- instance properties
         '
         Public Property backgroundImageFilename As String
-        Public Property fontStyleId As Integer
         Public Property themeStyleId As Integer
         Public Property padTop As Boolean
         Public Property padBottom As Boolean

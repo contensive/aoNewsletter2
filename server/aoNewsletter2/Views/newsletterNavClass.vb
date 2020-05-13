@@ -38,7 +38,7 @@ Namespace Views
                 Dim NavSQL As String
                 Dim CategoryName As String
                 Dim PreviousCategoryName As String = ""
-                Dim cn As New NewsletterCommonClass
+                Dim cn As New NewsletterController
                 Dim AccessString As String
                 Dim CategoryID As Integer
                 Dim QS As String
@@ -234,7 +234,7 @@ Namespace Views
             GetCurrentIssueLink = Stream
         End Function
         '
-        Private Function getNavItem(ByVal cp As CPBaseClass, ByVal cn As NewsletterCommonClass, ByVal cs As CPCSBaseClass, ByVal newsNavStoryItemLayout As String) As String
+        Private Function getNavItem(ByVal cp As CPBaseClass, ByVal cn As NewsletterController, ByVal cs As CPCSBaseClass, ByVal newsNavStoryItemLayout As String) As String
             Dim returnHtml As String = ""
             Try
                 Dim repeatItem As New BlockClass
@@ -259,7 +259,7 @@ Namespace Views
                     '
                     qs = cp.Doc.RefreshQueryString
                     qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(WorkingStoryId), True)
-                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails, True)
+                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormStory, True)
                 Else
                     '
                     ' link to the bookmark 'story#' on the cover

@@ -2,6 +2,7 @@
 Imports System
 Imports System.Collections.Generic
 Imports System.Text
+Imports Contensive.Addons.Newsletter.Controllers
 Imports Contensive.BaseClasses
 
 Namespace Views
@@ -61,7 +62,7 @@ Namespace Views
             Dim IssueID As Integer
             Dim IsWorkflowRendering As Boolean
             Dim IsQuickEditing As Boolean
-            Dim cn As New NewsletterCommonClass
+            Dim cn As New NewsletterController
             Dim NewsletterProperty As String
             Dim Parts() As String
             Dim NewsletterID As Integer

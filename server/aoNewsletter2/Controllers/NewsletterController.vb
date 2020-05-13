@@ -6,17 +6,14 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
+Imports Microsoft.SqlServer.Server
 
-Namespace Views
-    '
-    ' Sample Vb addon
-    '
-    Public Class NewsletterCommonClass
+Namespace Controllers
+    Public Class NewsletterController
         '
         Public Const cr As String = vbCrLf & vbTab
         '
         Private Private_LegacySiteSites_Loaded As Boolean
-        Private Private_LegacySiteSites As String
         Private EditWrapperCnt As Integer = 0
         '
         '=====================================================================================
@@ -34,52 +31,41 @@ Namespace Views
         End Sub
         '
         Friend Function GetIssueID(ByVal cp As CPBaseClass, ByVal NewsletterID As Integer, ByVal currentIssueId As Integer) As Integer
-            'On Error GoTo ErrorTrap
             '
-            Dim IssueID As Integer
-            '
-            IssueID = cp.Doc.GetInteger(RequestNameIssueID)
-            '
-            Call cp.Site.TestPoint("GetIssueID - IssueID From Stream: " & IssueID)
-            Call cp.Site.TestPoint("GetIssueID - NewsletterID: " & NewsletterID)
+            Dim IssueID As Integer = cp.Doc.GetInteger(RequestNameIssueID)
             '
             If IssueID = 0 Then
                 IssueID = currentIssueId
             End If
             '
-            Call cp.Site.TestPoint("GetIssueID - IssueID: " & IssueID)
-            '
-            GetIssueID = IssueID
-            '
-            'Exit Function
-            'ErrorTrap:
-            'Call HandleError(cp, ex, "GetIssueID")
+            Return IssueID
         End Function
         '
         Friend Function GetCurrentIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
-            Dim returnId As Integer = 0
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
-                '
-                Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc")
-                If cs.OK() Then
-                    returnId = cs.GetInteger("ID")
-                End If
-                Call cs.Close()
+                Dim returnId As Integer = 0
+                Using cs As CPCSBaseClass = cp.CSNew()
+                    '
+                    Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc")
+                    If cs.OK() Then
+                        returnId = cs.GetInteger("ID")
+                    End If
+                    Call cs.Close()
+                End Using
                 '
                 If returnId = 0 Then
                     '
                     ' there are no issues of this newsletter -- create a default issue
-                    '
-                    returnId = createDefaultIssueGetId(cp, NewsletterID)
+                    Return createDefaultIssueGetId(cp, NewsletterID)
                 End If
+                Return returnId
             Catch ex As Exception
                 Call handleError(cp, ex, "getCurrentIssueId")
+                Return 0
             End Try
-            Return returnId
         End Function
         '
-        Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As NewsletterCommonClass) As String
+        Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As NewsletterController) As String
             GetUnpublishedIssueList = ""
             '
             Dim qs As String = ""
@@ -93,7 +79,6 @@ Namespace Views
             Dim isContentMan As Boolean
             '
             isContentMan = cp.User.IsContentManager("Newsletters")
-            'Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc", , "ID")
             Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc")
             Do While cs.OK()
                 ID = cs.GetInteger("ID")
@@ -212,7 +197,7 @@ Namespace Views
                     Call cs.SetField("name", newsletterName & " Newsletter, Issue 1")
                     Call cs.SetField("NewsletterID", newsletterId.ToString())
                     Call cs.SetField("PublishDate", Now().ToShortDateString)
-                    Call cs.SetField("cover", GetLayout(cp, guidLayoutDefaultIssueCover))
+                    Call cs.SetField("cover", cp.WwwFiles.Read("newsletteraddon\Newsletter Issue Default.html"))
                 End If
                 Call cs.Close()
                 '
@@ -222,8 +207,8 @@ Namespace Views
                 If cs.OK() Then
                     Call cs.SetField("name", "The First Story")
                     Call cs.SetField("newsletterid", returnId.ToString())
-                    Call cs.SetField("Overview", GetLayout(cp, guidLayoutDefaultStoryOverview))
-                    Call cs.SetField("body", GetLayout(cp, guidLayoutDefaultStoryBody))
+                    Call cs.SetField("Overview", cp.WwwFiles.Read("newsletteraddon\Newsletter Default Story Overview.html"))
+                    Call cs.SetField("body", cp.WwwFiles.Read("newsletteraddon\Newsletter Default Story Copy.html"))
                 End If
                 Call cs.Close()
             Catch ex As Exception
@@ -453,77 +438,53 @@ Namespace Views
         End Function
         '
         Friend Function verifyDefaultTemplateGetId(cp As CPBaseClass) As Integer
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim TemplateID As Integer
-            Dim TemplateCopy As String
-            '
-            ' try default template
-            '
-            Call cs.Open("Newsletter Templates", "name='Default'")
-            If Not cs.OK() Then
-                Call cs.Close()
-                Call cs.Insert("Newsletter Templates")
+            Using cs As CPCSBaseClass = cp.CSNew()
+                '
+                ' -- try default template
+                Call cs.Open("Newsletter Templates", "name='Default'")
+                If Not cs.OK() Then
+                    Call cs.Close()
+                    Call cs.Insert("Newsletter Templates")
+                    If cs.OK() Then
+                        Call cs.SetField("name", "Default")
+                    End If
+                End If
                 If cs.OK() Then
-                    Call cs.SetField("name", "Default")
+                    '
+                    ' Use the default template in their Db already
+                    If String.IsNullOrEmpty(Trim(cs.GetText("Template"))) Then
+                        Call cs.SetField("Template", cp.WwwFiles.Read("newsletteraddon\Newsletter Template Default.html"))
+                    End If
+                    Return cs.GetInteger("ID")
                 End If
-            End If
-            If cs.OK() Then
-                '
-                ' Use the default template in their Db already
-                '
-                TemplateID = cs.GetInteger("ID")
-                TemplateCopy = Trim(cs.GetText("Template"))
-                If TemplateCopy = "" Then
-                    TemplateCopy = GetLayout(cp, guidLayoutDefaultTemplate)
-                    Call cs.SetField("Template", TemplateCopy)
-                End If
-            End If
-            Call cs.Close()
-            verifyDefaultTemplateGetId = TemplateID
+                Call cs.Close()
+                Return 0
+            End Using
         End Function
         '
         Friend Function verifyDefaultEmailTemplateGetId(cp As CPBaseClass) As Integer
-            Dim cs As CPCSBaseClass = cp.CSNew()
-            Dim TemplateID As Integer
-            Dim TemplateCopy As String
-            '
-            ' try default template
-            '
-            Call cs.Open("Newsletter Templates", "name='Default Email'")
-            If Not cs.OK() Then
-                Call cs.Close()
-                Call cs.Insert("Newsletter Templates")
+            Using cs As CPCSBaseClass = cp.CSNew()
+                '
+                ' -- try default template
+                Call cs.Open("Newsletter Templates", "name='Default Email'")
+                If Not cs.OK() Then
+                    Call cs.Close()
+                    Call cs.Insert("Newsletter Templates")
+                    If cs.OK() Then
+                        Call cs.SetField("name", "Default Email")
+                    End If
+                End If
                 If cs.OK() Then
-                    Call cs.SetField("name", "Default Email")
-                End If
-            End If
-            If cs.OK() Then
-                '
-                ' Use the default template in their Db already
-                '
-                TemplateID = cs.GetInteger("ID")
-                TemplateCopy = Trim(cs.GetText("Template"))
-                If TemplateCopy = "" Then
-                    TemplateCopy = GetLayout(cp, guidLayoutDefaultEmailTemplate)
-                    Call cs.SetField("Template", TemplateCopy)
-                End If
-            End If
-            Call cs.Close()
-            verifyDefaultEmailTemplateGetId = TemplateID
-        End Function
-        '
-        Friend Function GetLayout(ByVal cp As CPBaseClass, guid As String) As String
-            Dim returnHtml As String = ""
-            Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
-                If cs.Open("layouts", "ccguid='" & guid & "'") Then
-                    returnHtml = cs.GetText("layout")
+                    '
+                    ' Use the default template in their Db already
+                    If String.IsNullOrEmpty(Trim(cs.GetText("Template"))) Then
+                        Call cs.SetField("Template", cp.WwwFiles.Read("newsletteraddon\Newsletter Template Default Email.html"))
+                    End If
+                    Return cs.GetInteger("ID")
                 End If
                 Call cs.Close()
-            Catch ex As Exception
-                handleError(cp, ex, "GetLayout(" & guid & ")")
-            End Try
-            Return returnHtml
+                Return 0
+            End Using
         End Function
         '
         '===================================================================================================
@@ -531,36 +492,7 @@ Namespace Views
         '===================================================================================================
         '
         Public Function GetEditWrapper(cp As CPBaseClass, Caption As String, Content As String) As String
-            Dim returnString As String = Content
-            Try
-                '
-                Dim IsAuthoring As Boolean
-                '
-                IsAuthoring = cp.User.IsEditingAnything()
-                If Not IsAuthoring Then
-                    returnString = Content
-                Else
-                    returnString = GetLegacySiteStyles()
-                    returnString = returnString _
-                    & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">"
-                    If Caption <> "" Then
-                        returnString = returnString _
-                                & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
-                                & Caption _
-                                & "<!-- <img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle> -->" _
-                                & "</td></tr></table>"
-                    End If
-                    returnString = returnString _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & EditWrapperCnt & """>" _
-                            & Content _
-                            & "</td></tr></table>" _
-                        & "</td></tr></table>"
-                    EditWrapperCnt = EditWrapperCnt + 1
-                End If
-            Catch ex As Exception
-
-            End Try
-            Return returnString
+            Return cp.Content.GetEditWrapper(Content)
         End Function
         '
         '===================================================================================================
@@ -568,22 +500,7 @@ Namespace Views
         '===================================================================================================
         '
         Public Function GetAdminHintWrapper(cp As CPBaseClass, Content As String) As String
-            Dim returnString As String = Content
-            Try
-                If cp.User.IsEditingAnything() Or cp.User.IsAdmin Then
-                    returnString = GetLegacySiteStyles() _
-                        & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapperContent"">" _
-                            & "<b>Administrator</b>" _
-                            & "<BR>" _
-                            & "<BR>" & Content _
-                            & "</td></tr></table>" _
-                        & "</td></tr></table>"
-                End If
-            Catch ex As Exception
-
-            End Try
-            Return returnString
+            Return cp.Html.adminHint(Content)
         End Function
         '
         Friend Function encodeMinDate(source As Date) As Date
@@ -602,27 +519,6 @@ Namespace Views
             RandomLimit = 32767
             Randomize()
             GetRandomInteger = CInt(Rnd() * RandomLimit)
-        End Function
-        '
-        '
-        '
-        Private Function GetLegacySiteStyles() As String
-            Dim returnStyles As String = ""
-            If Not Private_LegacySiteSites_Loaded Then
-                Private_LegacySiteSites_Loaded = True
-                '
-                ' compatibility with old sites - if they do not get the default style sheet, put it in here
-                '
-                returnStyles = "" _
-                & cr & "<!-- compatibility with legacy framework --><style type=text/css>" _
-                & cr & " .ccEditWrapper {border:1px dashed #808080;}" _
-                & cr & " .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}" _
-                & cr & " .ccEditWrapperContent{padding:4px;}" _
-                & cr & " .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}" _
-                & cr & " .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}" _
-                & "</style>"
-            End If
-            Return returnStyles
         End Function
         '
         '

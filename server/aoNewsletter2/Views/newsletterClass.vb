@@ -33,7 +33,7 @@ Namespace Views
                 Dim BuildDefault As Boolean
                 Dim IssueID As Integer
                 Dim storyID As Integer
-                Dim cn As New NewsletterCommonClass
+                Dim cn As New NewsletterController
                 Dim cs As CPCSBaseClass = CP.CSNew()
                 Dim Body As NewsletterBodyClass
                 Dim nav As NewsletterNavClass
@@ -105,7 +105,7 @@ Namespace Views
                     End If
                     Call cs.Close()
                 End If
-                Call CP.Site.SetProperty(VisitPropertyNewsletter, NewsletterID & "." & IssueID & "." & storyID & "." & FormID)
+                Call CP.Visit.SetProperty(VisitPropertyNewsletter, NewsletterID & "." & IssueID & "." & storyID & "." & FormID)
                 '
                 Call CP.Site.TestPoint("PageClass NLID: " & NewsletterID)
                 '
@@ -167,7 +167,7 @@ Namespace Views
                             If TemplateID = 0 Then
                                 TemplateID = cn.verifyDefaultTemplateGetId(CP)
                                 If TemplateID <> 0 Then
-                                    Call openRecord(CP, cs, "Newsletter Issues", IssueID)
+                                    Call openRecord(CP, cs, "Newsletters", IssueID)
                                     If cs.OK() Then
                                         Call cs.SetField("TemplateID", TemplateID.ToString())
                                     End If
@@ -271,7 +271,7 @@ Namespace Views
                                     Call layout.setClassInner("newsletterTagLine", "")
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
-                            Case FormDetails
+                            Case FormStory
                                 newsBody = layout.getClassInner("newsBody")
                                 If (String.IsNullOrEmpty(newsBody.Trim())) Then
                                     problemList.Add("The newsletter template does not contain a class with 'newsBody', required for a detail page.")
@@ -300,6 +300,8 @@ Namespace Views
                                 End If
                                 newsNav = nav.GetNav(CP, IssueID, NewsletterID, isContentManager, FormID, newsNav, currentIssueID)
                             Case Else
+                                '
+                                ' -- Form Cover
                                 FormID = FormCover
                                 itemLayoutStory = layout.getClassOuter("newsCoverStoryItem")
                                 itemLayoutAdBanners = layout.getClassOuter("adBannerItem")
@@ -536,7 +538,7 @@ Namespace Views
                 Dim CSPointer As CPCSBaseClass = cp.CSNew()
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 Dim templateCopy As String = ""
-                Dim cn As New NewsletterCommonClass
+                Dim cn As New NewsletterController
                 Dim Body As NewsletterBodyClass
                 Dim webTemplateID As Integer
                 Dim Nav As NewsletterNavClass

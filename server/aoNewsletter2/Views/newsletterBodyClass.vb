@@ -11,7 +11,7 @@ Imports Contensive.BaseClasses
 Namespace Views
     Public Class NewsletterBodyClass
         '
-        Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal cn As NewsletterCommonClass, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
+        Friend Function GetArchiveItemList(ByVal cp As CPBaseClass, ByVal cn As NewsletterController, ByVal ButtonValue As String, ByVal currentIssueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String, ByVal NewsletterID As Integer) As String
             '
             Dim layout As New BlockClass
             Dim recordTop As Integer
@@ -47,12 +47,12 @@ Namespace Views
             Dim GoToPage As String = ""
             Dim storyBody As String = ""
             '
-            BlockSearchForm = cp.Doc.GetBoolean("Block Archive Search Form")
-            archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
+            BlockSearchForm = True
+            archiveIssuesToDisplay = 10
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
             yearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
             SearchKeywords = cp.Doc.GetText(RequestNameSearchKeywords)
-            RecordsPerPage = cp.Site.GetInteger("Newsletter Search Results Records Per Page", 3)
+            RecordsPerPage = 10
             recordTop = cp.Doc.GetInteger(RequestNameRecordTop)
             '
             PageNumber = cp.Doc.GetInteger(RequestNamePageNumber)
@@ -192,7 +192,7 @@ Namespace Views
                         qs = refreshQueryString
                         ' 01/12/2017 Dwayne request change the link to the full history
                         'qs = cp.Utils.ModifyQueryString(qs, "formid", FormCover.ToString())
-                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormDetails.ToString())
+                        qs = cp.Utils.ModifyQueryString(qs, "formid", FormStory.ToString())
                         qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, cs.GetInteger("ThisID").ToString())
                         Call layout.load(newsArchiveListItemLayout)
                         Call layout.setClassInner("newsArchiveListCaption", storyName)
@@ -272,7 +272,7 @@ Namespace Views
         End Function
         '
         '
-        Friend Function GetSearchItemList(ByVal cp As CPBaseClass, ByVal cn As NewsletterCommonClass, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String) As String
+        Friend Function GetSearchItemList(ByVal cp As CPBaseClass, ByVal cn As NewsletterController, ByVal ButtonValue As String, ByVal issueId As Integer, ByVal refreshQueryString As String, ByVal newsArchiveListItemLayout As String) As String
             '
             Dim layout As New BlockClass()
             Dim recordTop As Integer
@@ -309,12 +309,15 @@ Namespace Views
             Dim GoToPage As String = ""
             Dim storyBody As String = ""
             '
-            archiveIssuesToDisplay = cp.Doc.GetInteger("Archive Issues To Display")
+            ' -- move to view
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
             yearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
             SearchKeywords = cp.Doc.GetText(RequestNameSearchKeywords)
-            RecordsPerPage = cp.Site.GetInteger("Newsletter Search Results Records Per Page", "3")
             recordTop = cp.Doc.GetInteger(RequestNameRecordTop)
+            '
+            ' todo -- these are now in the settings model
+            archiveIssuesToDisplay = 10
+            RecordsPerPage = 10
             '
             PageNumber = cp.Doc.GetInteger(RequestNamePageNumber)
             If PageNumber = 0 Then
@@ -616,7 +619,7 @@ Namespace Views
                 Dim MainSQL As String
                 Dim CategoryName As String
                 Dim RecordCount As Integer
-                Dim cn As New NewsletterCommonClass
+                Dim cn As New NewsletterController
                 Dim FetchFlag As Boolean
                 Dim CategoryID As Integer
                 Dim CS2 As CPCSBaseClass = cp.CSNew()
@@ -765,7 +768,7 @@ Namespace Views
                 '
                 Dim StoryID As Integer
                 Dim StoryAccessString As String
-                Dim cn As New NewsletterCommonClass
+                Dim cn As New NewsletterController
                 Dim storyBookmark As String
                 Dim caption As String = ""
                 Dim readMoreLink As String = ""
@@ -796,7 +799,7 @@ Namespace Views
                 If Not cn.isBlank(cp, storyBody) Then
                     readMoreLink = refreshQueryString
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID.ToString())
-                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormDetails.ToString())
+                    readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormStory.ToString())
                 End If
                 returnhtml = GetCoverStoryItemLayout(cp, newsCoverStoryItem, StoryAccessString, storyBookmark, caption, overview, readMoreLink, coverInfographicthumbnail, coverInfographic, coverInfographicUrl)
             Catch ex As Exception
@@ -823,7 +826,7 @@ Namespace Views
             Try
                 '
                 Dim layout As New BlockClass
-                Dim cn As New NewsletterCommonClass
+                Dim cn As New NewsletterController
                 Dim readMore As String = ""
                 Dim storyBody As String = ""
                 Dim img As String = ""
@@ -898,7 +901,7 @@ Namespace Views
             Return returnhtml
         End Function
         '
-        Friend Function GetStory(ByVal cp As CPBaseClass, ByVal cn As NewsletterCommonClass, ByVal storyId As Integer, ByVal IssueID As Integer, ByVal refreshQueryString As String, ByVal newsBody As String, isEditing As Boolean) As String
+        Friend Function GetStory(ByVal cp As CPBaseClass, ByVal cn As NewsletterController, ByVal storyId As Integer, ByVal IssueID As Integer, ByVal refreshQueryString As String, ByVal newsBody As String, isEditing As Boolean) As String
             Dim returnHtml As String = ""
             Try
                 Dim cs As CPCSBaseClass = cp.CSNew()
@@ -941,12 +944,12 @@ Namespace Views
                         If cs.GetBoolean("AllowPrinterPage") Then
                             qs = cp.Doc.RefreshQueryString
                             qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, storyId.ToString())
-                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails.ToString())
+                            qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormStory.ToString())
                             qs = cp.Utils.ModifyQueryString(qs, "ccIPage", "l6d09a10sP")
                             returnHtml &= "<div class=""PrintIcon""><a target=_blank href=""?" & qs & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & qs & """><nobr>Printer Version</nobr></a></div>"
                         End If
                         If cs.GetBoolean("AllowEmailPage") Then
-                            Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormDetails
+                            Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormStory
                             returnHtml &= "<div class=""EmailIcon""><a target=_blank href=""?" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
                         End If
                         Call layout.setClassInner("newsBodyCaption", storyName)
@@ -990,7 +993,7 @@ Namespace Views
                                     End If
                                     qs = refreshQueryString
                                     qs = cp.Utils.ModifyQueryString(qs, RequestNameStoryId, CStr(storyId))
-                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormDetails.ToString())
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameFormID, FormStory.ToString())
                                     qs = cp.Utils.ModifyQueryString(qs, "method", "")
                                     rssChange = True
                                     Call cs.SetField("RSSLink", Link & "?" & qs)
