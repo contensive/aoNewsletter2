@@ -76,7 +76,7 @@ Namespace Views
                         If CS2.OK Then
                             CategoryName = cs.GetText("CategoryName")
                             If (CategoryName <> PreviousCategoryName) Then
-                                AccessString = cn.GetCategoryAccessString(cp, cs.GetInteger("CategoryID"))
+                                AccessString = NewsletterController.GetCategoryAccessString(cp, cs.GetInteger("CategoryID"))
                                 If AccessString <> "" Then
                                     repeatList &= "<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>"
                                 End If
@@ -96,7 +96,7 @@ Namespace Views
                                 repeatList &= getNavItem(cp, cn, CS2, newsNavStoryItem)
                                 'Call repeatItem.Load(newsNavStoryItem)
                                 'WorkingStoryId = CS2.GetInteger("ID")
-                                'AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                                'AccessString = NewsletterController.GetArticleAccessString(cp, WorkingStoryId)
                                 'storyCaption = CS2.GetText("Name")
                                 'Call repeatItem.SetClassInner("newsNavItemCaption", storyCaption)
                                 'If AccessString <> "" Then
@@ -136,14 +136,14 @@ Namespace Views
                         repeatList &= getNavItem(cp, cn, cs, newsNavStoryItem)
                         'Call repeatItem.Load(newsNavStoryItem)
                         'WorkingStoryId = cs.GetInteger("ID")
-                        'AccessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                        'AccessString = NewsletterController.GetArticleAccessString(cp, WorkingStoryId)
                         'storyCaption = cs.GetText("Name")
                         ''storyCaption = CS.GetEditLink() & CS.GetText("Name")
                         'If AccessString <> "" Then
                         '    repeatItem.Prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & AccessString & """>")
                         'End If
                         'Call repeatItem.SetClassInner("newsNavItemCaption", storyCaption)
-                        'If Not cn.isBlank(cp, cs.GetText("body")) Then
+                        'If Not NewsletterController.isBlank(cp, cs.GetText("body")) Then
                         '    'If cs.GetBoolean("AllowReadMore") Then
                         '    '
                         '    ' link to the story page
@@ -245,14 +245,14 @@ Namespace Views
                 '
                 Call repeatItem.load(newsNavStoryItemLayout)
                 WorkingStoryId = cs.GetInteger("ID")
-                accessString = cn.GetArticleAccessString(cp, WorkingStoryId)
+                accessString = NewsletterController.GetArticleAccessString(cp, WorkingStoryId)
                 storyCaption = cs.GetText("Name")
                 'storyCaption = CS.GetEditLink() & CS.GetText("Name")
                 If accessString <> "" Then
                     repeatItem.load("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & accessString & """>" & repeatItem.getHtml())
                 End If
                 Call repeatItem.setClassInner("newsNavItemCaption", storyCaption)
-                If Not cn.isBlank(cp, cs.GetText("body")) Then
+                If Not NewsletterController.isBlank(cp, cs.GetText("body")) Then
                     'If cs.GetBoolean("AllowReadMore") Then
                     '
                     ' link to the story page

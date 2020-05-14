@@ -25,11 +25,14 @@ Namespace Views
                 If (String.IsNullOrEmpty(settingsGuid)) Then Return result
                 '
                 ' -- locate or create a data record for this guid
+                Dim newsletterId As Integer = NewsletterController.getNewsletterId(CP, settingsGuid)
+                Dim currentIssueID As Integer = NewsletterController.GetCurrentIssueID(CP, newsletterId)
                 Dim settings = NewsletterModel.createOrAddSettings(CP, settingsGuid)
                 If (settings Is Nothing) Then Throw New ApplicationException("Could not create the design block settings record.")
                 '
                 ' -- create legacy newsletter
-                Dim legacyNewsletter As String = (New NewsletterClass()).Execute(CP)
+                '
+                Dim legacyNewsletter As String = (New NewsletterClass()).getLegacyNewsletter(CP, newsletterId, currentIssueID)
                 '
                 ' -- translate the Db model to a view model and mustache it into the layout
                 Dim viewModel = NewsletterViewModel.create(CP, settings, legacyNewsletter)

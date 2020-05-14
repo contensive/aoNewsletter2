@@ -367,4 +367,6 @@
 	<Resource name="aoNewsletter2.dll" type="executable" path="" />
 	<Resource name="footer.jpg" type="www" path="newsletterAddon" />
 	<Resource name="header.jpg" type="www" path="newsletterAddon" />
+	<Resource name="fpiebfooterfpi.jpg" type="www" path="newsletterAddon" />
+	<Resource name="fpiebheaderfpi.jpg" type="www" path="newsletterAddon" />
 </Collection>

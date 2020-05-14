@@ -10,7 +10,6 @@ Imports Contensive.BaseClasses
 
 Namespace Views
     Public Class NewsletterClass
-        Inherits AddonBaseClass
         ' 
         '=====================================================================================
         ''' <summary>
@@ -18,7 +17,7 @@ Namespace Views
         ''' </summary>
         ''' <param name="CP"></param>
         ''' <returns></returns>
-        Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
+        Public Function getLegacyNewsletter(ByVal CP As CPBaseClass, NewsletterID As Integer, currentIssueID As Integer) As Object
             Dim returnHtml As String = ""
             Try
                 Dim refreshQueryString As String = ""
@@ -43,7 +42,7 @@ Namespace Views
                 Dim TemplateCopy As String = ""
                 Dim qs As String
                 Dim ButtonValue As String
-                Dim NewsletterID As Integer
+
                 Dim isManager As Boolean
                 Dim ReferLink As String
                 Dim currentLink As String = ""
@@ -56,7 +55,7 @@ Namespace Views
                 ' deal with this later
                 Dim archiveIssueID As Integer = 0
                 Dim ItemList As String = ""
-                Dim currentIssueID As Integer
+
                 Dim footerAdBanners As String = ""
                 Dim itemLayoutAdBanners As String = ""
                 Dim sponsor As String = ""
@@ -71,9 +70,6 @@ Namespace Views
                 ReferLink = RequestNameRefer & "=" & CP.Utils.EncodeRequestVariable(CP.Utils.ModifyLinkQueryString(currentLink, RequestNameRefer, ""))
                 isManager = CP.User.IsContentManager("Newsletters")
                 '
-                NewsletterID = cn.getNewsletterId(CP)
-                currentIssueID = cn.GetCurrentIssueID(CP, NewsletterID)
-                '
                 BuildDefault = CP.Doc.GetBoolean("BuildDefault")
                 FormID = CP.Doc.GetInteger(RequestNameFormID)
                 storyID = CP.Doc.GetInteger(RequestNameStoryId)
@@ -82,7 +78,7 @@ Namespace Views
                     ' No page given, use the QS for the Issue, or get current
                     '
                     Call CP.Site.TestPoint("GetIssueID call 4, NewsletterID=" & NewsletterID)
-                    IssueID = cn.GetIssueID(CP, NewsletterID, currentIssueID)
+                    IssueID = NewsletterController.GetIssueID(CP, NewsletterID, currentIssueID)
                 Else
                     '
                     ' PageID given, get Issue from PageID (and check against Newsletter)
@@ -99,7 +95,7 @@ Namespace Views
                         ' Bad Issue, reset to current issue of current newsletter
                         '
                         Call CP.Site.TestPoint("GetIssueID call 5, NewsletterID=" & NewsletterID)
-                        IssueID = cn.GetIssueID(CP, NewsletterID, currentIssueID)
+                        IssueID = NewsletterController.GetIssueID(CP, NewsletterID, currentIssueID)
                         storyID = 0
                         FormID = FormCover
                     End If
@@ -109,14 +105,12 @@ Namespace Views
                 '
                 Call CP.Site.TestPoint("PageClass NLID: " & NewsletterID)
                 '
-                Call cn.SortCategoriesByIssue(CP, IssueID)
+                Call NewsletterController.SortCategoriesByIssue(CP, IssueID)
                 '
                 If (isManager And (FormID = FormEmail)) Then
                     '
                     ' create email version -- use Print Version to block edit links
-                    ' ????? 
                     '
-                    'Main.ServerPagePrintVersion = True
                     EmailID = CreateEmailGetID(CP, IssueID, NewsletterID, refreshQueryString, currentIssueID)
                     CP.Response.Redirect(CP.Site.GetText("adminUrl") & "?cid=" & CP.Content.GetID(ContentNameGroupEmail) & "&id=" & EmailID & "&af=4")
                     returnHtml = ""
@@ -165,7 +159,7 @@ Namespace Views
                             End If
                             '
                             If TemplateID = 0 Then
-                                TemplateID = cn.verifyDefaultTemplateGetId(CP)
+                                TemplateID = NewsletterController.verifyDefaultTemplateGetId(CP)
                                 If TemplateID <> 0 Then
                                     Call openRecord(CP, cs, "Newsletters", IssueID)
                                     If cs.OK() Then
@@ -180,7 +174,6 @@ Namespace Views
                                 If cs.OK() Then
                                     EditLink = cs.GetEditLink()
                                     TemplateCopy = cs.GetText("Template")
-                                    'returnHtml = cn.GetEditWrapper(cp, "Newsletter Template [" & cs.GetText("Name") & "] " & EditLink, returnHtml)
                                 End If
                                 Call cs.Close()
                             End If
@@ -202,13 +195,6 @@ Namespace Views
                         End Select
                         '
                         ' Dispay the form
-                        '
-                        '
-                        If TemplateCopy = "" Then
-                            '
-                            ' create default string 
-                            '
-                        End If
                         '
                         layout.load(TemplateCopy)
                         If (Not String.IsNullOrEmpty(mastheadFilename)) Then
@@ -423,6 +409,9 @@ Namespace Views
                     '
                     If isEditing Then
                         '
+                        ' -- wrap in issue edit
+                        returnHtml = CP.Content.GetEditWrapper(CP.Content.GetEditLink("newsletter issues", currentIssueID) & returnHtml)
+                        '
                         ' Controls
                         '
                         Controls = ""
@@ -468,7 +457,7 @@ Namespace Views
                             '
                             ' Search for unpublished versions
                             '
-                            UnpublishedIssueList = cn.GetUnpublishedIssueList(CP, NewsletterID, cn)
+                            UnpublishedIssueList = NewsletterController.GetUnpublishedIssueList(CP, NewsletterID, cn)
                             If UnpublishedIssueList <> "" Then
                                 Controls = Controls & "<h3>Unpublished issues for this Newsletter</h3>"
                                 Controls = Controls & UnpublishedIssueList
@@ -493,7 +482,7 @@ Namespace Views
                              & "<P>To create a new newsletter, click the 'Add a new Newsletter' link. To make your new newsletter appear here, turn on Advanced Edit and click the Options icon at the top of add-on (wrench icon). Select the newsletter you want to display and hit update.</P>" _
                              & ""
                         If Controls <> "" Then
-                            returnHtml = returnHtml & cn.GetAdminHintWrapper(CP, Controls)
+                            returnHtml = returnHtml & NewsletterController.GetAdminHintWrapper(CP, Controls)
                         End If
 
                     End If
@@ -508,15 +497,12 @@ Namespace Views
             Catch ex As Exception
                 HandleError(CP, ex, "execute")
             End Try
-            Call CP.Utils.ExecuteAddonAsProcess("RSS Feed Process")
+            Call CP.Addon.ExecuteAsyncByUniqueName("RSS Feed Process")
             Return returnHtml
         End Function
         '
-        '
         '=====================================================================================
         ' common report for this class
-        '=====================================================================================
-        '
         Private Sub HandleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
             Try
                 cp.Site.ErrorReport(ex, "Unexpected error in newsletterPageClass." & method)
@@ -560,14 +546,12 @@ Namespace Views
                 Dim mastheadFilename As String = ""
                 Dim footerFilename As String = ""
                 '
-                'Call cp.Utils.AppendLogFile("createEmailGetId, 000")
-                '
                 If IssueID > 0 Then
                     Call openRecord(cp, cs, "Newsletters", NewsletterID)
                     If cs.OK() Then
                         webTemplateID = cs.GetInteger("TemplateID")
                         emailTemplateID = cs.GetInteger("emailTemplateID")
-                        Styles = cp.File.ReadVirtual(cs.GetText("StylesFileName"))
+                        Styles = cp.CdnFiles.Read(cs.GetText("StylesFileName"))
                         mastheadFilename = cs.GetText("mastheadFilename")
                         footerFilename = cs.GetText("footerFilename")
                     End If
@@ -581,7 +565,7 @@ Namespace Views
                         Call openRecord(cp, cs, "newsletter templates", templateId)
                         If Not cs.OK Then
                             templateId = 0
-                            Call cp.Db.ExecuteSQL("update newsletters set emailtemplateid=0 where id=" & NewsletterID)
+                            Call cp.Db.ExecuteNonQuery("update newsletters set emailtemplateid=0 where id=" & NewsletterID)
                         Else
                             templateCopy = cs.GetText("Template")
                         End If
@@ -597,8 +581,8 @@ Namespace Views
                         '
                         templateId = webTemplateID
                         If templateId = 0 Then
-                            templateId = cn.verifyDefaultTemplateGetId(cp)
-                            Call cp.Db.ExecuteSQL("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
+                            templateId = NewsletterController.verifyDefaultTemplateGetId(cp)
+                            Call cp.Db.ExecuteNonQuery("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
                             '
                             Call openRecord(cp, cs, "newsletter templates", templateId)
                             If cs.OK Then
@@ -613,8 +597,8 @@ Namespace Views
                             Call openRecord(cp, cs, "newsletter templates", templateId)
                             If Not cs.OK Then
                                 Call cs.Close()
-                                templateId = cn.verifyDefaultTemplateGetId(cp)
-                                Call cp.Db.ExecuteSQL("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
+                                templateId = NewsletterController.verifyDefaultTemplateGetId(cp)
+                                Call cp.Db.ExecuteNonQuery("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
                                 Call openRecord(cp, cs, "newsletter templates", templateId)
                             End If
                             templateCopy = cs.GetText("Template")
@@ -628,14 +612,7 @@ Namespace Views
                         templateCopy = cs.GetText("Template")
                     End If
                     Call cs.Close()
-
                 End If
-                If templateCopy = "" Then
-                    '
-                    ' fix somehow
-                    '
-                End If
-                '
                 '
                 ' There is a template, encoding it captures the newsletterBodyClass
                 '
@@ -807,41 +784,6 @@ Namespace Views
             End Try
             Return returnId
         End Function
-        ''
-        'Private Function htmlGetClassInner(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String) As String
-        '    Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
-        '    If Not (node Is Nothing) Then
-        '        Return node.InnerHtml()
-        '    End If
-        '    Return String.Empty
-        'End Function
-        ''
-        'Private Function htmlGetClassOuter(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String) As String
-        '    Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
-        '    If Not (node Is Nothing) Then
-        '        Return node.OuterHtml()
-        '    End If
-        '    Return String.Empty
-        'End Function
-        ''
-        'Private Sub htmlSetClassInner(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String, replacement As String)
-        '    Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
-        '    If Not (nodes Is Nothing) Then
-        '        For Each node As HtmlAgilityPack.HtmlNode In nodes
-        '            node.InnerHtml = replacement
-        '        Next
-        '    End If
-        'End Sub
-        ''
-        'Private Sub htmlSetClassOuter(ByRef layout2 As HtmlAgilityPack.HtmlDocument, findClass As String, replacement As String)
-        '    Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
-        '    If Not (nodes Is Nothing) Then
-        '        For Each node As HtmlAgilityPack.HtmlNode In nodes
-        '            Dim newNode As HtmlAgilityPack.HtmlNode = HtmlAgilityPack.HtmlNode.CreateNode(replacement)
-        '            node.ParentNode.ReplaceChild(newNode, node)
-        '        Next
-        '    End If
-        'End Sub
-        '
+
     End Class
 End Namespace

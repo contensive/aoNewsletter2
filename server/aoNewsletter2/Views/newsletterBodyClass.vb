@@ -182,7 +182,7 @@ Namespace Views
                         storyOverview = cs.GetText("Overview")
                         storyBody = cs.GetText("body")
                         If storyOverview = "" Then
-                            If Not cn.isBlank(cp, storyBody) Then
+                            If Not NewsletterController.isBlank(cp, storyBody) Then
                                 'if cs.GetBoolean("AllowReadMore") Then
                                 storyOverview = storyBody
                             Else
@@ -436,7 +436,7 @@ Namespace Views
                         storyOverview = cs.GetText("Overview")
                         storyBody = cs.GetText("body")
                         If storyOverview = "" Then
-                            If Not cn.isBlank(cp, storyBody) Then
+                            If Not NewsletterController.isBlank(cp, storyBody) Then
                                 ' if cs.GetBoolean("AllowReadMore") Then
                                 storyOverview = storyBody
                             Else
@@ -622,7 +622,6 @@ Namespace Views
                 Dim cn As New NewsletterController
                 Dim FetchFlag As Boolean
                 Dim CategoryID As Integer
-                Dim CS2 As CPCSBaseClass = cp.CSNew()
                 Dim qs As String
                 Dim cover As String
                 '
@@ -671,30 +670,28 @@ Namespace Views
                 If cs.OK() Then
                     Do While cs.OK()
                         CategoryID = cs.GetInteger("CategoryID")
-                        '
-                        Call CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder,id")
-                        If CS2.OK Then
-                            '
-                            ' there are stories under this topic, wrap in div to allow a story indent
-                            '
-                            Call layout.load(newsCoverCategoryItem)
-                            CategoryName = cs.GetText("CategoryName")
-                            If isEditing And (RecordCount <> 0) Then
-                                qs = refreshQueryString
-                                qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID.ToString())
-                                qs = cp.Utils.ModifyQueryString(qs, RequestNameSortUp, CategoryID.ToString())
-                                CategoryName &= "&nbsp;<a href=""?" & qs & """><span style=""font-family:helvetica,arial,san-serif;font-weight:Normal;font-size:13px;text-decoration:none;"">[Move Up]</span></a> "
+                        Using CS2 As CPCSBaseClass = cp.CSNew()
+                            If CS2.Open(ContentNameNewsletterStories, "(CategoryID=" & CategoryID & ") AND (NewsletterID=" & IssueID & ")", "SortOrder,id") Then
+                                '
+                                ' there are stories under this topic, wrap in div to allow a story indent
+                                Call layout.load(newsCoverCategoryItem)
+                                CategoryName = cs.GetText("CategoryName")
+                                If isEditing And (RecordCount <> 0) Then
+                                    qs = refreshQueryString
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameIssueID, IssueID.ToString())
+                                    qs = cp.Utils.ModifyQueryString(qs, RequestNameSortUp, CategoryID.ToString())
+                                    CategoryName &= "&nbsp;<a href=""?" & qs & """><span style=""font-family:helvetica,arial,san-serif;font-weight:Normal;font-size:13px;text-decoration:none;"">[Move Up]</span></a> "
+                                End If
+                                Call layout.setClassInner("newsCoverCategoryItem", CategoryName)
+                                returnHtmlItemList &= layout.getHtml()
+                                '
+                                Do While CS2.OK
+                                    returnHtmlItemList &= GetCoverStoryItem(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
+                                    Call CS2.GoNext()
+                                Loop
                             End If
-                            Call layout.setClassInner("newsCoverCategoryItem", CategoryName)
-                            returnHtmlItemList &= layout.getHtml()
-                            '
-                            Do While CS2.OK
-                                returnHtmlItemList &= GetCoverStoryItem(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
-                                Call CS2.GoNext()
-                            Loop
-                            'returnHtmlItemList &= layout.GetHtml()
-                        End If
-                        Call CS2.Close()
+                            Call CS2.Close()
+                        End Using
                         Call cs.GoNext()
                         RecordCount = RecordCount + 1
                     Loop
@@ -718,7 +715,7 @@ Namespace Views
                 '
                 If isEditing Then
                     Call layout.load(newsCoverStoryItem)
-                    Call layout.setClassInner("newsCoverListCaption", cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything) & "Add a story to this issue")
+                    Call layout.setClassInner("newsCoverListCaption", cp.Content.GetAddLink(ContentNameNewsletterStories, "Newsletterid=" & IssueID, False, cp.User.IsEditingAnything))
                     Call layout.setClassInner("newsCoverListOverview", "")
                     Call layout.setClassInner("newsCoverListReadMore", "")
                     Call layout.setClassInner("infographicBox", "")
@@ -785,7 +782,7 @@ Namespace Views
                 coverInfographicUrl = CSStories.GetText("coverInfographicUrl")
                 storyBookmark = "story" & StoryID
                 '
-                StoryAccessString = cn.GetArticleAccessString(cp, StoryID)
+                StoryAccessString = NewsletterController.GetArticleAccessString(cp, StoryID)
                 '
                 If formId <> FormEmail Then
                     caption &= CSStories.GetEditLink()
@@ -796,7 +793,7 @@ Namespace Views
                 End If
                 overview &= cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview"))
                 storyBody = CSStories.GetText("body")
-                If Not cn.isBlank(cp, storyBody) Then
+                If Not NewsletterController.isBlank(cp, storyBody) Then
                     readMoreLink = refreshQueryString
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID.ToString())
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormStory.ToString())
@@ -925,6 +922,7 @@ Namespace Views
                 EmailIcon = "<img border=0 src=/ccLib/images/IconEmail.gif>"
                 '
                 If storyId = 0 Then
+                    Call layout.setClassOuter("newsBodyCaption", "")
                     Call layout.setClassInner("newsBodyStory", "<span class=""ccError"">The requested story is currently unavailable.</span>")
                 Else
                     Call cs.Open(ContentNameNewsletterStories, "ID=" & storyId)
@@ -960,13 +958,13 @@ Namespace Views
                         If Not isEditing Then
                             rssChange = False
                             If (IssueID <> 0) Then
-                                If (cn.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
+                                If (NewsletterController.encodeMinDate(cs.GetDate("RSSDatePublish")) = Date.MinValue) Then
                                     CSIssue.Open(ContentNameNewsletterIssues, "id=" & cp.Db.EncodeSQLNumber(IssueID))
                                     If CSIssue.OK() Then
                                         PublishDate = CSIssue.GetDate("publishDate")
                                     End If
                                     Call CSIssue.Close()
-                                    If (cn.encodeMinDate(PublishDate) <> Date.MinValue) Then
+                                    If (NewsletterController.encodeMinDate(PublishDate) <> Date.MinValue) Then
                                         rssChange = True
                                         Call cs.SetField("RSSDatePublish", PublishDate.ToString())
                                     End If

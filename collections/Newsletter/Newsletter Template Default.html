@@ -1,15 +1,12 @@
-
-			
-			
-			<style>
+<style>
 	/* define to match inline styles (for email) and over-ride site stylesheets (for pages) */
 	#newsTemplate div
 	,#newsTemplate p
 	,#newsTemplate li
 	,#newsTemplate td {
-		font-family: 'Roboto', sans-serif;
+		font-family:georgia,serif;
 		font-size:14px;
-		font-weight:normal
+		font-weight:normal;
 	}
 	#newsTemplate h1
 	,#newsTemplate h2
@@ -19,80 +16,130 @@
 	,#newsTemplate .newsNavCaption
 	,#newsTemplate .newsBodyCaption
 	{
-		font-family: 'Roboto Slab', serif;
+		font-family:helvetica,san-serif;
 		font-size:16px;
-		font-weight:bold
+		font-weight:bold;
 	}
 	#newsTemplate .newsNavItemCaption
 	{
-		font-family: 'Roboto Slab', serif;
-		font-size:16px;
+		font-family:helvetica,san-serif;
+		font-size:14px;
+	}
+	#newsTemplate .newsNavStoryItem
+	{
+		font-family:helvetica,san-serif;
+		font-size:14px;
+	}
+	#newsTemplate .newsNavCategoryItem
+	{
+		font-family:helvetica,san-serif;
+		font-size:14px;
 	}
 	#newsTemplate .newsCoverCategoryItem
 	{
 		color:#fff;
-		background-color:#a9a9a9;
-		font-family: 'Roboto', sans-serif;
-		font-size:18px;
+		background-color:#4a4;
+		font-family:helvetica,san-serif;
+		font-size:16px;
 		font-weight:bold
 	}
 	#newsTemplate .newsCoverListReadMoreCaption
 	{
-		font-family: 'Roboto', sans-serif;
-		font-size:14px;
+		font-family:helvetica,san-serif;
+		font-size:12px;
 		font-weight:normal;
-		color: #17a2b8!important;
 	}
-	#newsTemplate a {
-
-		text-decoration: none !important;
-	}
-
+	
 </style>
-<div id="newsTemplate" style="width:600px;margin:0 auto;font-family: 'Roboto', sans-serif;font-size:14px;">
+<div id="newsTemplate" style="width:600px;margin:0 auto;font-family:georgia,serif;font-size:14px;">
 	<table style="border:none;BORDER-COLLAPSE:collapse;TEXT-ALIGN: left; MARGIN: 0px; WIDTH: 600px" cellpadding="0">
 		<tbody>
 			<tr align="left">
-				<td style="border:none;TEXT-ALIGN:left;overflow:hidden;">
-					<div style="width:600px;height:100%" class="newsHeaderMasthead">
-						<img width="600" height="100%" border="0" alt="Welcome to Our Newsletter" title="Welcome to Our Newsletter" src="/newsletteraddon/header.jpg" data-image="eloob61wa1ah">
+				<td style="border:none;TEXT-ALIGN:left;overflow:hidden;" colspan="2">
+					<div style="width:600px;height:246px">
+						<div class="newsHeaderMasthead">
+							<img width="600" height="246 " border="0" src="/newsletteraddon/header.jpg" data-image="71wjsuv49mhg">
+						</div>
 					</div>
-					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family: 'Roboto Slab', serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #a9a9a9;" class="newsIssueCaption pt-4">
+					<div style="width:600px;border-bottom:1px solid #ddd;font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;margin: 0;padding: 0;line-height: 24px;color: #888;" class="newsIssueCaption">
 						Issue Caption
 					</div>
 				</td>
 			</tr>
 			<tr>
-				<td style=";border: none; vertical-align:top; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px">
-					<div class="newsCover">
+				<td width="200" style="width:200px;border: none; vertical-align:top; WORD-SPACING: 0px; TEXT-ALIGN: left; LETTER-SPACING: 0px">
+					<div class="newsNav" style="padding:20px 10px 0 10px;">
+						<div class="newsNavCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">In This Issue</div>
+						<div class="newsNavList">
+							<div class="newsNavCategoryItem" style="padding:10px 0 0 10px;"><span class="newsNavItemCaption" style="font-family:helvetica,san-serif;font-size:14px;font-weight:bold;">Category</span></div>
+							<div class="newsNavStoryItem" style="padding:5px 0 0 10px;"><a class="newsNavItemAnchor" href="?"><span class="newsNavItemCaption" style="font-family:helvetica,san-serif;font-size:12px;font-weight:normal;">Home</span></a></div>
+						</div>
+					</div>
+				</td>
+				<td width="400" style="width:400px;border:none;vertical-align:top;text-align:left;font-family:georgia,serif;font-size:14px;font-weight:normal;">
+				<div class="newsCover" style="padding:20px 10px 0 10px;">
 						<div class="newsCoverList">
-							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#a9a9a9;font-family: 'Roboto Slab', serif;font-size:16px;">
+							<div class="newsCoverCategoryItem" style="padding:10px;color:#fff;background-color:#4a4;font-family:helvetica,san-serif;font-size:16px;">
 								Industry news
 							</div>
-							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;">
-								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family: 'Roboto Slab', serif;font-size:16px; border-top:1px solid #d9d9d9; padding-top: 10px;">Story Headline</div>
-								<div class="newsCoverListOverview" style="font-family: 'Roboto', sans-serif;font-size:14px;">
+							<div class="newsCoverStoryItem" style="margin:10px 0 0 0;border-top:1px solid #888;">
+								<div class="infographImage"></div>
+								<div class="infographLink"></div>
+								<div class="newsCoverListCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Story Headline</div>
+								<div class="newsCoverListOverview" style="font-family:georgia,serif;font-size:14px;">
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
-								<div class="pb-3">
-									<div class="newsCoverListReadMore">
-										<a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a>
-									</div>
+								<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
+							</div>
+						</div>
+					</div>
+					<div class="newsBody" style="padding:20px 10px 0 10px">
+						<div class="newsBodyCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Story Headline</div>
+						<div class="newsBodyStory" style="font-family:georgia,serif;font-size:14px;">
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+						</div>
+					</div>
+					<div class="newsArchive" style="padding:20px 10px 0 10px;">
+						<div class="newsArchiveCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Archive Issues</div>
+						<div class="newsArchiveList" style="margin:0 0 10px 0;">
+							<div class="newsArchiveListItem" style="margin:10px 0 0;border-top:1px solid #888;">
+								<div style="margin:10px 0 0;">
+									<a href="?"><span class="newsArchiveListCaption" style="font-weight:bold;font-family:helvetica,san-serif;font-size:16px;">Archived Issue</span></a>
 								</div>
+								<div class="newsArchiveListOverview" style="margin:10px 0 0;font-family:georgia,serif;font-size:14px;">
+									<p>newsListOverview- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="newsSearch" style="padding:20px 10px 0 10px;">
+						<div class="newsSearchCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Archive Issues</div>
+						<div class="newsSearchList">
+							<div class="newsSearchListItem">
+								<div>
+									<a href="?"><span class="newsSearchListCaption" style="font-weight:bold;margin-top:10px;font-family:helvetica,san-serif;font-size:16px;">Archived Issue</span></a>
+								</div>
+								<div class="newsSearchListOverview" style="font-family:georgia,serif;font-size:14px;">
+									<p>newsListOverview- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
+								</div>
+								<div class="newsSearchListReadMore"><a class="newsSearchListReadMoreAnchor" href="?bid=67&issuepage=1&formid=400"><span class="newsSearchListReadMoreCaption">Read More</span></a></div>
 							</div>
 						</div>
 					</div>
 				</td>
 			</tr>
 			<tr>
-				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;">
-					<div style="width:600px;height:100%;TEXT-ALIGN: left" class="newsFooter pb-4">
-						<img width="600" height="100%" border="0" src="/newsletteraddon/footer.jpg" alt="Welcome" title="Welcome" data-image="d52ssk1nrfvs">
+				<td style="border: none;TEXT-ALIGN:center;overflow:hidden;" colspan="2">	
+					<div style="width:600px;height:169px;TEXT-ALIGN: left">
+						<div class="newsFooterMasthead">
+							<img width="600" height="169" border="0" src="/newsletteraddon/footer.jpg" data-image="15iezxfz2rz2">
+						</div>
 					</div>
 				</td>
 			</tr>
 		</tbody>
 	</table>
 </div>
-
-

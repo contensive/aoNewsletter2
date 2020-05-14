@@ -85,16 +85,16 @@ Namespace Views
                 If ExtensionName = "" Then
                     ExtensionName = "Default"
                     'If Main.IsAdmin() Then
-                    '    returnHtml = cn.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                    '    returnHtml = NewsletterController.getAdminHintWrapper( cp,"The ExtensionName is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     'End If
                 Else
                     '
                     ' Handle PageID Request Variable
                     '
-                    currentIssueId = cn.GetCurrentIssueID(cp, NewsletterID)
+                    currentIssueId = NewsletterController.GetCurrentIssueID(cp, NewsletterID)
                     ExtensionType = LCase(Trim(cp.Doc.GetText("ExtensionType", OptionString)))
                     Call cp.Site.TestPoint("GetIssueID call 1, NewsletterID=" & NewsletterID)
-                    IssueID = cn.GetIssueID(cp, NewsletterID, currentIssueId)
+                    IssueID = NewsletterController.GetIssueID(cp, NewsletterID, currentIssueId)
                     PageID = cp.Doc.GetInteger(RequestNameStoryId)
                     IsQuickEditing = cp.User.IsQuickEditing("Page Content")
                     IsWorkflowRendering = cp.User.IsWorkflowRendering
@@ -109,7 +109,7 @@ Namespace Views
                                 returnHtml = cp.Content.GetCopy("Newsletter-Extension-Issue-Page-" & IssueID & "-" & PageID & "-" & ExtensionName)
                             End If
                         Case Else
-                            returnHtml = cn.GetAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
+                            returnHtml = NewsletterController.GetAdminHintWrapper(cp, "The Extension Type is blank. To use the Page Extension, set the ExtensionName and select the ExtensionType.")
                     End Select
                 End If
             End If

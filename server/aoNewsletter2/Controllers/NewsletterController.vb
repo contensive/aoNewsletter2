@@ -13,14 +13,11 @@ Namespace Controllers
         '
         Public Const cr As String = vbCrLf & vbTab
         '
-        Private Private_LegacySiteSites_Loaded As Boolean
-        Private EditWrapperCnt As Integer = 0
-        '
         '=====================================================================================
         ' common report for this class
         '=====================================================================================
         '
-        Private Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
+        Private Shared Sub handleError(ByVal cp As CPBaseClass, ByVal ex As Exception, ByVal method As String)
             Try
                 cp.Site.ErrorReport(ex, "Unexpected error in newsletterCommonClass." & method)
             Catch exLost As Exception
@@ -30,7 +27,7 @@ Namespace Controllers
             End Try
         End Sub
         '
-        Friend Function GetIssueID(ByVal cp As CPBaseClass, ByVal NewsletterID As Integer, ByVal currentIssueId As Integer) As Integer
+        Friend Shared Function GetIssueID(ByVal cp As CPBaseClass, ByVal NewsletterID As Integer, ByVal currentIssueId As Integer) As Integer
             '
             Dim IssueID As Integer = cp.Doc.GetInteger(RequestNameIssueID)
             '
@@ -41,7 +38,7 @@ Namespace Controllers
             Return IssueID
         End Function
         '
-        Friend Function GetCurrentIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
+        Friend Shared Function GetCurrentIssueID(cp As CPBaseClass, NewsletterID As Integer) As Integer
             Try
                 Dim returnId As Integer = 0
                 Using cs As CPCSBaseClass = cp.CSNew()
@@ -65,7 +62,7 @@ Namespace Controllers
             End Try
         End Function
         '
-        Friend Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As NewsletterController) As String
+        Friend Shared Function GetUnpublishedIssueList(cp As CPBaseClass, NewsletterID As Integer, cn As NewsletterController) As String
             GetUnpublishedIssueList = ""
             '
             Dim qs As String = ""
@@ -93,7 +90,7 @@ Namespace Controllers
                 If Not Active Then
                     Copy = Copy & ",inactive"
                 End If
-                If cn.encodeMinDate(DateAdded) <> Date.MinValue Then
+                If NewsletterController.encodeMinDate(DateAdded) <> Date.MinValue Then
                     Copy = Copy & ", created " & DateAdded.ToShortDateString
                 End If
                 If PublishDate <> Date.MinValue Then
@@ -123,21 +120,11 @@ Namespace Controllers
             'Call HandleError("aoNewsletter.newsletterCommonClass", "GetUnpublishedIssueList")
         End Function
         '
-        Friend Function getNewsletterId(cp As CPBaseClass) As Integer
+        Friend Shared Function getNewsletterId(cp As CPBaseClass, addonArgInstanceGuid As String) As Integer
             Dim returnId As Integer = 0
             Try
-                Dim addonArgumentNewsletterId As Integer
-                Dim addonArgInstanceGuid As String
-                Dim templateID As Integer
-                Dim emailTemplateID As Integer
-                Dim cs As CPCSBaseClass = cp.CSNew()
-                Dim CSIssue As CPCSBaseClass = cp.CSNew()
-                Dim AOPointer As CPCSBaseClass = cp.CSNew()
-                Dim StyleString As String = ""
+                Dim addonArgumentNewsletterId As Integer = cp.Doc.GetInteger("Newsletter")
                 Dim criteria As String = ""
-                '
-                addonArgumentNewsletterId = cp.Doc.GetInteger("Newsletter")
-                addonArgInstanceGuid = cp.Doc.GetText("instanceid")
                 If addonArgumentNewsletterId > 0 Then
                     criteria = "(id=" & addonArgumentNewsletterId & ")"
                 ElseIf (addonArgInstanceGuid <> "") Then
@@ -145,44 +132,45 @@ Namespace Controllers
                 Else
                     criteria = "(name='Default')"
                 End If
-                Call cs.Open(ContentNameNewsletters, criteria)
-                If cs.OK() Then
-                    returnId = cs.GetInteger("ID")
-                Else
-                    Call cs.Close()
-                    '
-                    ' must create new newsletter
-                    '
-                    Call cs.Insert(ContentNameNewsletters)
-                    If cs.OK() Then
+                Using cs As CPCSBaseClass = cp.CSNew()
+                    If cs.Open(ContentNameNewsletters, criteria) Then
                         returnId = cs.GetInteger("ID")
-                        templateID = verifyDefaultTemplateGetId(cp)
-                        emailTemplateID = verifyDefaultEmailTemplateGetId(cp)
-                        If (addonArgInstanceGuid <> "") Then
-                            '
-                            ' newsletter called out by guid but not found
-                            '
-                            Call cs.SetField("ccguid", addonArgInstanceGuid)
-                            Call cs.SetField("Name", cp.Content.GetRecordName("page content", cp.Doc.PageId))
-                        Else
-                            '
-                            ' all other cases
-                            '
-                            Call cs.SetField("Name", "'Default'")
+                    Else
+                        Call cs.Close()
+                        '
+                        ' must create new newsletter
+                        '
+                        Call cs.Insert(ContentNameNewsletters)
+                        If cs.OK() Then
+                            returnId = cs.GetInteger("ID")
+                            Dim templateID As Integer = verifyDefaultTemplateGetId(cp)
+                            Dim emailTemplateID As Integer = verifyDefaultEmailTemplateGetId(cp)
+                            If (addonArgInstanceGuid <> "") Then
+                                '
+                                ' newsletter called out by guid but not found
+                                '
+                                Call cs.SetField("ccguid", addonArgInstanceGuid)
+                                Call cs.SetField("Name", cp.Content.GetRecordName("page content", cp.Doc.PageId))
+                            Else
+                                '
+                                ' all other cases
+                                '
+                                Call cs.SetField("Name", "'Default'")
+                            End If
+                            Call cs.SetField("TemplateID", templateID.ToString())
+                            Call cs.SetField("emailTemplateID", emailTemplateID.ToString())
                         End If
-                        Call cs.SetField("TemplateID", templateID.ToString())
-                        Call cs.SetField("emailTemplateID", emailTemplateID.ToString())
+                        Call createDefaultIssueGetId(cp, returnId)
                     End If
-                    Call createDefaultIssueGetId(cp, returnId)
-                End If
-                Call cs.Close()
+                    Call cs.Close()
+                End Using
             Catch ex As Exception
                 handleError(cp, ex, "getnewsletterId")
             End Try
             Return returnId
         End Function
         '
-        Friend Function createDefaultIssueGetId(cp As CPBaseClass, newsletterId As Integer) As Integer
+        Friend Shared Function createDefaultIssueGetId(cp As CPBaseClass, newsletterId As Integer) As Integer
             Dim returnId As Integer = 0
             Try
                 Dim cs As CPCSBaseClass = cp.CSNew()
@@ -217,7 +205,7 @@ Namespace Controllers
             Return returnId
         End Function
         '
-        Friend Sub SortCategoriesByIssue(cp As CPBaseClass, IssueID As Integer)
+        Friend Shared Sub SortCategoriesByIssue(cp As CPBaseClass, IssueID As Integer)
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Pointer As CPCSBaseClass = cp.CSNew()
             Dim CategoryID As Integer
@@ -304,7 +292,7 @@ Namespace Controllers
             End If
         End Sub
         '
-        Friend Function GetCategoryAccessString(cp As CPBaseClass, CategoryID As Integer) As String
+        Friend Shared Function GetCategoryAccessString(cp As CPBaseClass, CategoryID As Integer) As String
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim SQL As String
             Dim Stream As String = ""
@@ -346,7 +334,7 @@ Namespace Controllers
             GetCategoryAccessString = Stream
         End Function
         '
-        Friend Function GetArticleAccessString(cp As CPBaseClass, StoryID As Integer) As String
+        Friend Shared Function GetArticleAccessString(cp As CPBaseClass, StoryID As Integer) As String
             '
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim SQL As String
@@ -373,7 +361,7 @@ Namespace Controllers
             GetArticleAccessString = Stream
         End Function
         '
-        Friend Function HasAccess(cp As CPBaseClass, GroupString As String) As Boolean
+        Friend Shared Function HasAccess(cp As CPBaseClass, GroupString As String) As Boolean
             '
             Dim ListArray() As String
             Dim ListArrayCount As Integer
@@ -403,7 +391,7 @@ Namespace Controllers
             'Call HandleError("aoNewsletter.newsletterCommonClass", "GetArticleAccessString")
         End Function
         '
-        Private Function PadValue(cp As CPBaseClass, Value As Integer, StringLenghth As Integer) As String
+        Private Shared Function PadValue(cp As CPBaseClass, Value As Integer, StringLenghth As Integer) As String
             Dim Counter As Integer
             Dim ValueLenghth As Integer
             Dim InnerValue As String
@@ -420,7 +408,7 @@ Namespace Controllers
             PadValue = InnerValue
         End Function
         '
-        Private Function GetSortOrder(cp As CPBaseClass, CategoryID As Integer, IssueID As Integer) As String
+        Private Shared Function GetSortOrder(cp As CPBaseClass, CategoryID As Integer, IssueID As Integer) As String
             Dim cs As CPCSBaseClass = cp.CSNew()
             Dim Stream As String = ""
             '
@@ -437,7 +425,7 @@ Namespace Controllers
             GetSortOrder = Stream
         End Function
         '
-        Friend Function verifyDefaultTemplateGetId(cp As CPBaseClass) As Integer
+        Friend Shared Function verifyDefaultTemplateGetId(cp As CPBaseClass) As Integer
             Using cs As CPCSBaseClass = cp.CSNew()
                 '
                 ' -- try default template
@@ -462,7 +450,7 @@ Namespace Controllers
             End Using
         End Function
         '
-        Friend Function verifyDefaultEmailTemplateGetId(cp As CPBaseClass) As Integer
+        Friend Shared Function verifyDefaultEmailTemplateGetId(cp As CPBaseClass) As Integer
             Using cs As CPCSBaseClass = cp.CSNew()
                 '
                 ' -- try default template
@@ -491,7 +479,7 @@ Namespace Controllers
         '   Wrap the content in a common wrapper if authoring is enabled
         '===================================================================================================
         '
-        Public Function GetEditWrapper(cp As CPBaseClass, Caption As String, Content As String) As String
+        Public Shared Function GetEditWrapper(cp As CPBaseClass, Caption As String, Content As String) As String
             Return cp.Content.GetEditWrapper(Content)
         End Function
         '
@@ -499,11 +487,11 @@ Namespace Controllers
         '   Wrap the content in a common wrapper if authoring is enabled
         '===================================================================================================
         '
-        Public Function GetAdminHintWrapper(cp As CPBaseClass, Content As String) As String
+        Public Shared Function GetAdminHintWrapper(cp As CPBaseClass, Content As String) As String
             Return cp.Html.adminHint(Content)
         End Function
         '
-        Friend Function encodeMinDate(source As Date) As Date
+        Friend Shared Function encodeMinDate(source As Date) As Date
             Dim returnDate As Date = source
             If returnDate < CDate("1/1/1990") Then
                 returnDate = Date.MinValue
@@ -514,7 +502,7 @@ Namespace Controllers
         '   Get a Random Long Value
         '=================================================================================
         '
-        Public Function GetRandomInteger() As Integer
+        Public Shared Function GetRandomInteger() As Integer
             Dim RandomLimit As Integer
             RandomLimit = 32767
             Randomize()
@@ -523,7 +511,7 @@ Namespace Controllers
         '
         '
         '
-        Friend Function isBlank(ByVal cp As CPBaseClass, ByVal source As String) As Boolean
+        Friend Shared Function isBlank(ByVal cp As CPBaseClass, ByVal source As String) As Boolean
             Dim returnBool As Boolean = False
             Try
                 Dim test As String = source
