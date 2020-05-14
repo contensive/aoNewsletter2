@@ -5,7 +5,9 @@ Option Strict On
 Imports System
 Imports System.Collections.Generic
 Imports System.Text
+Imports Contensive.Addons.Newsletter.Models.Db
 Imports Contensive.BaseClasses
+Imports Contensive.Models.Db
 Imports Microsoft.SqlServer.Server
 
 Namespace Controllers
@@ -143,6 +145,7 @@ Namespace Controllers
                         Call cs.Insert(ContentNameNewsletters)
                         If cs.OK() Then
                             returnId = cs.GetInteger("ID")
+                            verifyAdBannerLayouts(cp)
                             Dim templateID As Integer = verifyDefaultTemplateGetId(cp)
                             Dim emailTemplateID As Integer = verifyDefaultEmailTemplateGetId(cp)
                             If (addonArgInstanceGuid <> "") Then
@@ -424,6 +427,51 @@ Namespace Controllers
             '
             GetSortOrder = Stream
         End Function
+        '
+        Public Shared Sub verifyAdBannerLayouts(cp As CPBaseClass)
+            Do
+                '
+                ' -- Single Ad
+                Dim layout As NewsletterAdBannerLayoutModel = DbBaseModel.createByUniqueName(Of NewsletterAdBannerLayoutModel)(cp, "Single Ad")
+                If (layout Is Nothing) Then
+                    layout = DbBaseModel.addDefault(Of NewsletterAdBannerLayoutModel)(cp)
+                    layout.name = "Single Ad"
+                    layout.rowcnt = 1
+                    layout.columncnt = 1
+                    layout.pxcolumnspace = 0
+                    layout.pxrowspace = 0
+                    layout.save(cp)
+                End If
+            Loop While False
+            'Do
+            '    '
+            '    ' -- Double Ad, 2 Wide
+            '    Dim layout As NewsletterAdBannerLayoutModel = DbBaseModel.createByUniqueName(Of NewsletterAdBannerLayoutModel)(cp, "Double Ad, 2 Wide")
+            '    If (layout Is Nothing) Then
+            '        layout = DbBaseModel.addDefault(Of NewsletterAdBannerLayoutModel)(cp)
+            '        layout.name = "Double Ad, 2 Wide"
+            '        layout.rowcnt = 1
+            '        layout.columncnt = 2
+            '        layout.pxcolumnspace = 0
+            '        layout.pxrowspace = 0
+            '        layout.save(cp)
+            '    End If
+            'Loop While False
+            Do
+                '
+                ' -- Double Ad, 2 Stacked
+                Dim layout As NewsletterAdBannerLayoutModel = DbBaseModel.createByUniqueName(Of NewsletterAdBannerLayoutModel)(cp, "Double Ad, 2 Stacked")
+                If (layout Is Nothing) Then
+                    layout = DbBaseModel.addDefault(Of NewsletterAdBannerLayoutModel)(cp)
+                    layout.name = "Double Ad, 2 Stacked"
+                    layout.rowcnt = 2
+                    layout.columncnt = 1
+                    layout.pxcolumnspace = 0
+                    layout.pxrowspace = 0
+                    layout.save(cp)
+                End If
+            Loop While False
+        End Sub
         '
         Friend Shared Function verifyDefaultTemplateGetId(cp As CPBaseClass) As Integer
             Using cs As CPCSBaseClass = cp.CSNew()

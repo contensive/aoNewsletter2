@@ -103,6 +103,8 @@
     <Compile Include="Models\Db\DesignBlockBaseModel.vb" />
     <Compile Include="Models\Db\DesignBlockThemeModel.vb" />
     <Compile Include="Models\Db\_BlankModel.vb" />
+    <Compile Include="Models\Db\NewsletterAdBannerLayoutModel.vb" />
+    <Compile Include="Models\Db\_BlankDesignBlockModel.vb" />
     <Compile Include="Models\Db\NewsletterModel.vb" />
     <Compile Include="Models\View\DesignBlockViewBaseModel.vb" />
     <Compile Include="Models\View\NewsletterViewModel.vb" />
