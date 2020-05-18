@@ -62,6 +62,7 @@ Namespace Views
                 Dim publishDate As Date = Date.MinValue
                 Dim tagLine As String = ""
                 Dim mastheadFilename As String = ""
+                Dim footerFilename As String = ""
                 Dim problemList As New List(Of String)
                 '
                 refreshQueryString = CP.Doc.RefreshQueryString
@@ -131,11 +132,11 @@ Namespace Views
                         returnHtml = "<p>There are currently no published issues of this newsletter</p>"
                     Else
                         If NewsletterID <> 0 Then
-                            Call openRecord(CP, cs, "Newsletters", NewsletterID, "StylesFilename,TemplateID,mastheadFilename")
+                            Call openRecord(CP, cs, "Newsletters", NewsletterID, "StylesFilename,TemplateID,mastheadFilename,footerFilename")
                             If cs.OK() Then
                                 TemplateID = cs.GetInteger("TemplateID")
                                 mastheadFilename = cs.GetText("mastheadFilename")
-                                'Call CP.Doc.AddHeadStyleLink(CP.Request.Protocol & CP.Site.DomainPrimary & CP.Site.FilePath & cs.GetText("StylesFileName"))
+                                footerFilename = cs.GetText("footerFilename")
                             End If
                             Call cs.Close()
                             '
@@ -197,9 +198,17 @@ Namespace Views
                         ' Dispay the form
                         '
                         layout.load(TemplateCopy)
+                        '
+                        ' -- masthead image
                         If (Not String.IsNullOrEmpty(mastheadFilename)) Then
                             mastheadFilename = Uri.EscapeUriString(mastheadFilename)
-                            layout.setClassInner("newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                            layout.setClassInner("newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ style=""width:100%"" class=""banner"" />")
+                        End If
+                        '
+                        ' -- footer image
+                        If (Not String.IsNullOrEmpty(footerFilename)) Then
+                            footerFilename = Uri.EscapeUriString(footerFilename)
+                            layout.setClassInner("newsFooterMasthead", "<img src=""" & CP.Site.FilePath & footerFilename & """ style=""width:100%"" class=""banner"" />")
                         End If
                         '
                         nav = New NewsletterNavClass
@@ -633,7 +642,7 @@ Namespace Views
                 End If
                 If (Not String.IsNullOrEmpty(footerFilename)) Then
                     footerFilename = Uri.EscapeUriString(footerFilename)
-                    layout.setClassInner("newsFooter", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
+                    layout.setClassInner("newsFooterMasthead", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
                 End If
                 '
                 ' set the link back to the web version
