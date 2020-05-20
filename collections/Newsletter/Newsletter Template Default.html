@@ -113,6 +113,7 @@
 								<div class="newsArchiveListOverview" style="margin:10px 0 0;font-family:georgia,serif;font-size:14px;">
 									<p>newsListOverview- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
+								<div class="newsArchiveListReadMore"><a class="newsSearchListReadMoreAnchor" href="?"><span class="newsSearchListReadMoreCaption">Read More</span></a></div>
 							</div>
 						</div>
 					</div>
@@ -126,7 +127,7 @@
 								<div class="newsSearchListOverview" style="font-family:georgia,serif;font-size:14px;">
 									<p>newsListOverview- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non tortor ac nisl dignissim mollis. Quisque sapien sem, varius ut pulvinar at, rhoncus id leo. Mauris convallis condimentum ipsum ac consequat. Maecenas eu neque lacus, quis tempor nisl. In ut massa eu tellus ultricies adipiscing. Curabitur vel tincidunt justo. In euismod blandit erat eget scelerisque.</p>
 								</div>
-								<div class="newsSearchListReadMore"><a class="newsSearchListReadMoreAnchor" href="?bid=67&issuepage=1&formid=400"><span class="newsSearchListReadMoreCaption">Read More</span></a></div>
+								<div class="newsSearchListReadMore"><a class="newsSearchListReadMoreAnchor" href="?"><span class="newsSearchListReadMoreCaption">Read More</span></a></div>
 							</div>
 						</div>
 					</div>
@@ -144,3 +145,50 @@
 		</tbody>
 	</table>
 </div>
+<!--
+
+there are several views included in this one html file, views not needed are removed programmatically
+	newsCover = The cover of the newsletter
+	newsBody = The view that displays just one story
+	newsArchive = The list of archived stories, similar to the cover page but may not have navigation
+	newsSearch = A list of stories from a search result, probably no navigation
+
+Data Replacement classes	
+	newsHeaderMasthead - a 100% width image used as the masthead for the newsletter
+	newsFooterMasthead  - a 100% width image used as the footer  for the newsletter
+	newsNav - a div around the navigation section, which includes the following elements
+		newsNavCaption - A navigation header like "in The Issue"
+		newsNavList - A wrapper element around the navigation items, which can be any number of either of these two:
+			newsNavCategoryItem - a catagory that appears in the navigation list
+			newsNavStoryItem - an item
+	newsCover - a div around the cover page, removed if not displaying the cover page
+		newsCoverList - a wrapper around the list of stories on the cover page. This list may have story items and/or categories
+			newsCoverCategoryItem - a wrapper around a cover category
+			newsCoverStoryItem - a wrapper around a cover category
+				infographImage - a div that may include an infographic for a story, removed if none
+				infographLink - a div that may include a lnked caption added by the server, removed if none
+				newsCoverListCaption - div around the story caption
+				newsCoverListOverview - div around the story overview
+				newsCoverListReadMore - div around the Read More link, may be removed by the code if no full story
+					- very important, the link within this readmore must be a single "?" - that is what is replaced with the link
+	newsBody - div around the body section of the template
+		newsBodyCaption - the aption of the story
+		newsBodyStory - the news story itself
+	newsArchive - div around the archive section of the template
+		newsArchiveCaption - div around the archive catpioin, like "Archived issues"
+		newsArchiveList - div around the list of arhived results
+		newsArchiveListItem - the item html used to repeat for each archived story
+			- important, within this list should only be one anchor tag, and its href must be "?"
+			newsArchiveListCaption - divaround the archived issue caption
+			newsArchiveListOverview - div around the overview for the issue
+			newsArchiveListReadMore - div around an anchor, with an href="?"
+	newsSearch - div around the  search results section, removed if the page is not a search results
+		newsSearchCaption - div around the search catpioin, like "Search Results"
+		newsSearchList - div around the list of results
+		newsSearchListItem - the item html used to repeat for each story
+			- important, within this list should only be one anchor tag, and its href must be "?"
+			newsSearchListCaption - divaround the issue caption
+			newsSearchListOverview - div around the overview for the issue
+			newsSearchListReadMore - div around an anchor, with an href="?"
+
+-->

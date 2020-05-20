@@ -89,3 +89,25 @@
 		</tbody>
 	</table>
 </div>
+<!--
+
+there are several views included in this one html file, views not needed are removed programmatically
+	newsCover = The cover of the newsletter
+	newsBody = The view that displays just one story
+	newsArchive = The list of archived stories, similar to the cover page but may not have navigation
+	newsSearch = A list of stories from a search result, probably no navigation
+
+Data Replacement classes	
+	newsHeaderMasthead - a 100% width image used as the masthead for the newsletter
+	newsFooterMasthead  - a 100% width image used as the footer  for the newsletter
+	newsCover - a div around the cover page, removed if not displaying the cover page
+		newsCoverList - a wrapper around the list of stories on the cover page. This list may have story items and/or categories
+			newsCoverCategoryItem - a wrapper around a cover category
+			newsCoverStoryItem - a wrapper around a cover category
+				infographImage - a div that may include an infographic for a story, removed if none
+				infographLink - a div that may include a lnked caption added by the server, removed if none
+				newsCoverListCaption - div around the story caption
+				newsCoverListOverview - div around the story overview
+				newsCoverListReadMore - div around the Read More link, may be removed by the code if no full story
+					- very important, the link within this readmore must be a single "?" - that is what is replaced with the link
+-->
