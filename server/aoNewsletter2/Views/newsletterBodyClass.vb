@@ -75,7 +75,7 @@ Namespace Views
             sql2 = " select count(story.id) as count"
             sql2 = sql2 & " from newsletterissues nl, newsletterissuepages story"
             sql2 = sql2 & " Where (NL.ID = story.newsletterid)"
-            sql2 = sql2 & " AND (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
+            sql2 = sql2 & " AND nl.active=1 and (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
             If monthSelected <> 0 Then
                 ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
             End If
@@ -111,7 +111,7 @@ Namespace Views
                     'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
                     ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * " _
                         & " From NewsletterIssues " _
-                        & " WHERE (PublishDate < { fn NOW() }) AND (ID <> " & currentIssueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") " _
+                        & " WHERE active=1 and (PublishDate < { fn NOW() }) AND (ID <> " & currentIssueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") " _
                         & " ORDER BY PublishDate DESC"
                     '
                     Call cs.OpenSQL(ThisSQL)
@@ -149,7 +149,7 @@ Namespace Views
                 'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                 ThisSQL2 = " select NL.id, nl.name, nl.publishdate, story.AllowReadMore, story.Overview, story.Body, story.id as ThisID ,story.newsletterid, story.name as storyName"
                 ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages story"
-                ThisSQL2 = ThisSQL2 & " Where (NL.ID = story.newsletterid) "
+                ThisSQL2 = ThisSQL2 & " Where nl.active=1 and (NL.ID = story.newsletterid) "
                 ThisSQL2 = ThisSQL2 & " and nl.NewsletterID=" & NewsletterID & " " ' 01/13/2017 Search only in the same NewsletterID
                 If monthSelected <> 0 Then
                     ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
@@ -233,7 +233,7 @@ Namespace Views
                 Dim searchForm As String = ""
                 searchForm &= "<h2>Archive Search</h2>"
                 'searchForm &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
-                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & "</div>"
+                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "active=1 and (Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & "</div>"
                 'searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>keyword search<br>"
@@ -338,7 +338,7 @@ Namespace Views
             PageCount = 1
             sql2 = " select count(story.id) as count"
             sql2 = sql2 & " from newsletterissues nl, newsletterissuepages story"
-            sql2 = sql2 & " Where (NL.ID = story.newsletterid)"
+            sql2 = sql2 & " Where nl.active=1 and (NL.ID = story.newsletterid)"
             sql2 = sql2 & " AND (NL.NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
             If monthSelected <> 0 Then
                 ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
@@ -373,7 +373,7 @@ Namespace Views
                     'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                     '
                     'ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
-                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & issueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
+                    ThisSQL = " SELECT  TOP " & archiveIssuesToDisplay & " * From NewsletterIssues WHERE active=1 and (PublishDate < { fn NOW() }) AND (ID <> " & issueId & ") AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
                     '
                     Call cs.OpenSQL(ThisSQL)
                     If cs.OK Then
@@ -407,7 +407,7 @@ Namespace Views
                 'stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                 ThisSQL2 = " select NL.id, nl.name, nl.publishdate, story.AllowReadMore, story.Overview, story.Body, story.id as ThisID ,story.newsletterid, story.name as storyName"
                 ThisSQL2 = ThisSQL2 & " from newsletterissues nl, newsletterissuepages story"
-                ThisSQL2 = ThisSQL2 & " Where (NL.ID = story.newsletterid)"
+                ThisSQL2 = ThisSQL2 & " Where nl.active=1 and (NL.ID = story.newsletterid)"
                 If monthSelected <> 0 Then
                     ThisSQL2 = ThisSQL2 & " and month(nl.publishdate) = " & monthSelected
                 End If
@@ -479,7 +479,7 @@ Namespace Views
                 '
                 Dim searchForm As String = ""
                 searchForm &= cp.Content.GetCopy("Newsletter Search Copy", "<h2>Archive Search</h2>")
-                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "(Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
+                searchForm &= "<div>" & cp.Html.SelectContent(RequestNameIssueID, "", ContentNameNewsletterIssues, "active=1 and (Publishdate<" & cp.Db.EncodeSQLDate(Now) & ")AND(NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")") & " " & cp.Html.Button(FormButtonViewNewsLetter) & "</div>"
                 searchForm &= "<div>&nbsp;</div>"
                 searchForm &= "<div>keyword search<br>"
                 searchForm &= cp.Html.InputText(RequestNameSearchKeywords) & "</div>"

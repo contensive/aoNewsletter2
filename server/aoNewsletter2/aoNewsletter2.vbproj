@@ -78,8 +78,8 @@
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
       <HintPath>..\packages\Contensive.CPBaseClass.5.2004.14.6\lib\net472\CPBase.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.11.23.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.23\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.24.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.24\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>

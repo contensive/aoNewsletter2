@@ -183,7 +183,7 @@ Namespace Views
                 ' Display Archive Link if there are archive issues
                 ' can not just lookup issues that are not the issueid because if you are editing a future issue, the current issue shows up as an archive
                 '
-                ThisSQL = "SELECT TOP 2 ID From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
+                ThisSQL = "SELECT TOP 2 ID From NewsletterIssues WHERE active=1 and (PublishDate < { fn NOW() }) AND (NewsletterID=" & cp.Db.EncodeSQLNumber(NewsletterID) & ")"
                 Call cs.OpenSQL(ThisSQL)
                 If cs.OK Then
                     '

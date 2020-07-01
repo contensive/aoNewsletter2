@@ -45,7 +45,7 @@ Namespace Controllers
                 Dim returnId As Integer = 0
                 Using cs As CPCSBaseClass = cp.CSNew()
                     '
-                    Call cs.Open(ContentNameNewsletterIssues, "(PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc")
+                    Call cs.Open(ContentNameNewsletterIssues, "active=1 and (PublishDate<=" & cp.Db.EncodeSQLDate(Now()) & ") AND (NewsletterID=" & NewsletterID & ")", "PublishDate desc, ID desc")
                     If cs.OK() Then
                         returnId = cs.GetInteger("ID")
                     End If
@@ -78,7 +78,7 @@ Namespace Controllers
             Dim isContentMan As Boolean
             '
             isContentMan = cp.User.IsContentManager("Newsletters")
-            Call cs.Open(ContentNameNewsletterIssues, "(newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc")
+            Call cs.Open(ContentNameNewsletterIssues, "active=1 and (newsletterid=" & NewsletterID & ")and(PublishDate is null)or(PublishDate>" & cp.Db.EncodeSQLDate(Now()) & ")", "PublishDate desc, ID desc")
             Do While cs.OK()
                 ID = cs.GetInteger("ID")
                 Name = Trim(cs.GetText("name"))

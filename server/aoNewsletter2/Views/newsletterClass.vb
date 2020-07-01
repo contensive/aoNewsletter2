@@ -90,7 +90,7 @@ Namespace Views
                     End If
                     Call cs.Close()
                     '
-                    Call cs.Open(ContentNameNewsletterIssues, "(id=" & IssueID & ")and(Newsletterid=" & NewsletterID & ")")
+                    Call cs.Open(ContentNameNewsletterIssues, "active=1 and (id=" & IssueID & ")and(Newsletterid=" & NewsletterID & ")")
                     If Not cs.OK() Then
                         '
                         ' Bad Issue, reset to current issue of current newsletter
