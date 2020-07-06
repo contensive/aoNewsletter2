@@ -6,6 +6,7 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.Addons.Newsletter.Controllers
+Imports Contensive.Addons.Newsletter.Models.Db
 Imports Contensive.BaseClasses
 
 Namespace Views
@@ -48,7 +49,8 @@ Namespace Views
             Dim storyBody As String = ""
             '
             BlockSearchForm = True
-            archiveIssuesToDisplay = 10
+            Dim newsletter As NewsletterModel = NewsletterModel.create(Of NewsletterModel)(cp, NewsletterID)
+            archiveIssuesToDisplay = newsletter.archiveIssuesToDisplay
             monthSelected = cp.Doc.GetInteger(RequestNameMonthSelectd)
             yearSelected = cp.Doc.GetInteger(RequestNameYearSelected)
             SearchKeywords = cp.Doc.GetText(RequestNameSearchKeywords)
@@ -316,7 +318,8 @@ Namespace Views
             recordTop = cp.Doc.GetInteger(RequestNameRecordTop)
             '
             ' todo -- these are now in the settings model
-            archiveIssuesToDisplay = 10
+            Dim newsletter As NewsletterModel = NewsletterModel.create(Of NewsletterModel)(cp, NewsletterID)
+            archiveIssuesToDisplay = newsletter.archiveIssuesToDisplay
             RecordsPerPage = 10
             '
             PageNumber = cp.Doc.GetInteger(RequestNamePageNumber)
