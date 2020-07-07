@@ -341,14 +341,14 @@ Namespace Views
                                                 adBannerLink = cs.GetText("adBannerLink" & adPtr)
                                                 If (String.IsNullOrEmpty(adBannerLink)) Then
                                                     adBanner = Uri.EscapeUriString(adBanner)
-                                                    footerAdBanners &= "<img src=""" & CP.Site.FilePath & adBanner & """ style=""width:100%"">"
+                                                    footerAdBanners &= "<img src=""" & CP.Site.FilePath & adBanner & """>"
                                                 Else
                                                     If (adBannerLink.IndexOf("://") < 0) Then
                                                         adBannerLink = "http://" & adBannerLink
                                                     End If
                                                     adBanner = Uri.EscapeUriString(adBanner)
                                                     adBannerLink = Uri.EscapeUriString(adBannerLink)
-                                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & CP.Site.FilePath & adBanner & """ style=""width:100%""></a>"
+                                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & CP.Site.FilePath & adBanner & """></a>"
                                                 End If
                                             End If
                                         Next
@@ -704,14 +704,14 @@ Namespace Views
                                 adBannerLink = cs.GetText("adBannerLink" & adPtr)
                                 If (String.IsNullOrEmpty(adBannerLink)) Then
                                     adBanner = Uri.EscapeUriString(adBanner)
-                                    footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """ style=""width:100%"">"
+                                    footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """>"
                                 Else
                                     If (adBannerLink.IndexOf("://") < 0) Then
                                         adBannerLink = "http://" & adBannerLink
                                     End If
                                     adBanner = Uri.EscapeUriString(adBanner)
                                     adBannerLink = Uri.EscapeUriString(adBannerLink)
-                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """ style=""width:100%""></a>"
+                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """></a>"
                                 End If
                             End If
                         Next
