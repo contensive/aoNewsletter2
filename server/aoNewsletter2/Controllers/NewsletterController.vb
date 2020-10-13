@@ -287,7 +287,7 @@ Namespace Controllers
                         SortArrayPointer = 0
                         For SortArrayPointer = 0 To SortArrayCount - 1
                             SQL = "Update NewsletterIssueCategoryRules SET SortOrder=" & SortArray(1, SortArrayPointer) & " WHERE (CategoryID=" & SortArray(0, SortArrayPointer) & ") AND (NewsletterIssueID=" & cp.Db.EncodeSQLNumber(IssueID) & ")"
-                            Call cp.Db.ExecuteSQL(SQL)
+                            Call cp.Db.ExecuteNonQuery(SQL)
                         Next
                     End If
                 End If
@@ -477,12 +477,12 @@ Namespace Controllers
             Using cs As CPCSBaseClass = cp.CSNew()
                 '
                 ' -- try default template
-                Call cs.Open("Newsletter Templates", "name='Default'")
+                Call cs.Open("Newsletter Templates", "name='Newsletter Template Default'")
                 If Not cs.OK() Then
                     Call cs.Close()
                     Call cs.Insert("Newsletter Templates")
                     If cs.OK() Then
-                        Call cs.SetField("name", "Default")
+                        Call cs.SetField("name", "Newsletter Template Default")
                     End If
                 End If
                 If cs.OK() Then
@@ -502,12 +502,12 @@ Namespace Controllers
             Using cs As CPCSBaseClass = cp.CSNew()
                 '
                 ' -- try default template
-                Call cs.Open("Newsletter Templates", "name='Default Email'")
+                Call cs.Open("Newsletter Templates", "name='Newsletter Template Default Email'")
                 If Not cs.OK() Then
                     Call cs.Close()
                     Call cs.Insert("Newsletter Templates")
                     If cs.OK() Then
-                        Call cs.SetField("name", "Default Email")
+                        Call cs.SetField("name", "Newsletter Template Default Email")
                     End If
                 End If
                 If cs.OK() Then

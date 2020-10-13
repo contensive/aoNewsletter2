@@ -60,7 +60,6 @@ Namespace Views
             Dim ExtensionType As String
             Dim PageID As Integer
             Dim IssueID As Integer
-            Dim IsWorkflowRendering As Boolean
             Dim IsQuickEditing As Boolean
             Dim cn As New NewsletterController
             Dim NewsletterProperty As String
@@ -97,7 +96,6 @@ Namespace Views
                     IssueID = NewsletterController.GetIssueID(cp, NewsletterID, currentIssueId)
                     PageID = cp.Doc.GetInteger(RequestNameStoryId)
                     IsQuickEditing = cp.User.IsQuickEditing("Page Content")
-                    IsWorkflowRendering = cp.User.IsWorkflowRendering
                     '
                     Select Case ExtensionType
                         Case "issue"

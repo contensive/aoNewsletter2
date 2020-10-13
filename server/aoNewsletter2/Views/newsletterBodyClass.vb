@@ -841,7 +841,7 @@ Namespace Views
                     layout.setClassOuter("infographicBox", "")
                 Else
                     coverinfographicThumbnail = Uri.EscapeUriString(coverinfographicThumbnail)
-                    img = "<img src=""" & cp.Site.FilePath & coverinfographicThumbnail & """ alt=""View the infographic"" class=""banner"" width=""100%"">"
+                    img = "<img src=""" & cp.Http.CdnFilePathPrefix & coverinfographicThumbnail & """ alt=""View the infographic"" class=""banner"" width=""100%"">"
                     If String.IsNullOrEmpty(coverinfographic) Then
                         '
                         ' no image
@@ -860,13 +860,13 @@ Namespace Views
                         ' linked thumbnail
                         '
                         coverinfographic = Uri.EscapeUriString(coverinfographic)
-                        layout.setClassInner("infographImage", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">" & img & "</a>")
+                        layout.setClassInner("infographImage", "<a href=""" & cp.Http.CdnFilePathPrefix & coverinfographic & """ target=""_blank"">" & img & "</a>")
                     End If
                 End If
                 If String.IsNullOrEmpty(coverinfographic) Then
                     layout.setClassOuter("infographLink", "")
                 Else
-                    layout.setClassInner("infographLink", "<a href=""" & cp.Site.FilePath & coverinfographic & """ target=""_blank"">View the infographic online.</a>")
+                    layout.setClassInner("infographLink", "<a href=""" & cp.Http.CdnFilePathPrefix & coverinfographic & """ target=""_blank"">View the infographic online.</a>")
                 End If
                 If StoryAccessString <> "" Then
                     Call layout.prepend("<AC type=""AGGREGATEFUNCTION"" name=""block text"" querystring=""allowgroups=" & StoryAccessString & """>")
@@ -950,7 +950,7 @@ Namespace Views
                             returnHtml &= "<div class=""PrintIcon""><a target=_blank href=""?" & qs & """>" & PrinterIcon & "</a>&nbsp;<a target=_blank href=""" & qs & """><nobr>Printer Version</nobr></a></div>"
                         End If
                         If cs.GetBoolean("AllowEmailPage") Then
-                            Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Site.AppRootPath & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormStory
+                            Link = "mailto:?SUBJECT=" & cp.Site.GetText("Email link subject", "A link to the " & cp.Site.DomainPrimary & " newsletter") & "&amp;BODY=http://" & cp.Site.DomainPrimary & cp.Request.Page & Replace(refreshQueryString, "&", "%26") & RequestNameStoryId & "=" & storyId & "%26" & RequestNameFormID & "=" & FormStory
                             returnHtml &= "<div class=""EmailIcon""><a target=_blank href=""?" & Link & """>" & EmailIcon & "</a>&nbsp;<a target=_blank href=""" & Link & """><nobr>Email this page</nobr></a></div>"
                         End If
                         Call layout.setClassInner("newsBodyCaption", storyName)
@@ -1001,7 +1001,7 @@ Namespace Views
                                 End If
                             End If
                             If rssChange Then
-                                Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
+                                Call cp.Addon.ExecuteAsync("RSS Feed Process")
                             End If
                         End If
                     End If
@@ -1012,7 +1012,7 @@ Namespace Views
             Catch ex As Exception
                 Call handleError(cp, ex, "getNewsletterBodyDetails")
             End Try
-            Call cp.Utils.ExecuteAddonAsProcess("RSS Feed Process")
+            Call cp.Addon.ExecuteAsync("RSS Feed Process")
             Return returnHtml
         End Function
         '

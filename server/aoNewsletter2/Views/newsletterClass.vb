@@ -202,13 +202,13 @@ Namespace Views
                         ' -- masthead image
                         If (Not String.IsNullOrEmpty(mastheadFilename)) Then
                             mastheadFilename = Uri.EscapeUriString(mastheadFilename)
-                            layout.setClassInner("newsHeaderMasthead", "<img src=""" & CP.Site.FilePath & mastheadFilename & """ style=""width:100%"" class=""banner"" />")
+                            layout.setClassInner("newsHeaderMasthead", "<img src=""" & CP.Http.CdnFilePathPrefix & mastheadFilename & """ style=""width:100%"" class=""banner"" />")
                         End If
                         '
                         ' -- footer image
                         If (Not String.IsNullOrEmpty(footerFilename)) Then
                             footerFilename = Uri.EscapeUriString(footerFilename)
-                            layout.setClassInner("newsFooterMasthead", "<img src=""" & CP.Site.FilePath & footerFilename & """ style=""width:100%"" class=""banner"" />")
+                            layout.setClassInner("newsFooterMasthead", "<img src=""" & CP.Http.CdnFilePathPrefix & footerFilename & """ style=""width:100%"" class=""banner"" />")
                         End If
                         '
                         nav = New NewsletterNavClass
@@ -341,14 +341,14 @@ Namespace Views
                                                 adBannerLink = cs.GetText("adBannerLink" & adPtr)
                                                 If (String.IsNullOrEmpty(adBannerLink)) Then
                                                     adBanner = Uri.EscapeUriString(adBanner)
-                                                    footerAdBanners &= "<img src=""" & CP.Site.FilePath & adBanner & """>"
+                                                    footerAdBanners &= "<img src=""" & CP.Http.CdnFilePathPrefix & adBanner & """>"
                                                 Else
                                                     If (adBannerLink.IndexOf("://") < 0) Then
                                                         adBannerLink = "http://" & adBannerLink
                                                     End If
                                                     adBanner = Uri.EscapeUriString(adBanner)
                                                     adBannerLink = Uri.EscapeUriString(adBannerLink)
-                                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & CP.Site.FilePath & adBanner & """></a>"
+                                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & CP.Http.CdnFilePathPrefix & adBanner & """></a>"
                                                 End If
                                             End If
                                         Next
@@ -574,57 +574,34 @@ Namespace Views
                     If templateId <> 0 Then
                         '
                         ' verify it
-                        '
                         Call openRecord(cp, cs, "newsletter templates", templateId)
-                        If Not cs.OK Then
-                            templateId = 0
-                            Call cp.Db.ExecuteNonQuery("update newsletters set emailtemplateid=0 where id=" & NewsletterID)
-                        Else
+                        If cs.OK Then
                             templateCopy = cs.GetText("Template")
                         End If
                         Call cs.Close()
-                        '
                     End If
                     '
-                    'Call cp.Utils.AppendLogFile("createEmailGetId, 100")
-                    '
-                    If templateId = 0 Then
+                    If String.IsNullOrEmpty(templateCopy) Then
                         '
-                        ' no valid emailtemplate, try webtemplate
-                        '
-                        templateId = webTemplateID
-                        If templateId = 0 Then
-                            templateId = NewsletterController.verifyDefaultTemplateGetId(cp)
-                            Call cp.Db.ExecuteNonQuery("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
-                            '
-                            Call openRecord(cp, cs, "newsletter templates", templateId)
-                            If cs.OK Then
-                                templateCopy = cs.GetText("Template")
-                            End If
-                            Call cs.Close()
-                        End If
-                        If templateId <> 0 Then
-                            '
-                            ' verify it, repair it with default template
-                            '
-                            Call openRecord(cp, cs, "newsletter templates", templateId)
-                            If Not cs.OK Then
-                                Call cs.Close()
-                                templateId = NewsletterController.verifyDefaultTemplateGetId(cp)
-                                Call cp.Db.ExecuteNonQuery("update newsletters set templateID=" & templateId & " where id=" & NewsletterID)
-                                Call openRecord(cp, cs, "newsletter templates", templateId)
-                            End If
+                        ' -- no email template available, rebuild from installation file
+                        templateId = NewsletterController.verifyDefaultEmailTemplateGetId(cp)
+                        Call cp.Db.ExecuteNonQuery("update newsletters set emailTemplateID=" & templateId & " where id=" & NewsletterID)
+                        Call openRecord(cp, cs, "newsletter templates", templateId)
+                        If cs.OK Then
                             templateCopy = cs.GetText("Template")
-                            Call cs.Close()
-                            '
                         End If
+                        Call cs.Close()
                     End If
                     '
-                    Call openRecord(cp, cs, "Newsletter Templates", templateId)
-                    If cs.OK() Then
-                        templateCopy = cs.GetText("Template")
+                    If String.IsNullOrEmpty(templateCopy) Then
+                        '
+                        ' -- if all else fails, use web template
+                        Call openRecord(cp, cs, "Newsletter Templates", webTemplateID)
+                        If cs.OK() Then
+                            templateCopy = cs.GetText("Template")
+                        End If
+                        Call cs.Close()
                     End If
-                    Call cs.Close()
                 End If
                 '
                 ' There is a template, encoding it captures the newsletterBodyClass
@@ -638,11 +615,11 @@ Namespace Views
                 layout.load(templateCopy)
                 If (Not String.IsNullOrEmpty(mastheadFilename)) Then
                     mastheadFilename = Uri.EscapeUriString(mastheadFilename)
-                    layout.setClassInner("newsHeaderMasthead", "<img src=""" & cp.Site.FilePath & mastheadFilename & """ class=""banner"" />")
+                    layout.setClassInner("newsHeaderMasthead", "<img width=""100%"" src=""" & cp.Http.CdnFilePathPrefix & mastheadFilename & """ class=""banner"" />")
                 End If
                 If (Not String.IsNullOrEmpty(footerFilename)) Then
                     footerFilename = Uri.EscapeUriString(footerFilename)
-                    layout.setClassInner("newsFooterMasthead", "<img src=""" & cp.Site.FilePath & footerFilename & """ class=""footer"" />")
+                    layout.setClassInner("newsFooterMasthead", "<img width=""100%"" src=""" & cp.Http.CdnFilePathPrefix & footerFilename & """ class=""footer"" />")
                 End If
                 '
                 ' set the link back to the web version
@@ -704,14 +681,14 @@ Namespace Views
                                 adBannerLink = cs.GetText("adBannerLink" & adPtr)
                                 If (String.IsNullOrEmpty(adBannerLink)) Then
                                     adBanner = Uri.EscapeUriString(adBanner)
-                                    footerAdBanners &= "<img src=""" & cp.Site.FilePath & adBanner & """>"
+                                    footerAdBanners &= "<img src=""" & cp.Http.CdnFilePathPrefix & adBanner & """>"
                                 Else
                                     If (adBannerLink.IndexOf("://") < 0) Then
                                         adBannerLink = "http://" & adBannerLink
                                     End If
                                     adBanner = Uri.EscapeUriString(adBanner)
                                     adBannerLink = Uri.EscapeUriString(adBannerLink)
-                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Site.FilePath & adBanner & """></a>"
+                                    footerAdBanners &= "<a href=""" & adBannerLink & """ target=""_blank""><img src=""" & cp.Http.CdnFilePathPrefix & adBanner & """></a>"
                                 End If
                             End If
                         Next
@@ -730,8 +707,6 @@ Namespace Views
                 Nav = New NewsletterNavClass
                 newsNav = Nav.GetNav(cp, IssueID, NewsletterID, False, 0, newsNav, currentIssueId)
                 '
-                Call cp.Utils.AppendLogFile("createEmailGetId, 500")
-                '
                 Call layout.setClassInner("newsNav", newsNav)
                 Call layout.setClassInner("newsCoverList", itemList)
                 Call layout.setClassOuter("newsBody", "")
@@ -742,12 +717,8 @@ Namespace Views
                 Call layout.setClassInner("newsIssuePublishDate", publishDate.ToShortDateString)
                 If (String.IsNullOrEmpty(tagLine)) Then
                     '
-                    Call cp.Utils.AppendLogFile("createEmailGetId, 510")
-                    '
                     Call layout.setClassOuter("newsletterTagLineRow", "")
                 Else
-                    '
-                    Call cp.Utils.AppendLogFile("createEmailGetId, 520")
                     '
                     Call layout.setClassInner("newsletterTagLine", tagLine)
                 End If

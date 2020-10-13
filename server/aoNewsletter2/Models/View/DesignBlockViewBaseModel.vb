@@ -64,7 +64,7 @@ Namespace Models.View
         ''' <param name="backgroundImage"></param>
         ''' <returns></returns>
         Public Shared Function encodeStyleBackgroundImage(cp As CPBaseClass, backgroundImage As String) As String
-            Return If(String.IsNullOrWhiteSpace(backgroundImage), String.Empty, "background-image: url('" & cp.Site.FilePath & backgroundImage & "');")
+            Return If(String.IsNullOrWhiteSpace(backgroundImage), String.Empty, "background-image: url('" & cp.Http.CdnFilePathPrefix & backgroundImage & "');")
         End Function
     End Class
 End Namespace

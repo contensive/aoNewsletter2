@@ -9,31 +9,73 @@ rem
 rem Setup deployment folder
 rem
 
-call env.cmd
-set deploymentNumber=%1
+rem all paths are relative to the git scripts folder
+rem
+rem GIT folder
+rem     -- aoSample
+rem			-- collection
+rem				-- Sample
+rem					unzipped collection files, must include one .xml file describing the collection
+rem			-- server 
+rem 			(all files related to server code)
+rem				-- aoSample (visual studio project folder)
+rem			-- ui 
+rem				(all files related to the ui
+rem			-- etc 
+rem				(all misc files)
+
+rem -- the application on the local server where this collection will be installed
+set appName=app200509
+
+rem -- major version 5, minor does not matter set 1
+set majorVersion=5
+set minorVersion=1
+
+rem -- name of the collection on the site (should NOT include ao prefix). This is the name as it appears on the navigator
+set collectionName=Newsletter
+
+rem -- name of the collection folder, (should NOT include ao prefix)
+set collectionPath=..\collections\Newsletter\
+
+rem -- name of the solution. SHOULD include ao prefix
+set solutionName=aoNewsletter2.sln
+
+rem -- name of the solution. SHOULD include ao prefix
+set binPath=..\server\aoNewsletter2\bin\debug\
+
+rem -- name of the solution. SHOULD include ao prefix
+set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
+
+rem -- name of the solution. SHOULD include ao prefix
+set deploymentFolderRoot=C:\Deployments\aoNewsletter2\Dev\
+
+rem Setup deployment folder
+
 set year=%date:~12,4%
 set month=%date:~4,2%
+if %month% GEQ 10 goto monthOk
+set month=%date:~5,1%
+:monthOk
 set day=%date:~7,2%
-
-rem
-rem if deployment number not entered, set it to date.1
-rem
-IF [%deploymentNumber%] == [] (
-	echo No deployment folder provided on the command line, use current date
-	set deploymentTimeStamp=%year%%month%%day%
-)
+if %day% GEQ 10 goto dayOk
+set day=%date:~8,1%
+:dayOk
+set versionMajor=%year%
+set versionMinor=%month%
+set versionBuild=%day%
+set versionRevision=1
 rem
 rem if deployment folder exists, delete it and make directory
 rem
-
-set suffix=1
 :tryagain
-set deploymentNumber=%deploymentTimeStamp%.%suffix%
-if not exist "%deploymentFolderRoot%%deploymentNumber%" goto :makefolder
-set /a suffix=%suffix%+1
+set versionNumber=%versionMajor%.%versionMinor%.%versionBuild%.%versionRevision%
+if not exist "%deploymentFolderRoot%%versionNumber%" goto :makefolder
+set /a versionRevision=%versionRevision%+1
 goto tryagain
 :makefolder
-md "%deploymentFolderRoot%%deploymentNumber%"
+md "%deploymentFolderRoot%%versionNumber%"
+
+
 
 rem ==============================================================
 rem
@@ -48,7 +90,6 @@ if errorlevel 1 (
 )
 cd ..\scripts
 
-rem pause
 
 rem ==============================================================
 rem
@@ -67,5 +108,6 @@ c:
 cd %collectionPath%
 del "%collectionName%.zip" /Q
 "c:\program files\7-zip\7z.exe" a "%collectionName%.zip"
-xcopy "%collectionName%.zip" "%deploymentFolderRoot%%deploymentNumber%" /Y
+xcopy "%collectionName%.zip" "%deploymentFolderRoot%%versionNumber%" /Y
 cd ..\..\scripts
+
