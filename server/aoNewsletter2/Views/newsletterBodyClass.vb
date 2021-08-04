@@ -1001,7 +1001,7 @@ Namespace Views
                                 End If
                             End If
                             If rssChange Then
-                                Call cp.Addon.ExecuteAsync("RSS Feed Process")
+                                Call cp.Addon.ExecuteAsProcess("RSS Feed Process")
                             End If
                         End If
                     End If
@@ -1012,7 +1012,7 @@ Namespace Views
             Catch ex As Exception
                 Call handleError(cp, ex, "getNewsletterBodyDetails")
             End Try
-            Call cp.Addon.ExecuteAsync("RSS Feed Process")
+            Call cp.Addon.ExecuteAsProcess("RSS Feed Process")
             Return returnHtml
         End Function
         '

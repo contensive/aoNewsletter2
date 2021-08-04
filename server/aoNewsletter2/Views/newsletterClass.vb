@@ -510,7 +510,7 @@ Namespace Views
             Catch ex As Exception
                 HandleError(CP, ex, "execute")
             End Try
-            Call CP.Addon.ExecuteAsyncByUniqueName("RSS Feed Process")
+            Call CP.Addon.ExecuteAsProcessByUniqueName("RSS Feed Process")
             Return returnHtml
         End Function
         '
