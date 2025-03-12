@@ -28,8 +28,8 @@ There are 4 views created from the layout
 * newsBodyCaption -- caption in the body
 * newsBodyStory -- wrapper around the body of story within the body
 * newsSearchListItem -- the item html used in the newsSearchList
-* newsSearchList
-* newsIssueCaption
+* newsSearchList -- the list of newsSearchListItem
+* newsIssueCaption -- innerHtml populated with the name of the issue
 * newsIssuePublishDate
 * newsIssueSponsor
 * newsletterTagLine
