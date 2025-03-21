@@ -3,7 +3,7 @@
 	<HelpLink>http://wiki.kmacloud.net/index.php?title=Newsletter</HelpLink>
 	<Help></Help>
 	<Addon name="Newsletter" guid="{E56A34E0-E013-41CB-87F6-52F22D5F7694}" type="Add-on">
-		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Views.NewsletterDesignBlockClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Views.NewsletterWidget]]></DotNetClass>
 		<instanceSettingPrimaryContentId><![CDATA[Newsletters]]></instanceSettingPrimaryContentId>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -355,18 +355,14 @@
 	<ImportCollection name="Banner Campaigns">{2B178115-EB9A-4D2A-8BFC-A949307272D2}</ImportCollection>
 	<Resource name="styles.css" type="www" path="newsletterAddon" />
 	<Resource name="script.js" type="www" path="newsletterAddon" />
-	<Resource name="Newsletter Template Default.html" type="www" path="newsletterAddon" />
 	<Resource name="Newsletter Template Default Email.html" type="www" path="newsletterAddon" />
 	<Resource name="Newsletter Default Story Copy.html" type="www" path="newsletterAddon" />
 	<Resource name="Newsletter Default Story Overview.html" type="www" path="newsletterAddon" />
-	<Resource name="Newsletter Issue Default.html" type="www" path="newsletterAddon" />
-	<Resource name="CPBase.dll" type="executable" path="" />
-	<Resource name="ContensiveDbModels.dll" type="executable" path="" />
-	<Resource name="HtmlAgilityPack.dll" type="executable" path="" />
-	<Resource name="Nustache.Core.dll" type="executable" path="" />
-	<Resource name="aoNewsletter2.dll" type="executable" path="" />
 	<Resource name="footer.jpg" type="www" path="newsletterAddon" />
 	<Resource name="header.jpg" type="www" path="newsletterAddon" />
 	<Resource name="fpiebfooterfpi.jpg" type="www" path="newsletterAddon" />
 	<Resource name="fpiebheaderfpi.jpg" type="www" path="newsletterAddon" />
+	<Resource name="NewsletterTemplate.html" type="www" path="newsletterAddon" />
+	<!---->
+	<Resource name="Newsletter Issue Default.html" type="files" path="newsletterAddon" />
 </Collection>

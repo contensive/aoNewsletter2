@@ -10,13 +10,13 @@ Namespace Views
     ''' <summary>
     ''' Design block with a centered headline, image, paragraph text and a button.
     ''' </summary>
-    Public Class NewsletterDesignBlockClass
+    Public Class NewsletterWidget
         Inherits AddonBaseClass
         '
         '====================================================================================================
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Const designBlockName As String = "Tile Design Block"
+            Const designBlockName As String = "Newsletter Widget"
             Try
                 '
                 ' -- read instanceId, guid created uniquely for this instance of the addon on a page

@@ -3,6 +3,7 @@ Imports Contensive.Addons.Newsletter.Models.Db
 Imports Contensive.Addons.Newsletter.Controllers
 Imports Contensive.BaseClasses
 Imports Contensive.Addons.Newsletter.Models.View
+Imports System.IO
 
 Namespace Views
     '
@@ -30,7 +31,11 @@ Namespace Views
                     End If
 
                 End If
-                    Return String.Empty
+                '
+                ' -- update layout
+                CP.Layout.updateLayout("{61913e8e-bf87-4b35-8fbf-c4b4ec4f1219}", "Newsletter Template - 2025", "newsletterAddon\NewsletterTemplate.html")
+                '
+                Return String.Empty
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
                 Return "<!-- Unexpected Exception -->"

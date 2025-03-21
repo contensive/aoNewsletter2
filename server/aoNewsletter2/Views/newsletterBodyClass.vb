@@ -637,7 +637,7 @@ Namespace Views
                     return_tagLine = cs.GetText("tagLine")
                     return_publishDate = GenericController.encodeMinDate(cs.GetDate("publishDate"))
                     If cover.Length > 50 Then
-                        returnHtmlItemList = GetCoverStoryItemLayout(cp, newsCoverStoryItem, "", "", "", cover, "", "", "", "")
+                        returnHtmlItemList = GetCoverStoryItemLayout(cp, newsCoverStoryItem, "", "", "", cover, "", "", "", "", isEditing, cs.GetEditLink())
                     End If
                 End If
                 Call cs.Close()
@@ -689,7 +689,7 @@ Namespace Views
                                 returnHtmlItemList &= layout.getHtml()
                                 '
                                 Do While CS2.OK
-                                    returnHtmlItemList &= GetCoverStoryItem(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing)
+                                    returnHtmlItemList &= GetCoverStoryItem(cp, CS2, formid, refreshQueryString, newsCoverStoryItem, isEditing, CS2.GetEditLink())
                                     Call CS2.GoNext()
                                 Loop
                             End If
@@ -710,7 +710,7 @@ Namespace Views
                     '    Stream &= vbCrLf & "<div class=""NewsletterTopic"">" & Caption & "</div>"
                     'End If
                     Do While cs.OK()
-                        returnHtmlItemList &= GetCoverStoryItem(cp, cs, formid, refreshQueryString, newsCoverStoryItem, isEditing)
+                        returnHtmlItemList &= GetCoverStoryItem(cp, cs, formid, refreshQueryString, newsCoverStoryItem, isEditing, cs.GetEditLink())
                         Call cs.GoNext()
                     Loop
                 End If
@@ -762,7 +762,7 @@ Namespace Views
         '    Return returnHtml
         'End Function
         '
-        Private Function GetCoverStoryItem(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String, isEditing As Boolean) As String
+        Private Function GetCoverStoryItem(ByVal cp As CPBaseClass, ByVal CSStories As CPCSBaseClass, ByVal formId As Integer, ByVal refreshQueryString As String, ByVal newsCoverStoryItem As String, isEditing As Boolean, editLink As String) As String
             Dim returnhtml As String = ""
             Try
                 '
@@ -791,9 +791,6 @@ Namespace Views
                     caption &= CSStories.GetEditLink()
                 End If
                 caption = "<span id=""" & storyBookmark & """>" & CSStories.GetText("Name") & "</span>"
-                If isEditing Then
-                    caption = CSStories.GetEditLink() & caption
-                End If
                 overview &= cp.Utils.EncodeContentForWeb(CSStories.GetText("Overview"))
                 storyBody = CSStories.GetText("body")
                 If Not NewsletterController.isBlank(cp, storyBody) Then
@@ -801,7 +798,7 @@ Namespace Views
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameStoryId, StoryID.ToString())
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, RequestNameFormID, FormStory.ToString())
                 End If
-                returnhtml = GetCoverStoryItemLayout(cp, newsCoverStoryItem, StoryAccessString, storyBookmark, caption, overview, readMoreLink, coverInfographicthumbnail, coverInfographic, coverInfographicUrl)
+                returnhtml = GetCoverStoryItemLayout(cp, newsCoverStoryItem, StoryAccessString, storyBookmark, caption, overview, readMoreLink, coverInfographicthumbnail, coverInfographic, coverInfographicUrl, isEditing, editLink)
             Catch ex As Exception
                 Call handleError(cp, ex, "getStoryOverview")
             End Try
@@ -821,7 +818,7 @@ Namespace Views
         ''' <param name="readMoreLink"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function GetCoverStoryItemLayout(ByVal cp As CPBaseClass, newsCoverStoryItem As String, StoryAccessString As String, storyBookmark As String, caption As String, overview As String, readMoreLink As String, coverinfographicThumbnail As String, coverinfographic As String, coverInfographicUrl As String) As String
+        Private Function GetCoverStoryItemLayout(ByVal cp As CPBaseClass, newsCoverStoryItem As String, StoryAccessString As String, storyBookmark As String, caption As String, overview As String, readMoreLink As String, coverinfographicThumbnail As String, coverinfographic As String, coverInfographicUrl As String, isEditing As Boolean, editLink As String) As String
             Dim returnhtml As String = ""
             Try
                 '
@@ -895,6 +892,9 @@ Namespace Views
                 End If
                 '
                 returnhtml = layout.getHtml()
+                If isEditing Then
+                    returnhtml = $"{editLink}<div class=""ccEditWrapper"">" & returnhtml & "</div>"
+                End If
             Catch ex As Exception
                 Call handleError(cp, ex, "getStoryOverview")
             End Try
@@ -1001,19 +1001,18 @@ Namespace Views
                                 End If
                             End If
                             If rssChange Then
-                                Call cp.Addon.ExecuteAsProcess("RSS Feed Process")
+                                RssFeedController.updateRSSFeed(cp)
                             End If
                         End If
                     End If
                     Call cs.Close()
                 End If
                 '
-                returnHtml = layout.getHtml()
+                Return layout.getHtml()
             Catch ex As Exception
                 Call handleError(cp, ex, "getNewsletterBodyDetails")
+                Throw
             End Try
-            Call cp.Addon.ExecuteAsProcess("RSS Feed Process")
-            Return returnHtml
         End Function
         '
         Private Function template(x As Integer) As String

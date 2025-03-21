@@ -1,5 +1,5 @@
 
-@echo off
+rem @echo off
 
 rem 
 rem Must be run from the projects git\project\scripts folder - everything is relative
@@ -24,9 +24,6 @@ rem				(all files related to the ui
 rem			-- etc 
 rem				(all misc files)
 
-rem -- the application on the local server where this collection will be installed
-set appName=app200509
-
 rem -- major version 5, minor does not matter set 1
 set majorVersion=5
 set minorVersion=1
@@ -44,7 +41,7 @@ rem -- name of the solution. SHOULD include ao prefix
 set binPath=..\server\aoNewsletter2\bin\debug\
 
 rem -- name of the solution. SHOULD include ao prefix
-set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
+set msbuildLocation=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\
 
 rem -- name of the solution. SHOULD include ao prefix
 set deploymentFolderRoot=C:\Deployments\aoNewsletter2\Dev\
@@ -75,7 +72,7 @@ goto tryagain
 :makefolder
 md "%deploymentFolderRoot%%versionNumber%"
 
-
+pause
 
 rem ==============================================================
 rem
@@ -89,6 +86,8 @@ if errorlevel 1 (
    exit /b %errorlevel%
 )
 cd ..\scripts
+
+pause
 
 
 rem ==============================================================
@@ -111,3 +110,4 @@ del "%collectionName%.zip" /Q
 xcopy "%collectionName%.zip" "%deploymentFolderRoot%%versionNumber%" /Y
 cd ..\..\scripts
 
+pause

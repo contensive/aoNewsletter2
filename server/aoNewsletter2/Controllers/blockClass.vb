@@ -29,7 +29,7 @@ Namespace Controllers
         End Sub
         '
         Public Function getClassInner(findClass As String) As String
-            Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
+            Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode($"//*[contains(concat(' ', normalize-space(@class), ' '), ' {findClass} ')]")
             If Not (node Is Nothing) Then
                 Return node.InnerHtml()
             End If
@@ -37,7 +37,7 @@ Namespace Controllers
         End Function
         '
         Public Function getClassOuter(findClass As String) As String
-            Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode("//*[@class='" & findClass & "']")
+            Dim node As HtmlAgilityPack.HtmlNode = layout2.DocumentNode.SelectSingleNode($"//*[contains(concat(' ', normalize-space(@class), ' '), ' {findClass} ')]")
             If Not (node Is Nothing) Then
                 Return node.OuterHtml()
             End If
@@ -45,7 +45,7 @@ Namespace Controllers
         End Function
         '
         Public Sub setClassInner(findClass As String, replacement As String)
-            Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
+            Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes($"//*[contains(concat(' ', normalize-space(@class), ' '), ' {findClass} ')]")
             If Not (nodes Is Nothing) Then
                 For Each node As HtmlAgilityPack.HtmlNode In nodes
                     node.InnerHtml = replacement
@@ -54,7 +54,7 @@ Namespace Controllers
         End Sub
         '
         Public Sub setClassOuter(findClass As String, replacement As String)
-            Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes("//*[@class='" & findClass & "']")
+            Dim nodes As HtmlAgilityPack.HtmlNodeCollection = layout2.DocumentNode.SelectNodes($"//*[contains(concat(' ', normalize-space(@class), ' '), ' {findClass} ')]")
             If Not (nodes Is Nothing) Then
                 For Each node As HtmlAgilityPack.HtmlNode In nodes
                     Dim newNode As HtmlAgilityPack.HtmlNode = HtmlAgilityPack.HtmlNode.CreateNode(replacement)

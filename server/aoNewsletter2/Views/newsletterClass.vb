@@ -423,7 +423,7 @@ Namespace Views
                     If isEditing Then
                         '
                         ' -- wrap in issue edit
-                        returnHtml = CP.Content.GetEditWrapper(CP.Content.GetEditLink("newsletter issues", currentIssueID) & returnHtml)
+                        returnHtml = CP.Content.GetEditLink("newsletter issues", currentIssueID) & CP.Content.GetEditWrapper(returnHtml)
                         '
                         ' Controls
                         '
