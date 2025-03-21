@@ -5,7 +5,7 @@ Public Class RssFeedController
     '
     Public Shared Sub updateRSSFeed(cp As CPBaseClass)
         '
-        cp.Db.ExecuteNonQuery($"upadte ccaggregatefunctions set processRunOnce=1 where name='RSS Feed Process'")
+        cp.Db.ExecuteNonQuery($"update ccaggregatefunctions set processRunOnce=1 where name='RSS Feed Process'")
         '
     End Sub
 End Class
