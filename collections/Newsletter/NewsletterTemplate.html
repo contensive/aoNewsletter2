@@ -111,12 +111,33 @@
 			max-height: none !important;
 		}
 	}
+
+	@media (max-width: 767px) {
+		.column.stack-column-1 {
+			padding: 30px 15px 15px 15px;
+		}
+
+		.column.stack-column-2 {
+			padding: 15px 15px 30px 15px;
+		}
+	}
+	@media (min-width: 768px) {
+		td.column.stack-column-1 {
+			padding: 30px 15px 30px 30px;
+		}
+
+		td.column.stack-column-2 {
+			padding: 30px 30px 30px 15px;
+		}
+	}
+
+
 	@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
 
 </style><!--[if mso ]><style>sup, sub { font-size: 100% !important; } sup { mso-text-raise:10% } sub { mso-text-raise:-10% }</style> <![endif]-->
 
 
-<body class="body" id="newsTemplate" style="background-color: #f9f9f9; padding-top: 30px; padding-bottom: 30px; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none; overflow-x: hidden;">
+<div class="body" id="newsTemplate" style="background-color: #f9f9f9;  padding: 50px 15px !important; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none; overflow-x: hidden;">
 	<table class="nl-container" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #f9f9f9;">
 		<tbody>
 			<tr>
@@ -186,7 +207,7 @@
 									<table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #000000; border-radius: 0; background-color: #ffffff; width: 900px; margin: 0 auto;  padding: 30px;" width="800">
 										<tbody>
 											<tr>
-												<td class="column column-1" width="33.333333333333336%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; padding: 30px 15px 30px 30px;">
+												<td class="column stack-column-1" width="33.333333333333336%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;">
 													<table class="list_block block-1" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="background-color: #f9f9f9; border: solid #d1d1d1 1px; mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word; color: #101218; direction: ltr;  font-family: 'Source Sans 4', serif; font-size: 16px; font-weight: 400; letter-spacing: 0px; line-height: 120%; text-align: left; mso-line-height-alt: 19.2px;">
 														<tr>
 															<td class="pad">
@@ -205,7 +226,7 @@
 													</table>
 												</td>
 
-												<td class="column column-2" width="66.66666666666667%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-left: 10px; vertical-align: top; padding: 30px 30px 30px 15px;">
+												<td class="column stack-column-2" width="66.66666666666667%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-left: 10px; vertical-align: top;">
 													<!---------Cover Story--------->
 													<table class="paragraph_block block-1" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>	
@@ -214,7 +235,7 @@
 																	<div class="newsCoverList">
 																		<div class="newsCoverCategoryItem" style="font-size: 20px; font-weight: 700; margin-bottom: 20px;font-family: 'Source Sans 3',sans-serif; letter-spacing: .3pt; padding: 3px; background-color: #f9f9f9; color: #101112;" align="center">Cover Category</div>
 																		<div class="newsCoverStoryItem" style="color:#101112;direction:ltr; font-family: 'Source Sans 3', sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px; margin-bottom: 20px; border-bottom: 1px solid #d1d1d1; padding-bottom: 20px;">
-																			<div class="newsCoverListCaption" style="font-size: 20px; font-weight: 600; margin-bottom: 10px;font-family: 'Source Sans 3', sans-serif;">Cover Header</div>
+																			<div class="newsCoverListCaption" style="font-size: 18px; font-weight: 600; margin-bottom: 10px;font-family: 'Source Sans 3', sans-serif;">Cover Header</div>
 																			<div class="newsCoverListOverview" style="margin: 0; font-family: 'Source Sans 4', serif;">I'm a new paragraph block.</div>
 																			<div class="newsCoverListReadMore"><a class="newsCoverListReadMoreAnchor" href="?" style="text-decoration: none; font-family: 'Source Sans 4', serif;"><span class="newsCoverListReadMoreCaption">Read More</span></a></div>
 																		</div>
@@ -224,13 +245,13 @@
 														</tr>
 													</table>
 													<!---------Storyline--------->
-													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+													<table class="paragraph_block block-2 newsBody" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
-															<td class="pad"  style="padding-bottom: 20px; margin-bottom: 20px;">
-																<div class="newsBody" style="border-bottom: 1px solid #d1d1d1;">
+															<td class="pad" style="padding-bottom: 20px; margin-bottom: 20px;">
+																<div class="" style="border-bottom: 1px solid #d1d1d1;">
 																	<div  style="color:#101112;direction:ltr; font-family: 'Source Sans 3', sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
-																		<div class="newsBodyCaption" style="font-size: 20px; font-weight: 700; margin-bottom: 10px;font-family: 'Source Sans 4',serif;">Story Header</div>
-																		<div class="newsBodyStory" style="margin: 0; font-family: 'Source Sans 3', sans-serif;">I'm a new paragraph block.</div>
+																		<div class="newsBodyCaption"  style="font-size: 18px; font-weight: 600; margin-bottom: 10px;font-family: 'Source Sans 3', sans-serif;">Story Header</div>
+																		<div class="newsBodyStory" style="margin: 0; font-family: 'Source Sans 4', serif;">I'm a new paragraph block.</div>
 																	</div>
 																</div>
 															</td>
@@ -240,14 +261,14 @@
 													<!---------Archive Stories--------->
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
-															<td class="pad" style="padding-bottom: 20px; margin-bottom: 20px;">
-																<div class="newsArchive" style="border-bottom: 1px solid #d1d1d1;">
-																	<div class="newsArchiveCaption"style="font-size: 24px; font-weight: 700; margin-bottom: 10px;font-family: 'Source Sans 4',serif; letter-spacing: .3pt;"></div>
+															<td class="pad" style="padding-bottom: 20px; margin-bottom: 20px; padding-top: 0;">
+																<div class="newsArchive" style="border-bottom: 1px solid #d1d1d1; padding-bottom: 20px;">
+																	<div class="newsArchiveCaption" style="font-size: 16px; font-weight: 700; font-family: 'Source Sans 3',sans-serif; letter-spacing: .3pt; border-bottom: 1px solid #d9d9d9; margin-bottom: 20px; padding-botton:10x; color: #7d7d7d;">Archive Issues</div>
 																	<div class="newsArchiveList">
 																		<div class="newsArchiveListItem" style="color:#101112;direction:ltr; font-family: 'Source Sans 3', sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
-																			<div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;font-family: 'Source Sans 4',serif; letter-spacing: .3pt;" class="newsArchiveListCaption">Archive Header</div>
-																			<div style="margin: 0; padding-bottom: 20px; font-family: 'Source Sans 3', sans-serif;" class="newsArchiveListOverview">I'm a new paragraph block.</div>
-																			<a href="?" class="newsArchiveLink" style="font-family: 'Source Sans 3', sans-serif;">Read More</a>
+																			<div  style="font-size: 18px; font-weight: 600; margin-bottom: 10px;font-family: 'Source Sans 3', sans-serif;" class="newsArchiveListCaption">Archive Header</div>
+																			<div style="margin: 0; font-family: 'Source Sans 4', serif;" class="newsArchiveListOverview">I'm a new paragraph block.</div>
+																			<a href="?" class="newsArchiveLink" style="text-decoration: none; font-family: 'Source Sans 4', serif;">Read More</a>
 																		</div>
 																	</div>
 																	
@@ -289,6 +310,6 @@
 			</tr>
 		</tbody>
 	</table><!-- End -->
-</body>
+</div>
 
 </html>
