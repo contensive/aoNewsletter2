@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<Collection name="Newsletter" guid="{b1853855-4e37-4099-9972-c1a9455efa05}" system="No" updatable="Yes" blockNavigatorNode="No" onInstallAddonGuid="{93dab84c-1a11-4dab-b0c0-5219d96c24ae}">
+<Collection name="Newsletter" guid="{b1853855-4e37-4099-9972-c1a9455efa05}" system="No" updatable="Yes" blockNavigatorNode="No" onInstallAddonGuid="{93dab84c-1a11-4dab-b0c0-5219d96c24ae}"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://contensive.s3.amazonaws.com/xsd/Collection.xsd"
+>
 	<HelpLink>http://wiki.kmacloud.net/index.php?title=Newsletter</HelpLink>
 	<Help></Help>
 	<Addon name="Newsletter" guid="{E56A34E0-E013-41CB-87F6-52F22D5F7694}" type="Add-on">
