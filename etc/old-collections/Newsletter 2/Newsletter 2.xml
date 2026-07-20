@@ -8,7 +8,6 @@
 	<Addon name="Newsletter 2" guid="{E56A34E0-E013-41CB-87F6-52F22D5F7694}" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
 		<DotNetClass><![CDATA[newsletter2.newsletterClass]]></DotNetClass>
 		<ArgumentList><![CDATA[Newsletter=0[Created for this page:0|listid(newsletters)]
 Archive Issues To Display=10
@@ -48,7 +47,6 @@ Block Archive Search Form=yes[yes|no]
 	<Addon name="newsletter2 Settings" guid="{fa787411-f505-433d-990b-47bb55473ef0}" type="Setting">
 		<Copy></Copy>
 		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
 		<DotNetClass></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
