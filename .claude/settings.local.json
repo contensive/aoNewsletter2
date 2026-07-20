@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet nuget search:*)",
+      "WebFetch(domain:www.nuget.org)",
+      "Bash(dotnet build:*)"
+    ]
+  }
+}

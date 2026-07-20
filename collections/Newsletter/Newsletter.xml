@@ -30,7 +30,7 @@
 		<ProcessRunOnce>No</ProcessRunOnce>
 		<ProcessInterval>0</ProcessInterval>
 		<styleslinkhref><![CDATA[/newsletterAddon/styles.css]]></styleslinkhref>
-		<Scripting Language="VBScript" EntryPoint="" Timeout="5000"/>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
 		<Category>Applications.Social Media</Category>
 	</Addon>
 	<Addon name="Newsletter OnInstall" guid="{93dab84c-1a11-4dab-b0c0-5219d96c24ae}" type="Add-on">
@@ -356,16 +356,6 @@
 	</CDef>
 	<ImportCollection name="RSS">{06791870-0EF8-48CB-AC54-2327FF5A1C40}</ImportCollection>
 	<ImportCollection name="Banner Campaigns">{2B178115-EB9A-4D2A-8BFC-A949307272D2}</ImportCollection>
-	<Resource name="styles.css" type="www" path="newsletterAddon" />
-	<Resource name="script.js" type="www" path="newsletterAddon" />
-	<Resource name="Newsletter Template Default Email.html" type="www" path="newsletterAddon" />
-	<Resource name="Newsletter Default Story Copy.html" type="www" path="newsletterAddon" />
-	<Resource name="Newsletter Default Story Overview.html" type="www" path="newsletterAddon" />
-	<Resource name="footer.jpg" type="www" path="newsletterAddon" />
-	<Resource name="header.jpg" type="www" path="newsletterAddon" />
-	<Resource name="fpiebfooterfpi.jpg" type="www" path="newsletterAddon" />
-	<Resource name="fpiebheaderfpi.jpg" type="www" path="newsletterAddon" />
-	<Resource name="NewsletterTemplate.html" type="www" path="newsletterAddon" />
-	<!---->
-	<Resource name="Newsletter Issue Default.html" type="files" path="newsletterAddon" />
+	<Resource name="wwwFiles.zip" type="wwwFiles" />
+	<Resource name="cdnFiles.zip" type="cdnFiles" />
 </Collection>
