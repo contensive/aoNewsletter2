@@ -28,8 +28,12 @@ namespace Contensive.Addons.Newsletter.Views {
                 }
                 // 
                 // -- update layout
-                CP.Layout.updateLayout("{61913e8e-bf87-4b35-8fbf-c4b4ec4f1219}", "Newsletter Template - 2025", @"newsletterAddon\NewsletterTemplate.html");
-                // 
+                CP.Layout.updateLayout(Constants.guidLayoutDefaultTemplate, "Newsletter Template Default", "NewsletterTemplate.html");
+                CP.Layout.updateLayout(Constants.guidLayoutDefaultIssueCover, "Newsletter Issue Default", "Newsletter Issue Default.html");
+                CP.Layout.updateLayout(Constants.guidLayoutDefaultStoryOverview, "Newsletter Default Story Overview", "Newsletter Default Story Overview.html");
+                CP.Layout.updateLayout(Constants.guidLayoutDefaultStoryBody, "Newsletter Default Story Copy", "Newsletter Default Story Copy.html");
+                CP.Layout.updateLayout(Constants.guidLayoutDefaultEmailTemplate, "Newsletter Template Default Email", "Newsletter Template Default Email.html");
+                //
                 return string.Empty;
             } catch (Exception ex) {
                 CP.Site.ErrorReport(ex);

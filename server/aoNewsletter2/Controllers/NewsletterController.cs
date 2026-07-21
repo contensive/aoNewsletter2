@@ -157,7 +157,7 @@ namespace Contensive.Addons.Newsletter.Controllers {
                                 // 
                                 // all other cases
                                 // 
-                                cs.SetField("Name", "'Default'");
+                                cs.SetField("Name", $"Newsletter {returnId}");
                             }
                             cs.SetField("TemplateID", templateID.ToString());
                             cs.SetField("emailTemplateID", emailTemplateID.ToString());
@@ -186,7 +186,7 @@ namespace Contensive.Addons.Newsletter.Controllers {
                     cs.SetField("name", newsletterName + " Newsletter, Issue 1");
                     cs.SetField("NewsletterID", newsletterId.ToString());
                     cs.SetField("PublishDate", DateTime.Now.ToShortDateString());
-                    cs.SetField("cover", cp.WwwFiles.Read(@"newsletteraddon\Newsletter Issue Default.html"));
+                    cs.SetField("cover", cp.Layout.GetLayout(Constants.guidLayoutDefaultIssueCover));
                 }
                 cs.Close();
                 // 
@@ -196,8 +196,8 @@ namespace Contensive.Addons.Newsletter.Controllers {
                 if (cs.OK()) {
                     cs.SetField("name", "The First Story");
                     cs.SetField("newsletterid", returnId.ToString());
-                    cs.SetField("Overview", cp.WwwFiles.Read(@"newsletteraddon\Newsletter Default Story Overview.html"));
-                    cs.SetField("body", cp.WwwFiles.Read(@"newsletteraddon\Newsletter Default Story Copy.html"));
+                    cs.SetField("Overview", cp.Layout.GetLayout(Constants.guidLayoutDefaultStoryOverview));
+                    cs.SetField("body", cp.Layout.GetLayout(Constants.guidLayoutDefaultStoryBody));
                 }
                 cs.Close();
             } catch (Exception ex) {
@@ -502,7 +502,7 @@ namespace Contensive.Addons.Newsletter.Controllers {
                     // 
                     // Use the default template in their Db already
                     if (string.IsNullOrEmpty((cs.GetText("Template") ?? "").Trim())) {
-                        cs.SetField("Template", cp.WwwFiles.Read(@"newsletteraddon\Newsletter Template Default.html"));
+                        cs.SetField("Template", cp.Layout.GetLayout(Constants.guidLayoutDefaultTemplate));
                     }
                     return cs.GetInteger("ID");
                 }
@@ -527,7 +527,7 @@ namespace Contensive.Addons.Newsletter.Controllers {
                     // 
                     // Use the default template in their Db already
                     if (string.IsNullOrEmpty((cs.GetText("Template") ?? "").Trim())) {
-                        cs.SetField("Template", cp.WwwFiles.Read(@"newsletteraddon\Newsletter Template Default Email.html"));
+                        cs.SetField("Template", cp.Layout.GetLayout(Constants.guidLayoutDefaultEmailTemplate));
                     }
                     return cs.GetInteger("ID");
                 }

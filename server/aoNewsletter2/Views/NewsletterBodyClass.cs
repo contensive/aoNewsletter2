@@ -790,7 +790,7 @@ namespace Contensive.Addons.Newsletter.Views {
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, Constants.RequestNameStoryId, StoryID.ToString());
                     readMoreLink = cp.Utils.ModifyQueryString(readMoreLink, Constants.RequestNameFormID, Constants.FormStory.ToString());
                 }
-                returnhtml = GetCoverStoryItemLayout(cp, newsCoverStoryItem, StoryAccessString, storyBookmark, caption, overview, readMoreLink, coverInfographicthumbnail, coverInfographic, coverInfographicUrl, isEditing, editLink);
+                returnhtml = GetCoverStoryItemLayout(cp, newsCoverStoryItem, StoryAccessString, storyBookmark, caption, overview, readMoreLink, coverInfographicthumbnail, coverInfographic, coverInfographicUrl, isEditing, editLink, StoryID);
             } catch (Exception ex) {
                 handleError(cp, ex, "getStoryOverview");
             }
@@ -810,7 +810,7 @@ namespace Contensive.Addons.Newsletter.Views {
         /// <param name="readMoreLink"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private string GetCoverStoryItemLayout(CPBaseClass cp, string newsCoverStoryItem, string StoryAccessString, string storyBookmark, string caption, string overview, string readMoreLink, string coverinfographicThumbnail, string coverinfographic, string coverInfographicUrl, bool isEditing, string editLink) {
+        private string GetCoverStoryItemLayout(CPBaseClass cp, string newsCoverStoryItem, string StoryAccessString, string storyBookmark, string caption, string overview, string readMoreLink, string coverinfographicThumbnail, string coverinfographic, string coverInfographicUrl, bool isEditing, string editLink, int storyId = 0) {
             string returnhtml = "";
             try {
                 // 
@@ -883,8 +883,10 @@ namespace Contensive.Addons.Newsletter.Views {
                 }
                 // 
                 returnhtml = layout.getHtml();
-                if (isEditing) {
-                    returnhtml = $"{editLink}<div class=\"ccEditWrapper\">" + returnhtml + "</div>";
+                if (isEditing && storyId > 0) {
+                    returnhtml = cp.Content.GetEditWrapper(returnhtml, Constants.ContentNameNewsletterStories, storyId);
+                } else if (isEditing) {
+                    returnhtml = $"{editLink}<div class=\"ccEditWrapper\">{returnhtml}</div>";
                 }
             } catch (Exception ex) {
                 handleError(cp, ex, "getStoryOverview");
@@ -922,17 +924,12 @@ namespace Contensive.Addons.Newsletter.Views {
                     cs.Open(Constants.ContentNameNewsletterStories, "ID=" + storyId);
                     if (cs.OK()) {
                         storyName = cs.GetText("name");
-                        if (isEditing) {
-                            storyName = cs.GetEditLink() + storyName;
-                        }
                         storyBody = cs.GetText("body");
                         storyOverview = cs.GetText("Overview");
                         if (string.IsNullOrEmpty(storyBody)) {
                             storyBody = storyOverview;
                         }
                         IssueID = cs.GetInteger("newsletterId");
-                        // 
-                        returnHtml += cs.GetEditLink();
                         if (cs.GetBoolean("AllowPrinterPage")) {
                             qs = cp.Doc.RefreshQueryString;
                             qs = cp.Utils.ModifyQueryString(qs, Constants.RequestNameStoryId, storyId.ToString());
@@ -945,8 +942,11 @@ namespace Contensive.Addons.Newsletter.Views {
                             returnHtml += "<div class=\"EmailIcon\"><a target=_blank href=\"?" + Link + "\">" + EmailIcon + "</a>&nbsp;<a target=_blank href=\"" + Link + "\"><nobr>Email this page</nobr></a></div>";
                         }
                         layout.setClassInner("newsBodyCaption", storyName);
+                        if (isEditing && storyId > 0) {
+                            storyBody = cp.Content.GetEditWrapper(storyBody, Constants.ContentNameNewsletterStories, storyId);
+                        }
                         layout.setClassInner("newsBodyStory", storyBody);
-                        // 
+                        //
                         // update RSS fields if empty
                         // 
                         if (!isEditing) {
@@ -998,7 +998,7 @@ namespace Contensive.Addons.Newsletter.Views {
                     }
                     cs.Close();
                 }
-                // 
+                //
                 return layout.getHtml();
             } catch (Exception ex) {
                 handleError(cp, ex, "getNewsletterBodyDetails");
