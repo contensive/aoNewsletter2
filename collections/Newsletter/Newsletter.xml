@@ -358,4 +358,107 @@
 	<ImportCollection name="Banner Campaigns">{2B178115-EB9A-4D2A-8BFC-A949307272D2}</ImportCollection>
 	<Resource name="wwwFiles.zip" type="wwwFiles" />
 	<Resource name="cdnFiles.zip" type="cdnFiles" />
+	<!--
+		Newsletter List - portal addon that lists all newsletters
+	-->
+	<Addon name="Newsletter List" guid="{951FA2BE-B559-495C-9CB6-1D65E1A074A0}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterListAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Newsletter Issue List - portal addon that lists issues for a newsletter
+	-->
+	<Addon name="Newsletter Issue List" guid="{C24A2D81-395B-4A47-BD7D-0904330E28A1}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterIssueListAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Portal Features - register newsletter in the Share portal
+	-->
+	<Data>
+		<!-- Newsletter Manager (top-level feature in Share portal) -->
+		<Record Content="Portal Features" Guid="{458709B9-FEBA-475E-9F17-41B0D912A798}" Name="Newsletters">
+			<Field Name="sortorder"><![CDATA[Newsletters]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{951FA2BE-B559-495C-9CB6-1D65E1A074A0}</Field>
+			<Field Name="heading"><![CDATA[Newsletters]]></Field>
+			<Field Name="parentfeatureid"></Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Newsletter Issues (child of Newsletters feature) -->
+		<Record Content="Portal Features" Guid="{369607B7-7FAA-424F-A06F-E2E8652EE11B}" Name="Newsletter Issues">
+			<Field Name="sortorder"><![CDATA[010 Issues]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{C24A2D81-395B-4A47-BD7D-0904330E28A1}</Field>
+			<Field Name="heading"><![CDATA[Issues]]></Field>
+			<Field Name="parentfeatureid">{458709B9-FEBA-475E-9F17-41B0D912A798}</Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Data: Newsletters (children of Share portal's Data feature) -->
+		<Record Content="Portal Features" Guid="{7F787123-E0B2-483E-AF30-74065F9D77A4}" Name="Newsletter Data - Newsletters">
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid"></Field>
+			<Field Name="heading"><![CDATA[Newsletters]]></Field>
+			<Field Name="parentfeatureid">{1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}</Field>
+			<Field Name="datacontentid">{EE578D56-7BA8-454E-BB94-0495736EF462}</Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Data: Newsletter Issues -->
+		<Record Content="Portal Features" Guid="{5AD2B9F5-C064-4934-8F55-4051686BD945}" Name="Newsletter Data - Issues">
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid"></Field>
+			<Field Name="heading"><![CDATA[Newsletter Issues]]></Field>
+			<Field Name="parentfeatureid">{1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}</Field>
+			<Field Name="datacontentid">{DA2F692A-145F-4F25-9DED-7FA2760675CF}</Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Data: Newsletter Stories -->
+		<Record Content="Portal Features" Guid="{EFBCFE25-26E2-45D8-B16A-4625F9FCE37A}" Name="Newsletter Data - Stories">
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid"></Field>
+			<Field Name="heading"><![CDATA[Newsletter Stories]]></Field>
+			<Field Name="parentfeatureid">{1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}</Field>
+			<Field Name="datacontentid">{BC6DC9D5-FF99-4560-A029-967CDD1405D5}</Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Data: Newsletter Categories -->
+		<Record Content="Portal Features" Guid="{09A7CC82-3BDA-4AA3-971A-675419DEA559}" Name="Newsletter Data - Categories">
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid"></Field>
+			<Field Name="heading"><![CDATA[Newsletter Categories]]></Field>
+			<Field Name="parentfeatureid">{1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}</Field>
+			<Field Name="datacontentid">{901D3FAE-9317-4787-BCE9-633CAEB04696}</Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Data: Newsletter Templates -->
+		<Record Content="Portal Features" Guid="{FA740F84-A74F-49D1-A4AF-8220D5140F79}" Name="Newsletter Data - Templates">
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid"></Field>
+			<Field Name="heading"><![CDATA[Newsletter Templates]]></Field>
+			<Field Name="parentfeatureid">{1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}</Field>
+			<Field Name="datacontentid">{84D3FFD9-95D7-4161-9CFE-3371AA62835E}</Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Data: Newsletter Ad Banner Layouts -->
+		<Record Content="Portal Features" Guid="{76194473-5E2E-4F78-AF97-090AAD249E08}" Name="Newsletter Data - Ad Banner Layouts">
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid"></Field>
+			<Field Name="heading"><![CDATA[Ad Banner Layouts]]></Field>
+			<Field Name="parentfeatureid">{1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}</Field>
+			<Field Name="datacontentid">{61D497DB-EDFA-4D6E-8A0C-B37853BF44AA}</Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+	</Data>
 </Collection>

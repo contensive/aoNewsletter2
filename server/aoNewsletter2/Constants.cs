@@ -96,7 +96,26 @@ namespace Contensive.Addons.Newsletter {
         // Public Const DefaultTemplate = "<TABLE style=""BORDER: black 1px solid; WIDTH: 100%; BORDER-COLLAPSE: collapse"" cellPadding=5><TBODY><TR><TD colspan=2 style=""BORDER: black 1px solid;"">Newsletter Banner<BR>(Edit this template to design your newsletter)</TD></TR><TR><TD style=""BORDER: black 1px solid; VERTICAL-ALIGN: top; WIDTH: 150px;""><AC type=""AGGREGATEFUNCTION"" name=""Newsletter-nav only"" querystring="""" acinstanceid=""{{ACID0}}""><br><img src=""/cclib/images/spacer.gif"" width=""150"" height=""1""></TD><TD width=""99%"" style=""BORDER: black 1px solid; VERTICAL-ALIGN: top; TEXT-ALIGN: left""><AC type=""AGGREGATEFUNCTION"" name=""Newsletter-body only"" querystring="""" acinstanceid=""{{ACID1}}""></TD></TR></TBODY></TABLE>"
         // 
         public const string NewsletterAddonGuid = "{B9EB288C-C2BD-4DDF-8C70-E44828C45BA0}";
-        // 
+        //
+        // -- Portal integration constants
+        //
+        public const string guidPortalShare = "{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}";
+        public const string guidPortalFeatureNewsletterList = "{458709B9-FEBA-475E-9F17-41B0D912A798}";
+        public const string guidPortalFeatureNewsletterIssueList = "{369607B7-7FAA-424F-A06F-E2E8652EE11B}";
+        public const string guidAddonNewsletterList = "{951FA2BE-B559-495C-9CB6-1D65E1A074A0}";
+        public const string guidAddonNewsletterIssueList = "{C24A2D81-395B-4A47-BD7D-0904330E28A1}";
+        //
+        // -- Portal request/form constants
+        //
+        public const string rnNewsletterId = "newsletterId";
+        public const string rnButton = "button";
+        public const string rnSrcFormId = "srcFormId";
+        public const string rnDstFeatureGuid = "dstFeatureGuid";
+        public const int formIdNewsletterList = 1;
+        public const int formIdNewsletterIssueList = 2;
+        public const string buttonAdd = "Add";
+        public const string buttonBack = "Back";
+        //
         public const string RequestNameRefer = "EditReferer";
         public static string ReferLink = "";
         // 
