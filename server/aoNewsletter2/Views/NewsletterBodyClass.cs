@@ -667,7 +667,7 @@ namespace Contensive.Addons.Newsletter.Views {
                     while (cs.OK()) {
                         CategoryID = cs.GetInteger("CategoryID");
                         using (var CS2 = cp.CSNew()) {
-                            if (CS2.Open(Constants.ContentNameNewsletterStories, "(CategoryID=" + CategoryID + ") AND (NewsletterID=" + IssueID + ")", "SortOrder,id")) {
+                            if (CS2.Open(Constants.ContentNameNewsletterStories, "(CategoryID=" + CategoryID + ") AND (NewsletterID=" + IssueID + ")", "SortOrder,id", true, "id,name,overview,body,coverinfographicthumbnail,coverinfographic,coverinfographicurl,newsletterid,categoryid,active,sortorder,allowreadmore")) {
                                 // 
                                 // there are stories under this topic, wrap in div to allow a story indent
                                 layout.load(newsCoverCategoryItem);
@@ -696,7 +696,7 @@ namespace Contensive.Addons.Newsletter.Views {
                 cs.Close();
                 // 
                 Criteria = "((CategoryID is Null) OR (CategoryID=0)) AND (NewsletterID=" + IssueID + ")";
-                cs.Open(Constants.ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded");
+                cs.Open(Constants.ContentNameNewsletterStories, Criteria, "SortOrder,DateAdded", true, "id,name,overview,body,coverinfographicthumbnail,coverinfographic,coverinfographicurl,newsletterid,categoryid,active,sortorder,allowreadmore");
                 if (cs.OK()) {
                     // Caption = cp.Site.GetText("Newsletter Caption Other Stories", "")
                     // If Caption <> "" Then

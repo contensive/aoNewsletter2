@@ -426,6 +426,9 @@ namespace Contensive.Addons.Newsletter.Views {
                         //
                         // -- wrap in issue edit
                         returnHtml = CP.Content.GetEditLink("newsletter issues", currentIssueID) + CP.Content.GetEditWrapper(returnHtml);
+                        //
+                        // -- add new issue link, full width below both cells
+                        returnHtml += CP.Content.GetAddLink(Constants.ContentNameNewsletterIssues, $"Newsletterid={NewsletterID}", false, CP.User.IsEditing());
                     }
                     // 
                     // Add any user errors
@@ -456,7 +459,7 @@ namespace Contensive.Addons.Newsletter.Views {
         //
         //
         //
-        private int CreateEmailGetID(CPBaseClass cp, int IssueID, int NewsletterID, string refreshQueryString, int currentIssueId) {
+        internal static int CreateEmailGetID(CPBaseClass cp, int IssueID, int NewsletterID, string refreshQueryString, int currentIssueId) {
             int returnId = 0;
             try {
                 string NewsletterName;
@@ -691,7 +694,7 @@ namespace Contensive.Addons.Newsletter.Views {
                 // Call cp.Utils.AppendLogFile("createEmailGetId, 999")
                 // 
             } catch (Exception ex) {
-                HandleError(cp, ex, "CreateEmailGetID");
+                cp.Site.ErrorReport(ex, "Unexpected error in newsletterPageClass.CreateEmailGetID");
             }
             return returnId;
         }

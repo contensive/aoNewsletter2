@@ -102,8 +102,18 @@ namespace Contensive.Addons.Newsletter {
         public const string guidPortalShare = "{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}";
         public const string guidPortalFeatureNewsletterList = "{458709B9-FEBA-475E-9F17-41B0D912A798}";
         public const string guidPortalFeatureNewsletterIssueList = "{369607B7-7FAA-424F-A06F-E2E8652EE11B}";
+        public const string guidPortalFeatureNewsletterIssueDetail = "{5ED42CC1-BCA6-47E9-B188-DD97CA746EDB}";
+        public const string guidPortalFeatureNewsletterDetail = "{F329AE40-6757-4109-9546-B57C8C68F416}";
+        public const string guidPortalFeatureNewsletterIssueAdBanners = "{A7E3D1F4-8B2C-4E5A-9D6F-1C3B5A7E9D2F}";
+        public const string guidPortalFeatureNewsletterIssueStories = "{B8F4E2A5-9C3D-4F6B-AE7A-2D4C6B8F0E3A}";
+        public const string guidPortalFeatureNewsletterStoryDetail = "{C9A5F3B6-0D4E-4A7C-BF8B-3E5D7C9A1F4B}";
         public const string guidAddonNewsletterList = "{951FA2BE-B559-495C-9CB6-1D65E1A074A0}";
         public const string guidAddonNewsletterIssueList = "{C24A2D81-395B-4A47-BD7D-0904330E28A1}";
+        public const string guidAddonNewsletterIssueDetail = "{470CC4C4-F0DB-4F14-BE02-FE6986754AC4}";
+        public const string guidAddonNewsletterDetail = "{D36A6947-E38D-46C7-B1C2-843EB122F64E}";
+        public const string guidAddonNewsletterIssueAdBanners = "{D0B6A4C7-1E5F-4B8D-CA9C-4F6E8D0B2A5C}";
+        public const string guidAddonNewsletterIssueStories = "{E1C7B5D8-2F6A-4C9E-DBD0-5A7F9E1C3B6D}";
+        public const string guidAddonNewsletterStoryDetail = "{F2D8C6E9-3A7B-4DAF-ECE1-6B8A0F2D4C7E}";
         //
         // -- Portal request/form constants
         //
@@ -113,8 +123,20 @@ namespace Contensive.Addons.Newsletter {
         public const string rnDstFeatureGuid = "dstFeatureGuid";
         public const int formIdNewsletterList = 1;
         public const int formIdNewsletterIssueList = 2;
+        public const int formIdNewsletterIssueDetail = 3;
+        public const int formIdNewsletterDetail = 4;
+        public const int formIdNewsletterIssueAdBanners = 5;
+        public const int formIdNewsletterIssueStories = 6;
+        public const int formIdNewsletterStoryDetail = 7;
+        public const string rnIssueId = "issueId";
+        public const string rnStoryId = "storyId";
         public const string buttonAdd = "Add";
         public const string buttonBack = "Back";
+        public const string buttonSave = "Save";
+        public const string buttonOK = "OK";
+        public const string buttonCancel = "Cancel";
+        public const string buttonDelete = "Delete";
+        public const string buttonEmailVersion = "Email Version";
         //
         public const string RequestNameRefer = "EditReferer";
         public static string ReferLink = "";

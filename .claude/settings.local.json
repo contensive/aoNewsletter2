@@ -3,7 +3,10 @@
     "allow": [
       "Bash(dotnet nuget search:*)",
       "WebFetch(domain:www.nuget.org)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(dotnet tool list:*)",
+      "Bash(dotnet-ildasm:*)",
+      "Bash(powershell.exe -NoProfile -Command '[System.Reflection.Assembly]::LoadFrom\\(\"\"C:\\\\Users\\\\jay\\\\.nuget\\\\packages\\\\contensive.cpbaseclass\\\\26.7.11.31887\\\\lib\\\\netstandard2.0\\\\CPBase.dll\"\"\\).GetTypes\\(\\) | ForEach-Object { $t=$_; $_.GetMethods\\(\\) | Where-Object { $_.Name -match \"\"\\(?i\\)button\"\" } | ForEach-Object { Write-Host \\(\"\"Type: \"\" + $t.FullName + \"\" | Method: \"\" + $_.ToString\\(\\)\\) } }')"
     ]
   }
 }

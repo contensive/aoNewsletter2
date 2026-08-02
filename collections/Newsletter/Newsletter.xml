@@ -375,6 +375,46 @@
 		<Admin>Yes</Admin>
 	</Addon>
 	<!--
+		Newsletter Issue Detail - portal addon that shows issue detail with email version button
+	-->
+	<Addon name="Newsletter Issue Detail" guid="{470CC4C4-F0DB-4F14-BE02-FE6986754AC4}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterIssueDetailAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Newsletter Detail - portal addon that shows editable newsletter properties
+	-->
+	<Addon name="Newsletter Detail" guid="{D36A6947-E38D-46C7-B1C2-843EB122F64E}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterDetailAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Newsletter Issue Ad Banners - portal addon that shows editable ad banner settings for an issue
+	-->
+	<Addon name="Newsletter Issue Ad Banners" guid="{D0B6A4C7-1E5F-4B8D-CA9C-4F6E8D0B2A5C}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterIssueAdBannersAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Newsletter Issue Stories - portal addon that lists stories for an issue
+	-->
+	<Addon name="Newsletter Issue Stories" guid="{E1C7B5D8-2F6A-4C9E-DBD0-5A7F9E1C3B6D}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterIssueStoriesAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Newsletter Story Detail - portal addon that shows editable story detail
+	-->
+	<Addon name="Newsletter Story Detail" guid="{F2D8C6E9-3A7B-4DAF-ECE1-6B8A0F2D4C7E}" type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterStoryDetailAddon]]></DotNetClass>
+		<BlockEditTools>Yes</BlockEditTools>
+		<Admin>Yes</Admin>
+	</Addon>
+	<!--
 		Portal Features - register newsletter in the Share portal
 	-->
 	<Data>
@@ -389,13 +429,68 @@
 			<Field Name="addpadding">False</Field>
 			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
 		</Record>
-		<!-- Newsletter Issues (child of Newsletters feature) -->
+		<!-- Newsletter Detail (child of Newsletters feature, shown as sub-nav tab) -->
+		<Record Content="Portal Features" Guid="{F329AE40-6757-4109-9546-B57C8C68F416}" Name="Newsletter Detail">
+			<Field Name="sortorder"><![CDATA[005 Detail]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{D36A6947-E38D-46C7-B1C2-843EB122F64E}</Field>
+			<Field Name="heading"><![CDATA[Detail]]></Field>
+			<Field Name="parentfeatureid">{458709B9-FEBA-475E-9F17-41B0D912A798}</Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Newsletter Issues (child of Newsletters feature, shown as sub-nav tab) -->
 		<Record Content="Portal Features" Guid="{369607B7-7FAA-424F-A06F-E2E8652EE11B}" Name="Newsletter Issues">
 			<Field Name="sortorder"><![CDATA[010 Issues]]></Field>
 			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
 			<Field Name="addonid">{C24A2D81-395B-4A47-BD7D-0904330E28A1}</Field>
 			<Field Name="heading"><![CDATA[Issues]]></Field>
 			<Field Name="parentfeatureid">{458709B9-FEBA-475E-9F17-41B0D912A798}</Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Newsletter Issue Detail (child of Newsletter Issues feature) -->
+		<Record Content="Portal Features" Guid="{5ED42CC1-BCA6-47E9-B188-DD97CA746EDB}" Name="Newsletter Issue Detail">
+			<Field Name="sortorder"><![CDATA[000 Issue Detail]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{470CC4C4-F0DB-4F14-BE02-FE6986754AC4}</Field>
+			<Field Name="heading"><![CDATA[Issue Detail]]></Field>
+			<Field Name="parentfeatureid">{369607B7-7FAA-424F-A06F-E2E8652EE11B}</Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Newsletter Issue Ad Banners (child of Newsletter Issues feature) -->
+		<Record Content="Portal Features" Guid="{A7E3D1F4-8B2C-4E5A-9D6F-1C3B5A7E9D2F}" Name="Newsletter Issue Ad Banners">
+			<Field Name="sortorder"><![CDATA[010 Ad Banners]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{D0B6A4C7-1E5F-4B8D-CA9C-4F6E8D0B2A5C}</Field>
+			<Field Name="heading"><![CDATA[Ad Banners]]></Field>
+			<Field Name="parentfeatureid">{369607B7-7FAA-424F-A06F-E2E8652EE11B}</Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Newsletter Issue Stories (child of Newsletter Issues feature) -->
+		<Record Content="Portal Features" Guid="{B8F4E2A5-9C3D-4F6B-AE7A-2D4C6B8F0E3A}" Name="Newsletter Issue Stories">
+			<Field Name="sortorder"><![CDATA[020 Stories]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{E1C7B5D8-2F6A-4C9E-DBD0-5A7F9E1C3B6D}</Field>
+			<Field Name="heading"><![CDATA[Stories]]></Field>
+			<Field Name="parentfeatureid">{369607B7-7FAA-424F-A06F-E2E8652EE11B}</Field>
+			<Field Name="datacontentid"></Field>
+			<Field Name="addpadding">False</Field>
+			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
+		</Record>
+		<!-- Newsletter Story Detail (child of Newsletter Issue Stories feature) -->
+		<Record Content="Portal Features" Guid="{C9A5F3B6-0D4E-4A7C-BF8B-3E5D7C9A1F4B}" Name="Newsletter Story Detail">
+			<Field Name="sortorder"><![CDATA[000 Story Detail]]></Field>
+			<Field Name="portalid">{e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}</Field>
+			<Field Name="addonid">{F2D8C6E9-3A7B-4DAF-ECE1-6B8A0F2D4C7E}</Field>
+			<Field Name="heading"><![CDATA[Story Detail]]></Field>
+			<Field Name="parentfeatureid">{B8F4E2A5-9C3D-4F6B-AE7A-2D4C6B8F0E3A}</Field>
 			<Field Name="datacontentid"></Field>
 			<Field Name="addpadding">False</Field>
 			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>

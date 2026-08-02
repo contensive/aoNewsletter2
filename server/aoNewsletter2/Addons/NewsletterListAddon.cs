@@ -39,6 +39,8 @@ namespace Contensive.Addons.Newsletter.Addons {
                             cs.SetField("name", $"Newsletter {newId}");
                             cs.SetField("active", "1");
                             cs.Close();
+                            string detailLink = cp.AdminUI.GetPortalFeatureLink(Constants.guidPortalShare, Constants.guidPortalFeatureNewsletterDetail) + $"&{Constants.rnNewsletterId}={newId}";
+                            cp.Response.Redirect(detailLink);
                         }
                     }
                     return;
@@ -100,7 +102,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                 sql += string.IsNullOrEmpty(layoutBuilder.sqlOrderBy) ? " order by n.name" : $" order by {layoutBuilder.sqlOrderBy}";
                 sql += $" OFFSET {(layoutBuilder.paginationPageNumber - 1) * layoutBuilder.paginationPageSize} ROWS FETCH NEXT {layoutBuilder.paginationPageSize} ROWS ONLY";
                 //
-                string issueListLink = cp.AdminUI.GetPortalFeatureLink(Constants.guidPortalShare, Constants.guidPortalFeatureNewsletterIssueList) + $"&{Constants.rnNewsletterId}=";
+                string detailLink = cp.AdminUI.GetPortalFeatureLink(Constants.guidPortalShare, Constants.guidPortalFeatureNewsletterDetail) + $"&{Constants.rnNewsletterId}=";
                 //
                 int rowPtr = 0;
                 using (var csList = cp.CSNew()) {
@@ -110,7 +112,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                             int newsletterId = csList.GetInteger("id");
                             string newsletterName = csList.GetText("name");
                             if (string.IsNullOrWhiteSpace(newsletterName)) { newsletterName = "(no name)"; }
-                            string nameLink = $"<a href=\"{issueListLink}{newsletterId}\">{newsletterName}</a>";
+                            string nameLink = $"<a href=\"{detailLink}{newsletterId}\">{newsletterName}</a>";
                             int issueCount = csList.GetInteger("issueCount");
                             bool isActive = csList.GetBoolean("active");
                             //
@@ -118,7 +120,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                             layoutBuilder.setCell((rowPtrStart + rowPtr + 1).ToString());
                             layoutBuilder.setCell(newsletterId.ToString());
                             layoutBuilder.setCell(nameLink);
-                            layoutBuilder.setCell($"<a href=\"{issueListLink}{newsletterId}\">{issueCount}</a>");
+                            layoutBuilder.setCell(issueCount.ToString());
                             layoutBuilder.setCell(isActive ? "Yes" : "No");
                             //
                             rowPtr += 1;
