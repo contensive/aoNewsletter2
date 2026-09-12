@@ -52,7 +52,8 @@ namespace Contensive.Addons.Newsletter.Views {
         // 
         public string GetContent(CPBaseClass cp, string OptionString) {
             string returnHtml = "";
-            // 
+            try {
+            //
             string ExtensionName;
             string ExtensionType;
             int PageID;
@@ -63,7 +64,7 @@ namespace Contensive.Addons.Newsletter.Views {
             string[] Parts;
             var NewsletterID = default(int);
             int currentIssueId;
-            // 
+            //
             if (true) {
                 // 
                 // Assume newsletterNavClass is used within a PageClass
@@ -116,6 +117,9 @@ namespace Contensive.Addons.Newsletter.Views {
                             }
                     }
                 }
+            }
+            } catch (Exception ex) {
+                handleError(cp, ex, "GetContent");
             }
             return returnHtml;
         }

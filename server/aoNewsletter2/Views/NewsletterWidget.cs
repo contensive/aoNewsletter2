@@ -1,6 +1,5 @@
 ﻿using System;
 using Contensive.Addons.Newsletter.Controllers;
-
 using Contensive.Addons.Newsletter.Models.Db;
 using Contensive.Addons.Newsletter.Models.View;
 using Contensive.BaseClasses;
@@ -40,7 +39,7 @@ namespace Contensive.Addons.Newsletter.Views {
                 var viewModel = NewsletterViewModel.create(CP, settings, legacyNewsletter);
                 if (viewModel is null)
                     throw new ApplicationException("Could not create design block view model.");
-                result = Nustache.Core.Render.StringToString(My.Resources.Resources.NewsletterLayout, viewModel);
+                result = CP.Mustache.Render(My.Resources.Resources.NewsletterLayout, viewModel);
                 // 
                 // -- if editing enabled, add the link and wrapperwrapper
                 return CP.Content.GetEditWrapper(result, NewsletterModel.tableMetadata.contentName, settings.id);

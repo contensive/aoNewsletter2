@@ -92,7 +92,15 @@ namespace Contensive.Addons.Newsletter.Addons {
                 }
                 //
                 var layoutBuilder = cp.AdminUI.CreateLayoutBuilderList();
-                layoutBuilder.portalSubNavTitle = $"{newsletterName}, #{newsletterId}";
+                layoutBuilder.callbackAddonGuid = Constants.guidAddonNewsletterIssueStories;
+                layoutBuilder.includeBodyColor = true;
+                layoutBuilder.includeBodyPadding = true;
+                layoutBuilder.includeForm = true;
+                layoutBuilder.isOuterContainer = false;
+                layoutBuilder.paginationPageSizeDefault = 50;
+                layoutBuilder.title = "Stories";
+                layoutBuilder.description = "Click a story to edit it.";
+                layoutBuilder.portalSubNavTitleList.Add($"{newsletterName}, #{newsletterId}");
                 //
                 // -- columns
                 layoutBuilder.columnCaption = "Row";
@@ -166,16 +174,6 @@ namespace Contensive.Addons.Newsletter.Addons {
                         csList.Close();
                     }
                 }
-                //
-                // -- layout settings
-                layoutBuilder.title = "Stories";
-                layoutBuilder.description = "Click a story to edit it.";
-                layoutBuilder.callbackAddonGuid = Constants.guidAddonNewsletterIssueStories;
-                layoutBuilder.includeBodyColor = true;
-                layoutBuilder.includeBodyPadding = true;
-                layoutBuilder.includeForm = true;
-                layoutBuilder.isOuterContainer = false;
-                layoutBuilder.paginationPageSizeDefault = 50;
                 //
                 // -- buttons
                 layoutBuilder.addFormButton(Constants.buttonAdd, Constants.rnButton);

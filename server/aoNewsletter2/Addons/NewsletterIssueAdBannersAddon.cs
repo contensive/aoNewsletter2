@@ -96,7 +96,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                 }
                 //
                 var layoutBuilder = cp.AdminUI.CreateLayoutBuilderNameValue();
-                layoutBuilder.portalSubNavTitle = $"{newsletterName}, #{newsletterId}";
+                layoutBuilder.portalSubNavTitleList.Add($"{newsletterName}, #{newsletterId}");
                 //
                 using (var cs = cp.CSNew()) {
                     cs.Open(Constants.ContentNameNewsletterIssues, $"id={issueId}");

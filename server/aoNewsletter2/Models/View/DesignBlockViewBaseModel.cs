@@ -30,7 +30,7 @@ namespace Contensive.Addons.Newsletter.Models.View {
 
                 result.outerContainerClass = "" + (settings.themeStyleId.Equals(0) ? string.Empty : " " + cp.Content.GetRecordName(DesignBlockThemeModel.tableMetadata.contentName, settings.themeStyleId)) + "";
 
-                result.contentContainerClass = "" + (settings.asFullBleed ? " container" : string.Empty) + (settings.padTop ? " pt-5" : " pt-0") + (settings.padRight ? " pr-4" : " pr-0") + (settings.padBottom ? " pb-5" : " pb-0") + (settings.padLeft ? " pl-4" : " pl-0") + "";
+                result.contentContainerClass = "" + (settings.asFullBleed ? " container" : string.Empty) + (settings.padTop ? " pt-5" : " pt-0") + (settings.padRight ? " pe-4" : " pe-0") + (settings.padBottom ? " pb-5" : " pb-0") + (settings.padLeft ? " ps-4" : " ps-0") + "";
 
 
 

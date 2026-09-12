@@ -81,7 +81,7 @@
 			<field name="Active">True</field>
 			<field name="SortOrder"></field>
 		</record>
-		<record content="layouts" guid="{02FCBD4C-C610-493B-AA44-453DD3D8865A}" name="">
+		<record content="layouts" guid="{02FCBD4C-C610-493B-AA44-453DD3D8865A}" name="Newsletter Template Default Email">
 			<field name="Layout"><![CDATA[]]></field>
 			<field name="StylesFilename"></field>
 			<field name="Active">True</field>
@@ -416,6 +416,8 @@
 	</Addon>
 	<!--
 		Portal Features - register newsletter in the Share portal
+		Base portal: Share {e4d011e9-9f3b-4f7e-8ec3-f4fcc2a20455}
+		Base feature: Data {1358AD7A-FCF6-43F0-8AB6-70EBD70EED78}
 	-->
 	<Data>
 		<!-- Newsletter Manager (top-level feature in Share portal) -->

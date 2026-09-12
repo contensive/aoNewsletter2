@@ -206,8 +206,8 @@ namespace Contensive.Addons.Newsletter.Views {
                 layout.setClassInner("newsNavList", repeatList);
                 // 
                 returnHtml = layout.getHtml();
-            } catch (Exception) {
-
+            } catch (Exception ex) {
+                handleError(cp, ex, "GetNav");
             }
             return returnHtml;
         }

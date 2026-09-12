@@ -78,7 +78,8 @@ namespace Contensive.Addons.Newsletter.Views {
                 ThisSQL2 = ThisSQL2 + " and year(nl.publishdate) = " + yearSelected;
             }
             if (!string.IsNullOrEmpty(SearchKeywords)) {
-                sql2 = sql2 + " and ((story.Body like '%" + SearchKeywords + "%' )or (story.name  like '%" + SearchKeywords + "%') or (story.Overview  like '%" + SearchKeywords + "%'))";
+                string encodedKeywords = cp.Db.EncodeSQLText(SearchKeywords);
+                sql2 = sql2 + $" and ((story.Body like '%' + {encodedKeywords} + '%')or (story.name like '%' + {encodedKeywords} + '%') or (story.Overview like '%' + {encodedKeywords} + '%'))";
             }
             if (cs.OpenSQL(sql2)) {
                 FileCount = cs.GetInteger("count");
@@ -104,7 +105,7 @@ namespace Contensive.Addons.Newsletter.Views {
                     // stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
                     //
                     // ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
-                    ThisSQL = " SELECT  TOP " + archiveIssuesToDisplay + " * " + " From NewsletterIssues " + " WHERE active=1 and (PublishDate < { fn NOW() }) AND (ID <> " + currentIssueId + ") AND (NewsletterID=" + cp.Db.EncodeSQLNumber(NewsletterID) + ") " + " ORDER BY PublishDate DESC";
+                    ThisSQL = $" SELECT TOP {archiveIssuesToDisplay} * From NewsletterIssues WHERE active=1 and (PublishDate < {{ fn NOW() }}) AND (ID <> {currentIssueId}) AND (NewsletterID={cp.Db.EncodeSQLNumber(NewsletterID)}) ORDER BY PublishDate DESC";
 
 
                     //
@@ -152,10 +153,11 @@ namespace Contensive.Addons.Newsletter.Views {
                     ThisSQL2 = ThisSQL2 + " and year(nl.publishdate) = " + yearSelected;
                 }
                 if (!string.IsNullOrEmpty(SearchKeywords)) {
-                    ThisSQL2 = ThisSQL2 + " and ((story.Body like '%" + SearchKeywords + "%' )or (story.name  like '%" + SearchKeywords + "%') or (story.Overview  like '%" + SearchKeywords + "%'))";
+                    string encodedKeywords = cp.Db.EncodeSQLText(SearchKeywords);
+                    ThisSQL2 = ThisSQL2 + $" and ((story.Body like '%' + {encodedKeywords} + '%')or (story.name like '%' + {encodedKeywords} + '%') or (story.Overview like '%' + {encodedKeywords} + '%'))";
                 }
                 ThisSQL2 = ThisSQL2 + "  ORDER BY PublishDate DESC";
-                // 
+                //
                 // Call cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber)
                 cs.OpenSQL(ThisSQL2, "");
                 if (!cs.OK()) {
@@ -344,7 +346,8 @@ namespace Contensive.Addons.Newsletter.Views {
                 ThisSQL2 = ThisSQL2 + " and year(nl.publishdate) = " + yearSelected;
             }
             if (!string.IsNullOrEmpty(SearchKeywords)) {
-                sql2 = sql2 + " and ((story.Body like '%" + SearchKeywords + "%' )or (story.name  like '%" + SearchKeywords + "%') or (story.Overview  like '%" + SearchKeywords + "%'))";
+                string encodedKeywords = cp.Db.EncodeSQLText(SearchKeywords);
+                sql2 = sql2 + $" and ((story.Body like '%' + {encodedKeywords} + '%')or (story.name like '%' + {encodedKeywords} + '%') or (story.Overview like '%' + {encodedKeywords} + '%'))";
             }
             if (cs.OpenSQL(sql2)) {
                 FileCount = cs.GetInteger("count");
@@ -358,19 +361,19 @@ namespace Contensive.Addons.Newsletter.Views {
                 }
             }
             cs.Close();
-            // 
+            //
             // Colors = "#ffffff"
-            // 
-            // 
+            //
+            //
             if ((ButtonValue ?? "") != Constants.FormButtonViewNewsLetter & (ButtonValue ?? "") != Constants.FormButtonViewArchives) {
-                // 
+                //
                 // List a page of archive issues
-                // 
+                //
                 if (monthSelected == 0 & yearSelected == 0) {
                     // stream &=  "<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=5>"
-                    // 
+                    //
                     // ThisSQL = " SELECT  TOP 6 * From NewsletterIssues WHERE (PublishDate < { fn NOW() }) AND (ID <> " & IssueID & ") AND (NewsletterID=" & cp.db.encodesqlNumber(NewsletterID) & ") ORDER BY PublishDate DESC"
-                    ThisSQL = " SELECT  TOP " + archiveIssuesToDisplay + " * From NewsletterIssues WHERE active=1 and (PublishDate < { fn NOW() }) AND (ID <> " + issueId + ") AND (NewsletterID=" + cp.Db.EncodeSQLNumber(NewsletterID) + ") ORDER BY PublishDate DESC";
+                    ThisSQL = $" SELECT TOP {archiveIssuesToDisplay} * From NewsletterIssues WHERE active=1 and (PublishDate < {{ fn NOW() }}) AND (ID <> {issueId}) AND (NewsletterID={cp.Db.EncodeSQLNumber(NewsletterID)}) ORDER BY PublishDate DESC";
                     // 
                     cs.OpenSQL(ThisSQL);
                     if (cs.OK()) {
@@ -412,10 +415,11 @@ namespace Contensive.Addons.Newsletter.Views {
                     ThisSQL2 = ThisSQL2 + " and year(nl.publishdate) = " + yearSelected;
                 }
                 if (!string.IsNullOrEmpty(SearchKeywords)) {
-                    ThisSQL2 = ThisSQL2 + " and ((story.Body like '%" + SearchKeywords + "%' )or (story.name  like '%" + SearchKeywords + "%') or (story.Overview  like '%" + SearchKeywords + "%'))";
+                    string encodedKeywords = cp.Db.EncodeSQLText(SearchKeywords);
+                    ThisSQL2 = ThisSQL2 + $" and ((story.Body like '%' + {encodedKeywords} + '%')or (story.name like '%' + {encodedKeywords} + '%') or (story.Overview like '%' + {encodedKeywords} + '%'))";
                 }
                 ThisSQL2 = ThisSQL2 + "  ORDER BY PublishDate DESC";
-                // 
+                //
                 cs.OpenSQL(ThisSQL2, "", RecordsPerPage, PageNumber);
                 if (!cs.OK()) {
                     layout.load(newsArchiveListItemLayout);
@@ -513,104 +517,7 @@ namespace Contensive.Addons.Newsletter.Views {
             GetSearchItemListRet = Stream;
             return GetSearchItemListRet;
         }
-        // 
-        private string GetFormRow(string Innards) {
-            string GetFormRowRet = default;
-            string Stream = "";
-            // 
-            Stream += "<TR>";
-            Stream += "<TD colspan=2 width=\"60%\">" + Innards + "</TD>";
-            Stream += "</TR>";
-            GetFormRowRet = Stream;
-            return GetFormRowRet;
-        }
-        // 
-        private string GetSpacer(int Height = 1, int Width = 1) {
-            string GetSpacerRet = default;
-            // On Error GoTo ErrorTrap
-            // 
-            string Stream;
-            // 
-            Stream = "<img src=\"/ccLib/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\">";
-            // 
-            GetSpacerRet = Stream;
-            return GetSpacerRet;
-            // 
-            // Exit Function
-            // ErrorTrap:
-            // Call HandleError("LeftSideNavigation", "GetSpacer")
-        }
-        // '
-        // Private Function GetArticleAccess(cp As CPBaseClass, ArticleID As Integer, isManager As Boolean, Optional GivenGroupID As Integer = 0) As Boolean
-        // 'On Error GoTo ErrorTrap
-        // '
-        // Dim cs As CPCSBaseClass = cp.CSNew()
-        // Dim AccessFlag As Boolean
-        // Dim ThisTest As String
-        // '
-        // If GivenGroupID <> 0 Then
-        // Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-        // If Not cs.OK() Then
-        // GetArticleAccess = True
-        // Else
-        // Do While cs.OK()
-        // If cs.GetInteger("GroupID") = GivenGroupID Then
-        // GetArticleAccess = True
-        // End If
-        // Call cs.GoNext()
-        // Loop
-        // End If
-        // Call cs.Close()
-        // Else
-        // If Not isManager Then
-        // Call cs.Open(ContentNameNewsLetterGroupRules, "NewsletterPageID=" & ArticleID, , , , , "GroupID")
-        // If Not cs.OK() Then
-        // GetArticleAccess = True
-        // Else
-        // Do While cs.OK()
-        // ThisTest = cs.GetText("GroupID")
-        // '
-        // '
-        // If ThisTest <> "" Then
-        // If cp.User.IsInGroup(ThisTest) Then
-        // GetArticleAccess = True
-        // End If
-        // End If
-        // Call cs.GoNext()
-        // Loop
-        // End If
-        // Call cs.Close()
-        // Else
-        // GetArticleAccess = True
-        // End If
-        // End If
-        // '
-        // 'Exit Function
-        // 'ErrorTrap:
-        // 'Call HandleError(cp, ex, "GetArticleAccess")
-        // End Function
-        // 
-        // Private Function GetIssuePublishDate(ByVal cp As CPBaseClass, ByVal IssueID As Integer) As String
-        // 'On Error GoTo ErrorTrap
-        // '
-        // Dim cs As CPCSBaseClass = cp.CSNew()
-        // Dim IssueDate As String
-        // Dim Stream As String = ""
-        // '
-        // cs.Open(ContentNameNewsletterIssues, "ID=" & IssueID, , , "PublishDate")
-        // If cs.OK Then
-        // IssueDate = cs.GetDate("PublishDate")
-        // If IsDate(IssueDate) Then
-        // Stream = MonthName(Month(IssueDate), True) & " " & Day(IssueDate) & ", " & Year(IssueDate)
-        // End If
-        // End If
-        // Call cs.Close()
-        // '
-        // '
-        // GetIssuePublishDate = Stream
-        // '
-        // End Function
-        // '
+        //
         internal string GetCoverContent(CPBaseClass cp, int IssueID, int storyId, string refreshQueryString, int formid, string newsCoverStoryItem, string newsCoverCategoryItem, bool isEditing, ref string return_Sponsor, ref DateTime return_publishDate, ref string return_tagLine) {
             string returnHtmlItemList = "";
             try {
@@ -1006,12 +913,12 @@ namespace Contensive.Addons.Newsletter.Views {
             }
         }
         // 
-        private string template(int x) {
+        private string template(CPBaseClass cp, int x) {
             string returnHtml = "";
             try {
 
-            } catch (Exception) {
-                // Call handleError(cp, ex, "template")
+            } catch (Exception ex) {
+                handleError(cp, ex, "template");
             }
             return returnHtml;
         }

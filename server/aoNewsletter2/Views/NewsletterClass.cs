@@ -429,6 +429,71 @@ namespace Contensive.Addons.Newsletter.Views {
                         //
                         // -- add new issue link, full width below both cells
                         returnHtml += CP.Content.GetAddLink(Constants.ContentNameNewsletterIssues, $"Newsletterid={NewsletterID}", false, CP.User.IsEditing());
+                        //
+                        // -- admin control panel
+                        //
+                        string controls = "";
+                        string referLink = $"{Constants.RequestNameRefer}={CP.Utils.EncodeRequestVariable(CP.Utils.ModifyLinkQueryString(currentLink, Constants.RequestNameRefer, ""))}";
+                        string qs;
+                        if (problemList.Count > 0) {
+                            string controlItems = "";
+                            foreach (string problem in problemList) {
+                                controlItems += CP.Html.li(problem);
+                            }
+                            controls += "<h3>Problems Found on this Page</h3>";
+                            controls += CP.Html.ul(controlItems);
+                        }
+                        if (IssueID != 0) {
+                            //
+                            // -- for this issue
+                            //
+                            controls += "<h3>For this Issue</h3><ul>";
+                            controls += $"<li><a href=\"{CP.Site.GetText("adminUrl")}?cid={CP.Content.GetID(Constants.ContentNameNewsletterStories)}&af=4&aa=2&ad=1&wc={CP.Utils.EncodeRequestVariable($"NewsletterID={IssueID}")}&{referLink}\">Add a new story</a></li>";
+                            controls += $"<li><a href=\"{CP.Site.GetText("adminUrl")}?cid={CP.Content.GetID(Constants.ContentNameNewsletterIssues)}&af=4&id={IssueID}&{referLink}\">Edit this issue</a></li>";
+                            if (CP.Request.PathPage.IndexOf("/admin", StringComparison.OrdinalIgnoreCase) >= 0 || (CP.Site.GetText("adminUrl") ?? "").Equals(CP.Request.PathPage ?? "", StringComparison.OrdinalIgnoreCase)) {
+                                controls += "<li>Create&nbsp;email&nbsp;version (not available from admin site)</li>";
+                            } else {
+                                qs = CP.Doc.RefreshQueryString;
+                                qs = CP.Utils.ModifyQueryString(qs, Constants.RequestNameFormID, Constants.FormEmail.ToString());
+                                qs = CP.Utils.ModifyQueryString(qs, Constants.RequestNameIssueID, IssueID.ToString());
+                                controls += $"<li><a href=\"?{qs}\">Create&nbsp;email&nbsp;version</a></li>";
+                            }
+                            controls += "</ul>";
+                        }
+                        if (NewsletterID != 0) {
+                            //
+                            // -- for this newsletter
+                            //
+                            controls += "<h3>For this Newsletter</h3><ul>";
+                            controls += $"<li><a href=\"{CP.Site.GetText("adminUrl")}?cid={CP.Content.GetID(Constants.ContentNameNewsletterIssues)}&wl0=newsletterid&wr0={NewsletterID}&af=4&aa=2&ad=1&{referLink}\">Add a new issue</a></li>";
+                            controls += $"<li><a href=\"{CP.Site.GetText("adminUrl")}?cid={CP.Content.GetID(Constants.ContentNameNewsletters)}&id={NewsletterID}&af=4&aa=2&ad=1&{referLink}\">Edit this newsletter</a></li>";
+                            controls += "</ul>";
+                            //
+                            // -- unpublished issues for this newsletter
+                            //
+                            string unpublishedIssueList = NewsletterController.GetUnpublishedIssueList(CP, NewsletterID, cn);
+                            if (!string.IsNullOrEmpty(unpublishedIssueList)) {
+                                controls += "<h3>Unpublished issues for this Newsletter</h3>";
+                                controls += unpublishedIssueList;
+                            }
+                        }
+                        //
+                        // -- general controls
+                        //
+                        controls += "<h3>General</h3><ul>";
+                        controls += $"<li><a href=\"{CP.Site.GetText("adminUrl")}?cid={CP.Content.GetID(Constants.ContentNameIssueCategories)}&{referLink}\">Edit categories</a></li>";
+                        controls += "</ul>";
+                        //
+                        // -- instructions
+                        //
+                        controls += "<p>This addon can control one or many different newsletters on your site. Each newsletter can have many issues, and each issue can have many stories. The newsletter creates one page for the front cover with a list of stories, and one page per story. It also includes a navigation panel for all pages.</p>"
+                            + "<p>The layout of the newsletter is controlled with a Newsletter Template. Use HTML and the addons 'Newsletter-body only' and 'Newsletter-nav only' to design your look and feel.</p>"
+                            + "<p>If you will be creating an email from this newsletter, be sure to include your styles in either the newsletter template or the newsletter record.</p>"
+                            + "<p>When you view the newsletter addon for the first time, it will automatically create a 'Default' newsletter for you.</p>"
+                            + "<p>To create a new issue for this newsletter, click the 'Add a new Issue' link. The new issue will automatically appear on the publish date you set. Before the publish date only administrators can access the new issue as they add or modify stories.</p>";
+                        if (!string.IsNullOrEmpty(controls)) {
+                            returnHtml += NewsletterController.GetAdminHintWrapper(CP, controls);
+                        }
                     }
                     // 
                     // Add any user errors

@@ -82,14 +82,14 @@ namespace Contensive.Addons.Newsletter.Addons {
                 using (var cs = cp.CSNew()) {
                     cs.Open(Constants.ContentNameNewsletters, $"id={newsletterId}");
                     if (!cs.OK()) {
-                        layoutBuilder.portalSubNavTitle = "Unknown Newsletter";
+                        layoutBuilder.portalSubNavTitleList.Add("Unknown Newsletter");
                         layoutBuilder.addRow();
                         layoutBuilder.rowName = "&nbsp;";
                         layoutBuilder.rowValue = $"Newsletter [{newsletterId}] was not found.";
                         return layoutBuilder.getHtml();
                     }
                     //
-                    layoutBuilder.portalSubNavTitle = $"{cs.GetText("name")}, #{cs.GetInteger("id")}";
+                    layoutBuilder.portalSubNavTitleList.Add($"{cs.GetText("name")}, #{cs.GetInteger("id")}");
                     //
                     layoutBuilder.addRow();
                     layoutBuilder.rowName = "Name";
@@ -118,7 +118,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                 layoutBuilder.addFormButton(Constants.buttonCancel);
                 layoutBuilder.addFormButton(Constants.buttonSave);
                 layoutBuilder.addFormButton(Constants.buttonOK);
-                layoutBuilder.addFormButton(Constants.buttonDelete, Constants.rnButton, "", "btn btn-danger mr-auto");
+                layoutBuilder.addFormButton(Constants.buttonDelete, Constants.rnButton, "", "btn btn-danger me-auto");
                 //
                 // -- hiddens
                 layoutBuilder.addFormHidden(Constants.rnSrcFormId, Constants.formIdNewsletterDetail);

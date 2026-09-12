@@ -122,7 +122,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                 }
                 //
                 var layoutBuilder = cp.AdminUI.CreateLayoutBuilder();
-                layoutBuilder.portalSubNavTitle = $"{newsletterName}, #{newsletterId}";
+                layoutBuilder.portalSubNavTitleList.Add($"{newsletterName}, #{newsletterId}");
                 //
                 // -- title field, overview, and WYSIWYG editor for story body
                 string nameInput = cp.Html5.InputText("rnStoryName", 255, storyName, "form-control");

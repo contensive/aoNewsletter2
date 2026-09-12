@@ -74,7 +74,15 @@ namespace Contensive.Addons.Newsletter.Addons {
                 }
                 //
                 var layoutBuilder = cp.AdminUI.CreateLayoutBuilderList();
-                layoutBuilder.portalSubNavTitle = $"{newsletterName}, #{newsletterId}";
+                layoutBuilder.callbackAddonGuid = Constants.guidAddonNewsletterIssueList;
+                layoutBuilder.includeBodyColor = true;
+                layoutBuilder.includeBodyPadding = true;
+                layoutBuilder.includeForm = true;
+                layoutBuilder.isOuterContainer = false;
+                layoutBuilder.paginationPageSizeDefault = 50;
+                layoutBuilder.title = string.IsNullOrWhiteSpace(newsletterName) ? "Newsletter Issues" : $"Issues for: {newsletterName}";
+                layoutBuilder.description = "Click an issue to edit it. Use Add to create a new issue for this newsletter.";
+                layoutBuilder.portalSubNavTitleList.Add($"{newsletterName}, #{newsletterId}");
                 //
                 // -- columns
                 layoutBuilder.columnCaption = "Row";
@@ -149,16 +157,6 @@ namespace Contensive.Addons.Newsletter.Addons {
                         csList.Close();
                     }
                 }
-                //
-                // -- layout settings
-                layoutBuilder.title = string.IsNullOrWhiteSpace(newsletterName) ? "Newsletter Issues" : $"Issues for: {newsletterName}";
-                layoutBuilder.description = "Click an issue to edit it. Use Add to create a new issue for this newsletter.";
-                layoutBuilder.callbackAddonGuid = Constants.guidAddonNewsletterIssueList;
-                layoutBuilder.includeBodyColor = true;
-                layoutBuilder.includeBodyPadding = true;
-                layoutBuilder.includeForm = true;
-                layoutBuilder.isOuterContainer = false;
-                layoutBuilder.paginationPageSizeDefault = 50;
                 //
                 // -- buttons
                 layoutBuilder.addFormButton(Constants.buttonAdd, Constants.rnButton);

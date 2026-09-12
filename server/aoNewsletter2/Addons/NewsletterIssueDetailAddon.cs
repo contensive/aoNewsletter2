@@ -103,7 +103,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                 }
                 //
                 var layoutBuilder = cp.AdminUI.CreateLayoutBuilderNameValue();
-                layoutBuilder.portalSubNavTitle = $"{newsletterName}, #{newsletterId}";
+                layoutBuilder.portalSubNavTitleList.Add($"{newsletterName}, #{newsletterId}");
                 //
                 using (var cs = cp.CSNew()) {
                     cs.Open(Constants.ContentNameNewsletterIssues, $"id={issueId}");
@@ -153,7 +153,7 @@ namespace Contensive.Addons.Newsletter.Addons {
                 layoutBuilder.addFormButton(Constants.buttonSave);
                 layoutBuilder.addFormButton(Constants.buttonOK);
                 layoutBuilder.addFormButton(Constants.buttonEmailVersion);
-                layoutBuilder.addFormButton(Constants.buttonDelete, Constants.rnButton, "", "btn btn-danger mr-auto");
+                layoutBuilder.addFormButton(Constants.buttonDelete, Constants.rnButton, "", "btn btn-danger me-auto");
                 //
                 // -- hiddens
                 layoutBuilder.addFormHidden(Constants.rnSrcFormId, Constants.formIdNewsletterIssueDetail);

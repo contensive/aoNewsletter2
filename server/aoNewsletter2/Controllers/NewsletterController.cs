@@ -61,9 +61,9 @@ namespace Contensive.Addons.Newsletter.Controllers {
         }
         // 
         internal static string GetUnpublishedIssueList(CPBaseClass cp, int NewsletterID, NewsletterController cn) {
-            string GetUnpublishedIssueListRet = default;
-            GetUnpublishedIssueListRet = "";
-            // 
+            string GetUnpublishedIssueListRet = "";
+            try {
+            //
             string qs = "";
             var cs = cp.CSNew();
             int ID;
@@ -113,12 +113,10 @@ namespace Contensive.Addons.Newsletter.Controllers {
                 }
                 GetUnpublishedIssueListRet = "<UL>" + GetUnpublishedIssueListRet + "</UL>";
             }
-
+            } catch (Exception ex) {
+                handleError(cp, ex, "GetUnpublishedIssueList");
+            }
             return GetUnpublishedIssueListRet;
-            // 
-            // Exit Function
-            // ErrorTrap:
-            // Call HandleError("aoNewsletter.newsletterCommonClass", "GetUnpublishedIssueList")
         }
         // 
         internal static int getNewsletterId(CPBaseClass cp, string addonArgInstanceGuid) {
@@ -207,6 +205,7 @@ namespace Contensive.Addons.Newsletter.Controllers {
         }
         // 
         internal static void SortCategoriesByIssue(CPBaseClass cp, int IssueID) {
+            try {
             var cs = cp.CSNew();
             var Pointer = cp.CSNew();
             int CategoryID;
@@ -291,7 +290,10 @@ namespace Contensive.Addons.Newsletter.Controllers {
                         }
                     }
                 }
-                // 
+                //
+            }
+            } catch (Exception ex) {
+                handleError(cp, ex, "SortCategoriesByIssue");
             }
         }
         // 
@@ -557,8 +559,7 @@ namespace Contensive.Addons.Newsletter.Controllers {
             if (returnDate < DateTime.Parse("1/1/1990")) {
                 returnDate = DateTime.MinValue;
             }
-
-            return default;
+            return returnDate;
         }
         // 
         // =================================================================================

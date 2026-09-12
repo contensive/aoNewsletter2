@@ -56,6 +56,14 @@ namespace Contensive.Addons.Newsletter.Addons {
                 if (!cp.Response.isOpen) { return ""; }
                 //
                 var layoutBuilder = cp.AdminUI.CreateLayoutBuilderList();
+                layoutBuilder.callbackAddonGuid = Constants.guidAddonNewsletterList;
+                layoutBuilder.includeBodyColor = true;
+                layoutBuilder.includeBodyPadding = true;
+                layoutBuilder.includeForm = true;
+                layoutBuilder.isOuterContainer = false;
+                layoutBuilder.paginationPageSizeDefault = 50;
+                layoutBuilder.title = "Newsletters";
+                layoutBuilder.description = "Click a newsletter to see its issues.";
                 //
                 // -- columns
                 layoutBuilder.columnCaption = "Row";
@@ -129,16 +137,6 @@ namespace Contensive.Addons.Newsletter.Addons {
                         csList.Close();
                     }
                 }
-                //
-                // -- layout settings
-                layoutBuilder.title = "Newsletters";
-                layoutBuilder.description = "Click a newsletter to see its issues.";
-                layoutBuilder.callbackAddonGuid = Constants.guidAddonNewsletterList;
-                layoutBuilder.includeBodyColor = true;
-                layoutBuilder.includeBodyPadding = true;
-                layoutBuilder.includeForm = true;
-                layoutBuilder.isOuterContainer = false;
-                layoutBuilder.paginationPageSizeDefault = 50;
                 //
                 // -- buttons
                 layoutBuilder.addFormButton(Constants.buttonAdd, Constants.rnButton);
