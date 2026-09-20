@@ -10,6 +10,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Contensive.Addons.Mcp.Shared" Version="1.0.0" />
     <PackageReference Include="Contensive.CPBaseClass" Version="26.7.11.31887" />
     <PackageReference Include="Contensive.DbModels" Version="26.7.11.31887" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />

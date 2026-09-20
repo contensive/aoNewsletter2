@@ -138,6 +138,11 @@ namespace Contensive.Addons.Newsletter {
         public const string buttonDelete = "Delete";
         public const string buttonEmailVersion = "Email Version";
         //
+        //
+        // -- MCP Tools
+        //
+        public const string guidAddonNewsletterMcpTools = "{2FDAA479-A707-44B4-8818-CAAA888545F9}";
+        //
         public const string RequestNameRefer = "EditReferer";
         public static string ReferLink = "";
         // 

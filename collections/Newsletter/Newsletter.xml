@@ -356,6 +356,7 @@
 	</CDef>
 	<ImportCollection name="RSS">{06791870-0EF8-48CB-AC54-2327FF5A1C40}</ImportCollection>
 	<ImportCollection name="Banner Campaigns">{2B178115-EB9A-4D2A-8BFC-A949307272D2}</ImportCollection>
+	<ImportCollection name="MCP Server">{D89C47DD-1971-4999-9CCB-D889BD33E939}</ImportCollection>
 	<Resource name="wwwFiles.zip" type="wwwFiles" />
 	<Resource name="layoutFiles.zip" type="layoutFiles"/>
 	<!--
@@ -413,6 +414,19 @@
 		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterStoryDetailAddon]]></DotNetClass>
 		<BlockEditTools>Yes</BlockEditTools>
 		<Admin>Yes</Admin>
+	</Addon>
+	<!--
+		Newsletter MCP Tools - AI-callable tools for newsletter management
+	-->
+	<Addon Name="Newsletter MCP Tools" Guid="{2FDAA479-A707-44B4-8818-CAAA888545F9}" Type="Add-on">
+		<DotNetClass><![CDATA[Contensive.Addons.Newsletter.Addons.NewsletterMcpTools]]></DotNetClass>
+		<Admin>No</Admin>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<RemoteMethod>No</RemoteMethod>
+		<Help><![CDATA[MCP extension tools for AI-driven newsletter management. Provides tools to list, get, create, update, delete, and reorder newsletters, issues, and stories.]]></Help>
+		<Category>Newsletter</Category>
 	</Addon>
 	<!--
 		Portal Features - register newsletter in the Share portal
@@ -557,5 +571,369 @@
 			<Field Name="addpadding">False</Field>
 			<Field Name="collectionid">{b1853855-4e37-4099-9972-c1a9455efa05}</Field>
 		</Record>
+		<!--
+			MCP Server Instructions - workflow guidance for AI clients
+		-->
+		<record content="MCP Server Instructions" guid="{586F589F-25DF-40FD-8DF4-BA0B9F93775E}" name="Newsletter">
+			<field name="sortOrder">1010</field>
+			<field name="category">Newsletter</field>
+			<field name="instructions"><![CDATA[Newsletter: A newsletter is created by adding a Newsletter widget to a page using page_widget_add. Each Newsletter widget instance represents one newsletter. If no newsletters exist, first use widget_types to find the Newsletter widget, then add it to a page. Use newsletter_list to see existing newsletters. Each newsletter contains issues managed with newsletter_issue_list, newsletter_issue_get, newsletter_issue_create, newsletter_issue_update, and newsletter_issue_delete. Each issue contains stories managed with newsletter_story_list, newsletter_story_get, newsletter_story_create, newsletter_story_update, newsletter_story_delete, and newsletter_story_reorder. Newsletter-level settings are updated with newsletter_update.]]></field>
+		</record>
+		<!--
+			MCP Tool Definitions - AI-callable tools for newsletter management
+		-->
+		<record content="MCP Tool Definitions" guid="{B41E9589-1576-4740-9522-F8612D23D9F3}" name="newsletter_list">
+			<field name="toolName">newsletter_list</field>
+			<field name="description"><![CDATA[List all newsletter records with their settings. Returns newsletterId, name, and key configuration fields.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "pageSize": {
+      "type": "integer",
+      "description": "Number of newsletters to return (default 50)"
+    },
+    "pageNumber": {
+      "type": "integer",
+      "description": "Page number for pagination (default 1)"
+    }
+  }
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{50E26458-E090-4597-8FA3-480B897FC952}" name="newsletter_get">
+			<field name="toolName">newsletter_get</field>
+			<field name="description"><![CDATA[Get a single newsletter by ID with full details including configuration fields.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "newsletterId": {
+      "type": "integer",
+      "description": "ID of the newsletter to retrieve"
+    }
+  },
+  "required": ["newsletterId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{99A18E1B-D305-40D3-A0B5-D1F807DFA7EC}" name="newsletter_update">
+			<field name="toolName">newsletter_update</field>
+			<field name="description"><![CDATA[Update a newsletter's settings. Provide only the fields you want to change. Supports undo.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "newsletterId": {
+      "type": "integer",
+      "description": "ID of the newsletter to update"
+    },
+    "name": {
+      "type": "string",
+      "description": "Newsletter name"
+    },
+    "blockArchiveSearchForm": {
+      "type": "boolean",
+      "description": "When true, the archive search form is hidden"
+    },
+    "archiveIssuesToDisplay": {
+      "type": "integer",
+      "description": "Number of archive issues to display"
+    },
+    "searchResultsPerPage": {
+      "type": "integer",
+      "description": "Number of search results per page"
+    }
+  },
+  "required": ["newsletterId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{6AEA69CE-4DCB-472E-A48D-D58C7D87012B}" name="newsletter_issue_list">
+			<field name="toolName">newsletter_issue_list</field>
+			<field name="description"><![CDATA[List newsletter issues with optional newsletter filter. Returns issueId, name, publishDate, sponsor, and tagline.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "newsletterId": {
+      "type": "integer",
+      "description": "Filter issues by newsletter ID"
+    },
+    "pageSize": {
+      "type": "integer",
+      "description": "Number of issues to return (default 50)"
+    },
+    "pageNumber": {
+      "type": "integer",
+      "description": "Page number for pagination (default 1)"
+    }
+  }
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{233545F4-E33B-4DDE-91F3-DD33C304D3D1}" name="newsletter_issue_get">
+			<field name="toolName">newsletter_issue_get</field>
+			<field name="description"><![CDATA[Get a single newsletter issue by ID with full details including cover copy, overview, and metadata.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "issueId": {
+      "type": "integer",
+      "description": "ID of the issue to retrieve"
+    }
+  },
+  "required": ["issueId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{431869BD-73C2-4C47-93FA-74CF0C53B7E0}" name="newsletter_issue_create">
+			<field name="toolName">newsletter_issue_create</field>
+			<field name="description"><![CDATA[Create a new newsletter issue. Requires newsletterId and name. Returns the new issue ID.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "newsletterId": {
+      "type": "integer",
+      "description": "ID of the parent newsletter"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the issue (e.g. 'September 2026')"
+    },
+    "publishDate": {
+      "type": "string",
+      "description": "Publish date in ISO format, e.g. 2026-01-15. Issue is not visible before this date."
+    },
+    "sponsor": {
+      "type": "string",
+      "description": "Cover sponsor text"
+    },
+    "cover": {
+      "type": "string",
+      "description": "HTML cover copy displayed at the top of the issue page"
+    },
+    "overview": {
+      "type": "string",
+      "description": "HTML overview copy displayed in the archive list"
+    },
+    "tagline": {
+      "type": "string",
+      "description": "Cover tagline text"
+    }
+  },
+  "required": ["newsletterId", "name"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{33812EB1-B3ED-40E9-ADAD-D4C30989E0C7}" name="newsletter_issue_update">
+			<field name="toolName">newsletter_issue_update</field>
+			<field name="description"><![CDATA[Update an existing newsletter issue. Provide only the fields you want to change. Supports undo.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "issueId": {
+      "type": "integer",
+      "description": "ID of the issue to update"
+    },
+    "name": {
+      "type": "string",
+      "description": "New name for the issue"
+    },
+    "publishDate": {
+      "type": "string",
+      "description": "New publish date in ISO format"
+    },
+    "cover": {
+      "type": "string",
+      "description": "New HTML cover copy"
+    },
+    "overview": {
+      "type": "string",
+      "description": "New HTML overview for archive page"
+    },
+    "sponsor": {
+      "type": "string",
+      "description": "New cover sponsor text"
+    },
+    "tagline": {
+      "type": "string",
+      "description": "New cover tagline text"
+    },
+    "sortOrder": {
+      "type": "string",
+      "description": "Alpha sort order for issue ordering"
+    }
+  },
+  "required": ["issueId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{706D9556-1029-499F-B8ED-EE4180A392C9}" name="newsletter_issue_delete">
+			<field name="toolName">newsletter_issue_delete</field>
+			<field name="description"><![CDATA[Delete a newsletter issue (soft delete — sets active to false). Supports undo.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "issueId": {
+      "type": "integer",
+      "description": "ID of the issue to delete"
+    }
+  },
+  "required": ["issueId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{253B7CF3-182A-442C-8D68-F4A7055E81AE}" name="newsletter_story_list">
+			<field name="toolName">newsletter_story_list</field>
+			<field name="description"><![CDATA[List stories for a newsletter issue. Returns storyId, name, sortOrder, categoryId, and active status.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "issueId": {
+      "type": "integer",
+      "description": "Filter stories by issue ID"
+    },
+    "pageSize": {
+      "type": "integer",
+      "description": "Number of stories to return (default 50)"
+    },
+    "pageNumber": {
+      "type": "integer",
+      "description": "Page number for pagination (default 1)"
+    }
+  }
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{08014C05-D87D-4FD7-B143-A484E3B4AF6B}" name="newsletter_story_get">
+			<field name="toolName">newsletter_story_get</field>
+			<field name="description"><![CDATA[Get a single newsletter story by ID with full details including overview and body HTML content.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "storyId": {
+      "type": "integer",
+      "description": "ID of the story to retrieve"
+    }
+  },
+  "required": ["storyId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{C8159BE2-9163-4146-96E4-B7850778B380}" name="newsletter_story_create">
+			<field name="toolName">newsletter_story_create</field>
+			<field name="description"><![CDATA[Create a new newsletter story within an issue. Requires issueId and name. Returns the new story ID.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "issueId": {
+      "type": "integer",
+      "description": "ID of the parent issue"
+    },
+    "name": {
+      "type": "string",
+      "description": "Story headline/name"
+    },
+    "overview": {
+      "type": "string",
+      "description": "HTML overview displayed on the newsletter cover under the story link"
+    },
+    "body": {
+      "type": "string",
+      "description": "HTML full story content"
+    },
+    "categoryId": {
+      "type": "integer",
+      "description": "Newsletter category ID"
+    },
+    "sortOrder": {
+      "type": "string",
+      "description": "Sort order string (default 'zzz')"
+    }
+  },
+  "required": ["issueId", "name"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{64AD83D6-0A7C-4390-BF50-0AEBC4D03F06}" name="newsletter_story_update">
+			<field name="toolName">newsletter_story_update</field>
+			<field name="description"><![CDATA[Update an existing newsletter story. Provide only the fields you want to change. Supports undo.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "storyId": {
+      "type": "integer",
+      "description": "ID of the story to update"
+    },
+    "name": {
+      "type": "string",
+      "description": "New headline/name"
+    },
+    "overview": {
+      "type": "string",
+      "description": "New HTML overview"
+    },
+    "body": {
+      "type": "string",
+      "description": "New HTML full story content"
+    },
+    "categoryId": {
+      "type": "integer",
+      "description": "New newsletter category ID"
+    },
+    "sortOrder": {
+      "type": "string",
+      "description": "New sort order string"
+    }
+  },
+  "required": ["storyId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{B3A36CD2-3146-47D8-AFA9-3E4432470526}" name="newsletter_story_delete">
+			<field name="toolName">newsletter_story_delete</field>
+			<field name="description"><![CDATA[Delete a newsletter story (soft delete — sets active to false). Supports undo.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "storyId": {
+      "type": "integer",
+      "description": "ID of the story to delete"
+    }
+  },
+  "required": ["storyId"]
+}]]></field>
+		</record>
+		<record content="MCP Tool Definitions" guid="{B5A5E13C-D428-466B-AED4-FEBCB5510000}" name="newsletter_story_reorder">
+			<field name="toolName">newsletter_story_reorder</field>
+			<field name="description"><![CDATA[Reorder stories within a newsletter issue. Provide story IDs in the desired order. Assigns sequential sortOrder values. Supports undo.]]></field>
+			<field name="addonGuid">{2FDAA479-A707-44B4-8818-CAAA888545F9}</field>
+			<field name="category">Newsletter</field>
+			<field name="inputSchemaJson"><![CDATA[{
+  "type": "object",
+  "properties": {
+    "issueId": {
+      "type": "integer",
+      "description": "ID of the issue containing the stories"
+    },
+    "storyIdOrder": {
+      "type": "string",
+      "description": "Comma-separated story IDs in desired order, e.g. '42,17,23'"
+    }
+  },
+  "required": ["issueId", "storyIdOrder"]
+}]]></field>
+		</record>
 	</Data>
 </Collection>
