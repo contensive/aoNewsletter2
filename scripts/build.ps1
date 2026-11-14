@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 [CmdletBinding()]
 param(
     [ValidateSet('Debug','Release')]
@@ -14,7 +14,7 @@ Import-Module (Join-Path $PSScriptRoot '..\..\Contensive5\scripts\build-addon-co
 $projectRoot = (Resolve-Path "$PSScriptRoot\..").Path
 
 # Display build info
-$version = Get-ContensiveVersion -DeploymentRoot 'C:\Deployments\aoNewsletter2'
+$version = Get-ContensiveVersion -DeploymentRoot 'C:\Deployments\aoNewsletter2' -RepoPath $projectRoot
 Write-Host ""
 Write-Host "========================================"
 Write-Host "  aoNewsletter2 Build"
@@ -70,8 +70,10 @@ switch ($DeployType) {
         Write-Host ""
     }
     default {
-        Write-Host "Press any key to continue or Ctrl+C to cancel..."
-        $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+        if (-not $env:CONTENSIVE_NOPAUSE) {
+            Write-Host "Press any key to continue or Ctrl+C to cancel..."
+            $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+        }
         Write-Host ""
     }
 }
